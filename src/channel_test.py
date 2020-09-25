@@ -1,12 +1,12 @@
 import pytest
 import channel
-from error import InputError
+from error import InputError, AccessError
 
 def test_channel_invite():
     pass
 
 def test_channel_details():
-    assert channel.channel_details(1,1) == {
+    assert channel.channel_details(1, 1) == {
         'name': 'Hayden',
         'owner_members': [
             {
@@ -28,13 +28,73 @@ def test_channel_messages():
     pass
 
 def test_channel_leave():
-    pass
+    # Assumes that channel_invite is working
+    # Assumes that channel_join is working
+    # Assumes that channel_details is working
+
+    token = 1
+    channel_id = 1
+    u_id = 1
+
+    channel.channel_invite(token, channel_id, u_id)   
+    channel.channel_join(token, channel_id)
+
+    # Maybe check that the person join successfully
+    channel.channel_leave(token, channel_id)
+
+    result = channel.channel_details(token, channel_id)
+
+    # Need to change into a for loop
+    assert result['all_members'][0]['u_id'] != u_id
 
 def test_channel_join():
-    pass    
+    # Assumes that channel_invite is working
+    # Assumes that channel_details is working
+
+    token = 1
+    channel_id = 1
+    u_id = 1
+
+    channel.channel_invite(token, channel_id, u_id)   
+    channel.channel_join(token, channel_id)
+    result = channel.channel_details(token, channel_id)
+    assert result['all_members'][0]['u_id'] == u_id
+
 
 def test_channel_addowner():
-    pass
+    # Assumes that channel_invite is working
+    # Assumes that channel_join is working
+    # Assumes that channel_details is working
+    
+    token = 1
+    channel_id = 1
+    u_id = 1
+
+    channel.channel_invite(token, channel_id, u_id)   
+    channel.channel_join(token, channel_id)
+    # Maybe check that the person join successfully
+
+    channel.channel_addowner(token, channel_id, u_id)
+    result = channel.channel_details(token, channel_id)
+    # Need to change into a for loop
+    assert result['owner_members'][0]['u_id'] == u_id
 
 def test_channel_removeowner():
-    pass
+    # Assumes that channel_invite is working
+    # Assumes that channel_join is working
+    # Assumes that channel_addowner is working
+    # Assumes that channel_details is working
+
+    token = 1
+    channel_id = 1
+    u_id = 1
+
+    channel.channel_invite(token, channel_id, u_id)   
+    channel.channel_join(token, channel_id)
+    # Maybe check that the person join successfully
+
+    channel.channel_addowner(token, channel_id, u_id)
+    channel.channel_removeowner(token, channel_id, u_id)
+    result = channel.channel_details(token, channel_id)
+    # Need to change into a for loop
+    assert result['owner_members'][0]['u_id'] != u_id
