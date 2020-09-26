@@ -21,10 +21,15 @@ def test_auth_login_not_registered():
 # Password is not correct
 def test_auth_login_incorrect_password():
     auth.delete_users()
-    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "LASTNAME") == {'u_id': 1, 'token': 1,}
+    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "LASTNAME") == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
     with pytest.raises(InputError) as e:
         assert auth.auth_login("EMAIL@gmail.com", "NOTTHEPASSWORD")
     
+# Password is correct
+def test_auth_login_correct_password():
+    auth.delete_users()
+    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "LASTNAME") == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    assert auth.auth_login("EMAIL@gmail.com", "PASSWORD") == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
 
 ################################################################################
 
@@ -54,7 +59,7 @@ def test_auth_register_password_short():
     
 def test_auth_register_password_correct():
     auth.delete_users()
-    assert auth.auth_register("EMAIL@gmail.com", "WORDSS", "FIRSTNAME", "LASTNAME") == {'u_id': 1, 'token': 1,} # Password is length 6
+    assert auth.auth_register("EMAIL@gmail.com", "WORDSS", "FIRSTNAME", "LASTNAME") == {'u_id': 1, 'token': 'EMAIL@gmail.com',} # Password is length 6
     
 
 ################################################################################
@@ -74,12 +79,12 @@ def test_auth_register_firstname_long():
 
 def test_auth_register_firstname_valid1():
     auth.delete_users()
-    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "A", "LASTNAME") == {'u_id': 1, 'token': 1,} # name_first is length 1
+    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "A", "LASTNAME") == {'u_id': 1, 'token': 'EMAIL@gmail.com',} # name_first is length 1
     
 
 def test_auth_register_firstname_valid2():
     auth.delete_users()
-    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "A"*50, "LASTNAME") == {'u_id': 1, 'token': 1,} # name_first is length 50
+    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "A"*50, "LASTNAME") == {'u_id': 1, 'token': 'EMAIL@gmail.com',} # name_first is length 50
     
 
 ################################################################################
@@ -99,24 +104,25 @@ def test_auth_register_lastname_long():
 
 def test_auth_register_lastname_valid1():
     auth.delete_users()
-    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "A") == {'u_id': 1, 'token': 1,} # name_last is length 1
+    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "A") == {'u_id': 1, 'token': 'EMAIL@gmail.com',} # name_last is length 1
     
 
 def test_auth_register_lastname_valid2():
     auth.delete_users()
-    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "A"*50) == {'u_id': 1, 'token': 1,} # name_last is length 50
+    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "A"*50) == {'u_id': 1, 'token': 'EMAIL@gmail.com',} # name_last is length 50
     
 
 ################################################################################
 
 def test_auth_successful_logout():
     auth.delete_users()
-    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "LASTNAME") == {'u_id': 1, 'token': 1,}
-    assert auth.auth_login("EMAIL@gmail.com", "PASSWORD") == {'u_id': 1, 'token': 1,}
-    assert auth.auth_logout(1) == {'is_success': True,}
+    assert auth.auth_register("EMAIL@gmail.com", "PASSWORD", "FIRSTNAME", "LASTNAME") == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    assert auth.auth_login("EMAIL@gmail.com", "PASSWORD") == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    assert auth.auth_logout("EMAIL@gmail.com") == {'is_success': True,}
     
 
 def test_auth_unsuccessful_logout():
     auth.delete_users()
-    assert auth.auth_logout(1) == {'is_success': False,}
-    
+    assert auth.auth_logout("EMAIL@gmail.com") == {'is_success': False,}
+
+
