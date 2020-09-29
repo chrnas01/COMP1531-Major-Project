@@ -1,12 +1,29 @@
 import pytest
+import auth
 import channel
+import channels
 from error import InputError, AccessError
 
 ########################################################
 
 def test_channel_invite_invalid_channel_id():
-    # Throw InputError 
-    pass
+
+    # Init the variables
+    token = 1
+    channel_id = 1
+    u_id = 2
+
+    # Register the users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung")
+    auth.auth_register("Steven@gmail.com", "password", "Steven", "Luong")
+    
+    # Create a channel
+    # channels.create(token, "EPIC CHANNEL", false)
+
+    # Invite to channel that does not exit
+    with pytest.raises(InputError) as e:
+        assert channel.channel_invite(token, channel_id, u_id)
+
 
 def test_channel_invite_invalid_uid():
     # Throw InputError 
