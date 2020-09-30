@@ -9,58 +9,84 @@ from error import InputError, AccessError
 def test_channel_invite_invalid_channel_id():
 
     # Init the variables
-    token = 1
+    token = "jayden@gmail.com"
     channel_id = 1
     u_id = 2
 
     # Register the users
-    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung")
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
     auth.auth_register("Steven@gmail.com", "password", "Steven", "Luong")
     
-    # Create a channel
-    # channels.create(token, "EPIC CHANNEL", false)
+    # Create a private channel
+    # channels.create(token, "EPIC CHANNEL", False)
 
-    # Invite to channel that does not exit
     with pytest.raises(InputError) as e:
         assert channel.channel_invite(token, channel_id, u_id)
 
 
 def test_channel_invite_invalid_uid():
-    # Throw InputError 
-    pass
+    # Init the variables
+    token = "jayden@gmail.com"
+    channel_id = 1
+    u_id = 99
+
+    # Register the users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    
+    # Create a private channel
+    channels.channels_create(token, "EPIC CHANNEL", False)
+
+    with pytest.raises(InputError) as e:
+        assert channel.channel_invite(token, channel_id, u_id)
 
 def test_channel_invite_invalid_access():
-    # Throw AccessError 
-    pass
+    # Init the variables
+    token = "steven@gmail.com"
+    channel_id = 1
+    u_id = 99
+
+    # Register the users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    auth.auth_register("sam@gmail.com", "password", "Sam", "He") # uid 3
+
+    # Create a private channel as jayden
+    channels.channels_create("jayden@gmail.com", "EPIC CHANNEL", False) # channel_id 1
+
+    # Invite as steven
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_invite(token, channel_id, 3)
 
 ########################################################
 
-def test_channel_invalid_channel():
-    # Throw InputError 
-    pass
+def test_channel_details_invalid_channel_id():
+    # Init the variables
+    token = "jayden@gmail.com"
+    channel_id = 99
 
-def test_channel_invalid_access():
-    # Throw AccessError  
-    pass
+    # Register the users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
 
-# def test_channel_details():
-#     assert channel.channel_details(1, 1) == {
-#         'name': 'Hayden',
-#         'owner_members': [
-#             {
-#                 'u_id': 1,
-#                 'name_first': 'Hayden',
-#                 'name_last': 'Jacobs',
-#             }
-#         ],
-#         'all_members': [
-#             {
-#                 'u_id': 1,
-#                 'name_first': 'Hayden',
-#                 'name_last': 'Jacobs',
-#             }
-#         ],
-#     }
+    # Channel does not exist
+    with pytest.raises(InputError) as e:
+        assert channel.channel_details(token, channel_id)
+
+def test_channel_details_invalid_access():
+    # Init the variables
+    token = "steven@gmail.com"
+    channel_id = 1
+
+    # Register the users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    auth.auth_register("sam@gmail.com", "password", "Sam", "He") # uid 3
+
+    # Create a private channel as jayden
+    channels.channels_create("jayden@gmail.com", "EPIC CHANNEL", False) # channel_id 1
+
+    # Call channel_details with the user that is not in the channel
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_details(token, channel_id)
 
 ########################################################
 
@@ -79,12 +105,38 @@ def test_channel_messages_invalid_access():
 ########################################################
 
 def test_channel_leave_invalid_channel_id():
-    # Throw InputError 
-    pass
+    # Init the variables
+    token = "steven@gmail.com"
+    channel_id = 99
+
+    # Register the users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    auth.auth_register("sam@gmail.com", "password", "Sam", "He") # uid 3
+
+
+    # Call channel_leave to a channel that does not exist
+    with pytest.raises(InputError) as e:
+        assert channel.channel_leave(token, channel_id)
 
 def test_channel_leave_not_already_in_channel():
-    # Throw AccessError 
-    pass
+
+    # Init the variables
+    token = "steven@gmail.com"
+    channel_id = 1
+
+    # Register the users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    auth.auth_register("sam@gmail.com", "password", "Sam", "He") # uid 3
+
+    # Create a private channel as jayden
+    channels.channels_create("jayden@gmail.com", "EPIC CHANNEL", False) # channel_id 1
+
+    # Call channel_leave when the user is not in the channel
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_leave(token, channel_id)
+
 
 # def test_channel_leave():
 #     # Assumes that channel_invite is working
@@ -109,12 +161,32 @@ def test_channel_leave_not_already_in_channel():
 ########################################################
 
 def test_channel_join_invalid_channel_id():
-    # Throw InputError 
-    pass
+    # Init the variables
+    token = "steven@gmail.com"
+    channel_id = 99
+
+    # Register user
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    
+    with pytest.raises(InputError) as e:
+        assert channel.channel_join(token, channel_id)
  
 def test_channel_join_invalid_access():
-    # Throw AccessError  
-    pass
+    # Init the variables
+    token = "steven@gmail.com"
+    channel_id = 1
+
+    # Register user
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    
+    # Create a private channel as jayden
+    channels.channels_create("jayden@gmail.com", "EPIC CHANNEL", False) # channel_id 1
+
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_join(token, channel_id)
+ 
 
 # def test_channel_join():
 #     # Assumes that channel_invite is working
@@ -132,17 +204,52 @@ def test_channel_join_invalid_access():
 ########################################################
 
 def test_channel_addowner_invalid_channel_id():
-    # Throw InputError 
-    pass
+    # Init the variables
+    token = "jayden@gmail.com"
+    channel_id = 99
+
+    # Register user
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    
+    with pytest.raises(InputError) as e:
+        assert channel.channel_addowner(token, channel_id, 2)
 
 
 def test_channel_addowner_already_existing_owner():
-    # Throw InputError 
-    pass
+    # Init the variables
+    token = "jayden@gmail.com"
+    channel_id = 1
+
+    # Register users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    
+    # Create a private channel as jayden
+    channels.channels_create("jayden@gmail.com", "EPIC CHANNEL", False) # channel_id 1
+
+    # Add yourself to the channel
+    with pytest.raises(InputError) as e:
+        assert channel.channel_addowner(token, channel_id, 1)
 
 def test_channel_addowner_not_owner_of_flockr():
-    # Throw AccessError 
-    pass
+    # Init the variables
+    token = "steven@gmail.com"
+    channel_id = 1
+
+    # Register users
+    auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    auth.auth_register("steven@gmail.com", "password", "Steven", "Luong") # uid 2
+    
+    # Create a public channel as jayden
+    channels.channels_create("jayden@gmail.com", "EPIC CHANNEL", True) # channel_id 1
+
+    # Get a user to join the channel
+    channel.channel_join(token, channel_id)
+
+    # Try to your own escalate perms
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_addowner(token, channel_id, 1)
 
 def test_channel_addowner_not_owner_of_channel():
     # Throw AccessError 
