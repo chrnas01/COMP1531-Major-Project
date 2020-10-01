@@ -72,8 +72,8 @@ def auth_register(email, password, name_first, name_last):
     prefix = name_first.lower()
     handle_str = name_last.lower()
 
+    # concatenate
     handle_str = prefix + handle_str
-    # reduced_handle = handle_str[:20]
 
     # Make handle unique
     if handle_str in handle_strs:
@@ -97,7 +97,6 @@ def auth_register(email, password, name_first, name_last):
         'name_last': name_last, 
         'handle_str': handle_str,
     }
-
     all_users.append(new_register)
     
     return {
