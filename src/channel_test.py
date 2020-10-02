@@ -38,6 +38,9 @@ def test_channel_invite_invalid_access():
     with pytest.raises(AccessError) as e:
         assert channel.channel_invite(u2["token"], channel_id, u3["u_id"])
 
+def test_channel_invite_success():
+    pass
+
 ########################################################
 
 def test_channel_details_invalid_channel_id():
@@ -61,6 +64,9 @@ def test_channel_details_invalid_access():
     with pytest.raises(AccessError) as e:
         assert channel.channel_details(u2["token"], channel_id)
 
+def test_channel_details_success():
+    pass
+
 ########################################################
 
 def test_channel_messages_invalid_channel_id():
@@ -78,6 +84,12 @@ def test_channel_messages_invalid_start():
 def test_channel_messages_invalid_access():
     # Throw AccessError 
     pass
+
+
+def test_channel_messages_success():
+    # Throw AccessError 
+    pass
+
 
 ########################################################
 
@@ -102,6 +114,9 @@ def test_channel_leave_not_already_in_channel():
     with pytest.raises(AccessError) as e:
         assert channel.channel_leave(u2["token"], channel_id)
 
+def test_channel_leave_success():
+    pass
+
 ########################################################
 
 def test_channel_join_invalid_channel_id():
@@ -121,7 +136,10 @@ def test_channel_join_invalid_access():
 
     with pytest.raises(AccessError) as e:
         assert channel.channel_join(u2["token"], channel_id)
- 
+
+def test_channel_join_success():
+    pass
+
 ########################################################
 
 def test_channel_addowner_invalid_channel_id():
@@ -174,6 +192,9 @@ def test_channel_addowner_not_owner_of_channel():
     with pytest.raises(AccessError) as e:
         assert channel.channel_addowner(u2["token"], channel_id, u3["u_id"])
 
+def test_channel_addowner_success():
+    pass
+
 ########################################################
 
 def test_channel_removeowner_invalid_channel_id():
@@ -211,5 +232,8 @@ def test_channel_removeowner_not_owner_of_flockr():
 
     with pytest.raises(AccessError) as e:
         assert channel.channel_removeowner(u2["token"], channel_id, u1["u_id"])
+
+def test_channel_removeowner_success():
+    pass
 
 ########################################################
