@@ -1,34 +1,38 @@
 from error import InputError
+import auth 
 
-all_channels =[]
+data = {
+    'channels': [
+
+    ]   
+}
 
 # Provide a list of all channels 
 # (and their associated details) that the authorised user is part of
 # Return type: { channels }
 def channels_list(token):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+    # User of interest
+    user_uid = token_to_uid(token)
+    # Total number of channels  
+    total_channels = len(data['channels'])
+    # Output 
+    user_channels = {
+                'channels': [],
+            }
+    
+     for i in range(total_channels):
+        if user_uid in data['channels'][i]['all_members']
+            user_channels['channels'].append(data['channels'][i])
+            
+    return user_channels
 
 
 # Provide a list of all channels (and their associated details)
 # Return type { channels }
 def channels_listall(token):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
-    }
+    return data
 
-
+# Assumption channel name cannot be left blank
 # Creates a new channel with that name that is either 
 # a public or private channel
 # Input Error: When name is more than 20 characters long 
@@ -38,23 +42,35 @@ def channels_create(token, name, is_public):
     if len(name) > 20 
         raise InputError('Channel name is greater than 20 characters long - Cannot create channel')
     
-    # Determine channel_id: 
-    # We want to access the global varible all_channels to access the last channel_id and increment by 1 
-    if not all_channels: 
+    if not data['channels']: 
         channel_id = 1 
     else:
-        channel_id = len(all_channels)
+        channel_id = len(data['channels'])
 
+    # Assumtpion: When a channel is created the creator becomes owner by default 
     new_channel = {
-            'owner_token': token 
-            'channel_name': name
-            'channel_id': channel_id
-            'privacy_status': is_public 
-    }
+            'channel_name': name,  
+            'channel_id': channel_id,
+            'is_public': is_public,
+            'owner_members': [token_to_uid(token),],
+            'all_members': [],
+    }   
 
-    all_channels.append(new_channel)
-
-
+    data['channels'].append(new_channel)
+   
     return {
         'channel_id': channel_id,
     }
+
+
+
+def token_to_uid(token):
+    for user in all_users:
+        if user['token'] == token:
+            return user['u_id']
+    else:
+        return -1 
+
+def delete_data():
+    data['channels'].clear()
+    return
