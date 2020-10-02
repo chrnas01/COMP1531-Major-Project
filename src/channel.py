@@ -1,6 +1,54 @@
+import pytest
+import auth
+from channels import data
+from error import InputError, AccessError
+
+# data = {
+#     'channels': [
+#         {
+#                 'channel_name': "channel 1"
+#                 'channel_id': 1               # always one number behind the index
+#                 'privacy_status': true 
+
+#                 'owner_members': [
+#                     1,
+#                 ],
+#                 'all_members': [
+#                     1,
+#                 ],
+#         },
+
+#         {
+#                 'channel_name': "channel 2"
+#                 'channel_id': 2               # always one number behind the index
+#                 'privacy_status': true 
+
+#                 'owner_members': [
+#                     1,
+#                 ],
+#                 'all_members': [
+#                     1,
+#                 ],
+#         },
+#     ],
+# }
+
+
 def channel_invite(token, channel_id, u_id):
-    return {
-    }
+    pass
+    # # Check for channel_id does not refer to a valid
+    # if channel_id > len(data['channels'])
+    #     raise InputError("channel_id does not refer to a valid")
+
+    # # Check for u_id does not refer to a valid user
+
+    # # Check for when the authorised user is not already a member of the channel
+
+    # data['channels'][channel_id - 1]['all_members'].append(u_id)
+    
+
+
+
 
 def channel_details(token, channel_id):
     return {
