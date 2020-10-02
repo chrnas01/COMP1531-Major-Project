@@ -4,82 +4,93 @@ import channel
 import channels 
 from error import InputError         
 
-    ### Functions to be seperated out and file to be formatted and styled correctly ###
-    ## Include auth.delete_users() to ensure more accurate testing. 
-def test_channels_list(): 
+# Assumtiopns for these tests: 
+    # The user is registered and logged in with a valid token. 
+    # The user cannot join channels with invalid access i.e. can join a private channel if they have been invited only.
+    # The user can successfully join and leave channels.  
 
-    # Assume user is registered and logged in:  [For Tests 1 - 4]
-    auth.auth_register("chris@gmai.com, "password", "Chris", "Nassif")
-    auth.auth_login("chris@gmail.com, "password")
+###################################################################################################
 
-    # Test 1: 
-    channels.channels_create("chris@gmail.com", "Channel_1", True) == {'channel_id': 1,}
-    channel.channel_join()
+# Successfuly provides a list of all channels that the authorized user is part of: 
+def test_channels_list_successful():
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif") 
+    u2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
 
+    # Created a private and a public channel 
+    c1 = channels.channels_create(u1['token'], "Channel_1", True) 
+    c2 = channels.channels_create(u2['token'], "Channel_2", False)
 
+    # Shouldnt include channel 2 as user1 is not in this channel 
+    assert channels_list(u1['token']) == [{'channel_id': c1['channel_id'], 'name': "Channel_1"}]
 
-    # Test 1: Unsuccessful for unregistered user 
-    with pytest raises(InputError) as e: 
-        assert channels.channels_list("invaliduser@gmail.com") 
+# User doesnt belong to any channels
+def test_channels_list_no_channels: 
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif") 
+    u2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
 
-    # Test 2: Registered users that dont belong to a channel should returh an empty dictionary 
-    auth.auth_register("JohnSmith@gmai.com, "password", "John", "Smith")
-    assert channels.channels_list("JohnSmith@gmail.com") == {}
-
-    # Test 3:
-
-def test_channels_listall(): 
-
-    # Assume user is registered and logged in
-    auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
-    auth.auth_login("chris@gmail.com", "password")
-
-    # Assume there is an existing private and public channel. 
-    channels.channels_create("chris@gmail.com", "Channel_1", True) == {'channel_id': 1,}
-    channels.channels_create("chris@gmail.com", "Channel_2", False) == {'channel_id': 2,}
+    # Only user 1 creates channel 
+    c1 = channels.channels_create(u1['token'], "Channel_1", True) 
     
-    # Test 1:  Successful for registered and logged in user 
-    assert channels.channels_listall("chris@gmail.com") == 'channels': [{'channel_id': 1,'name': 'Channel_1',}, 
-    {'channel_id': 2,'name': 'Channel_2',}]
+    # User 2 belongs to no channels hence an empty list is returned 
+    assert channels_list(u2['token']) == []
 
-    # Test 2: Unsuccessful for unregistered user 
-    with pytest.raises(InputError) as e: 
-        assert channels.channels_listall("unregistered@gmail.com")
+
+###############################################################################################################################
+
+# Successfully provides a list of all channels and their associated details 
+def test_channels_listall_successful(): 
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
+    u2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
+
+    # Created a private and a public channel 
+    c1 = channels.channels_create(u1['token'], "Channel_1", True) 
+    c2 = channels.channels_create(u2['token'], "Channel_2", False)
     
-   
-def test_channels_create(): 
+    assert channels.channels_listall(u1['token']) == [{'channel_id': c1['channel_id'], 'name': "Channel_1"}, {'channel_id': c2['channel_id'], 'name': "Channel_2"}] 
 
+# If there are no existing channels channels_listall() should return an empty list 
+def test_channels_listall_no_existing_channels():
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
+    assert channels.channels_listall(u1['token']) == []
+ 
+################################################################################################################################
 
-    # Assume user is registered and logged in:  [For Tests 1 - 4]
-    auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
-    auth.auth_login("chris@gmail.com", "password")
-    # The token "chris@gmail.com is valid" 
-
-    # Test 1: Public channel name is greater than 20 characters long: 
+# Public channel name is greather than 20 charcters long 
+def test_channels_create_invalid_channel_name1(): 
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
     with pytest.raises(InputError) as e:
-        assert channels.channels_create("chris@gmail.com", "ChannelNameGreaterthan20characters", True) 
+        assert channels.channels_create(u1['token'], "ChannelNameGreaterthan20characters", True)            # For Public Channel. 
+
+# Private channel name is greather than 20 characters long   
+def test_channels_create_invalid_channel_name2():
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
+    with pytest.raises(InputError) as e:
+        assert channels.channels_create(u1['token'], "ChannelNameGreaterthan20characters", False)           # For Private Channel. 
+
+# Public channel is successfully created 
+def test_channels_create_successful_public():
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
+    assert channels.channels_create(u1['token'], "ChannelName", True) == {'channel_id': 1}                  
     
-    # Test 2: Private channel name is greather than 20 characterss long: 
-    with pytest.raises(InputError) as e: 
-        assert channels.channels_create("chris@gmai.com", "ChannelNameGreaterthan20characters", False) 
-
-    # Test 3: Successfully creates Public Channel
-    assert channels.channels_create("chris@gmail.com", "ChannelName", True) == {'channel_id': 1}
-
-    # Tets 4: Successfuly creates Private Channel 
-    assert channels.channels_create(chris@gmail.com, "ChannelName", False) == {'channel_id': 1}
-
-    # Test 5: Unregistered/ Invalid user attempts to create channel 
-    ######## For Public 
-                ### Use auth.delete_users() function for better testing ###
+# Private channel is successfully created 
+def test_channels_create_successful_private():
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
+    assert channels.channels_create(u1['token'], "ChannelName", False) == {'channel_id': 1}   
     
-    with pytest.raises(InputError) as e: 
-        assert channels.channels_create("unregistered@gmail.com", "ChannelName", True)
-    ######## For Private
-    with pytest.raises(InputError) as e: 
-        assert channels.channels_create("unregistered@gmail.com", "ChannelName", False)
-
-    # Test 6: Channel name already exists 
+# Channel name already exists 
+def test_channels_create_name_exists():
+    auth.delete_users()
+    u1 = auth.auth_register("chris@gmai.com", "password", "Chris", "Nassif")
+    u2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
     
+    channels.channels_create(u1['token'], "ChannelName", True)
     with pytest.raises(InputError) as e: 
-        assert channels.channels_create("unregistered@gmail.com", "ChannelName", False)
+        assert channels.channels_create(u2['token'], "ChannelName", True)
