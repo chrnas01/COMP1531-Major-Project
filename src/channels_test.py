@@ -81,6 +81,13 @@ def test_channels_create_invalid_channel_name2():
     with pytest.raises(InputError) as e:
         assert channels.channels_create(user1['token'], "ChannelNameGreaterthan20characters", False)           # For Private Channel. 
 
+# Boundary Test: Channel name is exactly 20 characters long 
+def test_channels_create_20char_channel_name:
+    auth.delete_users()
+    # Include clear() function to clear channels 
+    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
+    assert channels.channels_create(user1['token'], 20*"a", True) == {'channel_id': 1}  
+
 # Public channel is successfully created 
 def test_channels_create_successful_public():
     auth.delete_users()
