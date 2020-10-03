@@ -1,3 +1,4 @@
+
 Assumptions: 
 
 Authentication:
@@ -11,3 +12,6 @@ Authentication:
     - handle_str is the concatenation of the firstname and lastname, but to be made unqiue, it will be allocated a id number added as a suffix within the 20 character limit
 - u_id
     - Begins on u_id 1 (assumed from starter code provided)
+
+Channel:
+    - You cannot remove owner of yourself if you are the last owner in the channel
