@@ -28,16 +28,16 @@ def test_channels_list_successful():
     channel2 = channels.channels_create(user2['token'], "Channel_2", False)
 
     # Shouldn't include channel 2 as user1 is not in this channel 
-    assert channels_list(user1['token']) == {
-                                            'channel': [ 
+    assert channels.channels_list(user1['token']) == {
+                                            'channels': [ 
                                                 {
                                                 'channel_name': 'Channel_1',  
                                                 'channel_id': channel1['channel_id'],
                                                 'is_public': True,
                                                 'owner_members': [user1['u_id'],],
-                                                'all_members': [],
-                                                }
-                                            ]
+                                                'all_members': [user1['u_id'],],
+                                                },
+                                            ],
                                         }
 
 # User doesnt belong to any channels
@@ -68,22 +68,22 @@ def test_channels_listall_successful():
     channel2 = channels.channels_create(user2['token'], "Channel_2", False)
     
     assert channels.channels_listall(user1['token']) == {
-                                            'channel': [ 
+                                            'channels': [ 
                                                 {
                                                 'channel_name': 'Channel_1',  
                                                 'channel_id': channel1['channel_id'],
                                                 'is_public': True,
                                                 'owner_members': [user1['u_id'],],
-                                                'all_members': [],
+                                                'all_members': [user1['u_id'],],
                                                 },
                                                 {
                                                 'channel_name': 'Channel_2',  
                                                 'channel_id': channel2['channel_id'],
                                                 'is_public': False,
                                                 'owner_members': [user2['u_id'],],
-                                                'all_members': [],
+                                                'all_members': [user2['u_id'],],
                                                 },
-                                            ]
+                                            ],
                                         }
 
 # If there are no existing channels channels_listall() should return an empty list 
