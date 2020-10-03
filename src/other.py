@@ -1,18 +1,12 @@
+import auth
+import channels
+
 def clear():
-    pass
+    auth.delete_users()
+    channels.delete_data()
 
 def users_all(token):
-    return {
-        'users': [
-            {
-                'u_id': 1,
-                'email': 'cs1531@cse.unsw.edu.au',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'hjacobs',
-            },
-        ],
-    }
+    return auth.all_users
 
 def search(token, query_str):
     return {
