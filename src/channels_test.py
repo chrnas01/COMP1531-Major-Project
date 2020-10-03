@@ -40,6 +40,38 @@ def test_channels_list_successful():
                                             ],
                                         }
 
+# Successfuly provides a list of all channels that the authorized user is part of: 
+def test_channels_list_successful_two_channels():
+    channels.delete_data()
+    auth.delete_users()
+    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
+
+    # Created a private and a public channel 
+    channel1 = channels.channels_create(user1['token'], "Channel_1", True) 
+    channel2 = channels.channels_create(user1['token'], "Channel_2", False)
+    
+    assert channels.channels_listall(user1['token']) == {
+                                            'channels': [ 
+                                                {
+                                                'channel_name': 'Channel_1',  
+                                                'channel_id': channel1['channel_id'],
+                                                'is_public': True,
+                                                'owner_members': [user1['u_id'],],
+                                                'all_members': [user1['u_id'],],
+                                                },
+                                                {
+                                                'channel_name': 'Channel_2',  
+                                                'channel_id': channel2['channel_id'],
+                                                'is_public': False,
+                                                'owner_members': [user1['u_id'],],
+                                                'all_members': [user1['u_id'],],
+                                                },
+                                            ],
+                                        }
+    
+
+
+
 # User doesnt belong to any channels
 def test_channels_list_no_channels(): 
     channels.delete_data()
