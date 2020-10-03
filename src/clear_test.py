@@ -24,4 +24,4 @@ def test_channel_clear_1():
     channels.channels_create(auth.all_users[0]['token'], 'test_channel', True)
     other.clear()
     assert bool(auth.all_users) == False
-    assert bool(channels.data) == False
+    assert bool(channels.data['channels']) == False
