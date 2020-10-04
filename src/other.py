@@ -1,5 +1,9 @@
+import auth
+import channel
+import channels
+
 def clear():
-    pass
+    auth.delete_users()
 
 def users_all(token):
     return {
