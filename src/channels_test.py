@@ -4,14 +4,6 @@ import channel
 import channels 
 from error import InputError         
 
-# Assumptions for these tests: (Will also be included in Assumptions document)
-    # The user is registered and logged in with a valid token. 
-    # The user cannot join channels with invalid access i.e. can join a private channel if they have been invited only.
-    # The user can successfully join and leave channels.
-
-    # channel_create Assumptions:
-    # An InputError will be made and a channel will not be made if the channel name already exists, is left blank
-    # or is greather than 20 characters long. 
 
 # Tests for channels_list() function. 
 ################################################################################################################################
@@ -69,10 +61,7 @@ def test_channels_list_successful_two_channels():
                                             ],
                                         }
     
-
-
-
-# User doesnt belong to any channels
+# User doesn't belong to any channels
 def test_channels_list_no_channels(): 
     channels.delete_data()
     auth.delete_users()
@@ -129,7 +118,7 @@ def test_channels_listall_no_existing_channels():
 # Tests for channels_create() function.
 ################################################################################################################################
 
-# Public channel name is greather than 20 charcters long 
+# Public channel name is greater than 20 charcters long 
 def test_channels_create_invalid_channel_name1(): 
     channels.delete_data()
     auth.delete_users()
@@ -137,7 +126,7 @@ def test_channels_create_invalid_channel_name1():
     with pytest.raises(InputError) as e:
         assert channels.channels_create(user1['token'], "ChannelNameGreaterthan20characters", True)            # For Public Channel. 
 
-# Private channel name is greather than 20 characters long   
+# Private channel name is greater than 20 characters long   
 def test_channels_create_invalid_channel_name2():
     channels.delete_data()
     auth.delete_users()
