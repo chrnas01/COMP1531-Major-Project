@@ -1,3 +1,4 @@
+
 Assumptions: 
 
 Authentication:
@@ -11,3 +12,13 @@ Authentication:
     - handle_str is the concatenation of the firstname and lastname, but to be made unqiue, it will be allocated a id number added as a suffix within the 20 character limit
 - u_id
     - Begins on u_id 1 (assumed from starter code provided)
+    - u_id 1 is the flockr owner (global owner)
+    - u_id 1 is the only flockr owner (global owner)
+
+Channel:
+    - You can remove your own ownership if you are the last channel owner
+    - Channels can have no channel owners
+    - Channels can have no members
+    - channel_addowner will raise an input error if u_id is invalid
+    - channel_removeowner will raise an input error if u_id is invalid
+    - Flockr owner needs to be in the channel before they can add or remove owners in the channel
