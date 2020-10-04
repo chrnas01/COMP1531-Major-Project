@@ -6,7 +6,7 @@ import other
 # that the authorised user is part of:
 def channels_list(token):
     # User of interest
-    user_uid = token_to_uid(token)
+    user_uid = other.token_to_uid(token)
     # Total number of channels  
     total_channels = len(other.data['channels'])
     # Output (Mimics data stucture already put in place)
@@ -21,7 +21,7 @@ def channels_list(token):
 
 # Provide a list of all channels (and their associated details)
 def channels_listall(token):
-    # Simply return data strcture which stores all channel information. 
+    # Simply returns data strcture which stores all channels information.
     return other.data['channels']
 
 # Creates a new channel with that name that is either 
@@ -36,7 +36,7 @@ def channels_create(token, name, is_public):
         raise InputError('Field, "Channel name" left blank - Cannot create channel')
     # Name cannot already exist 
     total_channels = len(other.data['channels'])
-    user_uid = token_to_uid(token)
+    user_uid = other.token_to_uid(token)
     for i in range(total_channels):
         if name in other.data['channels'][i]['channel_name']:
             raise InputError('Channel name already exists - Cannot create channel')
@@ -47,14 +47,12 @@ def channels_create(token, name, is_public):
     else:
         channel_id = len(other.data['channels'])
 
-    # Assumtpion: When a channel is created the creator becomes owner by default 
-    # (Will be added to assumptions)
     new_channel = {
             'channel_name': name,  
             'channel_id': channel_id,
             'is_public': is_public,
-            'owner_members': [token_to_uid(token),],
-            'all_members': [token_to_uid(token),],
+            'owner_members': [other.token_to_uid(token),],
+            'all_members': [other.token_to_uid(token),],
     }   
 
     other.data['channels'].append(new_channel)
@@ -62,11 +60,3 @@ def channels_create(token, name, is_public):
     return {
         'channel_id': channel_id,
     }
-
-# Coverts the users token to a valid user_id 
-def token_to_uid(token):
-    for user in other.data['users']:
-        if user['token'] == token:
-            return user['u_id']
-    else:
-        return -1 

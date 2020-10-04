@@ -3,13 +3,6 @@ from auth import auth_register
 from channels import channels_create
 from error import InputError, AccessError
 import other
-        
-def token_to_uid(token):
-    for user in other.data['users']:
-        if user['token'] == token:
-            return user['u_id']
-    else:
-        return -1 
 
 def valid_user(u_id):
     for user in other.data['users']:
@@ -24,7 +17,7 @@ def channel_invite(token, channel_id, u_id):
         raise InputError("channel_id does not refer to a valid")
 
     # Check if token user exists
-    if not valid_user(token_to_uid(token)): 
+    if not valid_user(other.token_to_uid(token)): 
         raise InputError("token does not refer to a valid user")
 
     # Check if user exists
@@ -32,7 +25,7 @@ def channel_invite(token, channel_id, u_id):
         raise InputError("u_id does not refer to a valid user")
        
     # Check that the user is a member of the channel
-    if token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
+    if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
         raise AccessError("the authorised user is not already a member of the channel")
          
     # add the user the the channel
@@ -46,7 +39,7 @@ def channel_details(token, channel_id):
         raise InputError("Channel ID is not a valid channel")
 
     # Check that the user is a member of the channel
-    if token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
+    if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
         raise AccessError("Authorised user is not a member of channel with channel_id")
 
     name = other.data['channels'][channel_id - 1]['channel_name']
@@ -97,7 +90,7 @@ def channel_messages(token, channel_id, start):
         raise InputError("Start is greater than the total number of messages in the channel")
 
     # Check that the user is a member of the channel
-    if token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
+    if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
         raise AccessError("Authorised user is not a member of channel with channel_id")    
 
     end = start + 50
@@ -122,13 +115,13 @@ def channel_leave(token, channel_id):
         raise InputError("Channel ID is not a valid channel")
 
     # Check that the user is a member of the channel
-    if token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
+    if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
         raise AccessError("Authorised user is not a member of channel with channel_id")
 
-    other.data['channels'][channel_id - 1]['all_members'].remove(token_to_uid(token))
+    other.data['channels'][channel_id - 1]['all_members'].remove(other.token_to_uid(token))
 
-    if token_to_uid(token) in other.data['channels'][channel_id - 1]['owner_members']:
-        other.data['channels'][channel_id - 1]['owner_members'].remove(token_to_uid(token))
+    if other.token_to_uid(token) in other.data['channels'][channel_id - 1]['owner_members']:
+        other.data['channels'][channel_id - 1]['owner_members'].remove(other.token_to_uid(token))
 
 def channel_join(token, channel_id):
     # Check for channel_id exists
@@ -136,11 +129,11 @@ def channel_join(token, channel_id):
         raise InputError("Channel ID is not a valid channel")
     
     # for not global owner(flockr owner)
-    if token_to_uid(token) != 1:
+    if other.token_to_uid(token) != 1:
         if other.data['channels'][channel_id - 1]['is_public'] == False:
             raise AccessError("channel_id refers to a channel that is private")
 
-    other.data['channels'][channel_id - 1]['all_members'].append(token_to_uid(token))
+    other.data['channels'][channel_id - 1]['all_members'].append(other.token_to_uid(token))
     
     # remove duplicates
     other.data['channels'][channel_id - 1]['all_members'] = list(set(other.data['channels'][channel_id - 1]['all_members']))
@@ -161,8 +154,8 @@ def channel_addowner(token, channel_id, u_id):
         raise InputError("When user with user id u_id is already an owner of the channel")
 
     # Check for not flockr owner and a member
-    if token_to_uid(token) != 1:
-        if token_to_uid(token) not in other.data['channels'][channel_id - 1]['owner_members']:
+    if other.token_to_uid(token) != 1:
+        if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['owner_members']:
             raise AccessError("when the authorised user is not an owner of the flockr, or an owner of this channel")
 
     other.data['channels'][channel_id - 1]['owner_members'].append(u_id)
@@ -186,8 +179,8 @@ def channel_removeowner(token, channel_id, u_id):
         raise InputError("When user with user id u_id is not an owner of the channel")
 
     # Check for not flockr owner and a member
-    if token_to_uid(token) != 1:
-        if token_to_uid(token) not in other.data['channels'][channel_id - 1]['owner_members']:
+    if other.token_to_uid(token) != 1:
+        if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['owner_members']:
             raise AccessError("when the authorised user is not an owner of the flockr, or an owner of this channel")
 
     other.data['channels'][channel_id - 1]['owner_members'].remove(u_id)

@@ -26,3 +26,11 @@ def search(token, query_str):
             }
         ],
     }
+
+# Coverts the users token to a valid user_id 
+def token_to_uid(token):
+    for user in data['users']:
+        if user['token'] == token:
+            return user['u_id']
+    else:
+        return -1 
