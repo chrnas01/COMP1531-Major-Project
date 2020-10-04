@@ -10,13 +10,11 @@ def channels_list(token):
     # Total number of channels  
     total_channels = len(other.data['channels'])
     # Output (Mimics data stucture already put in place)
-    user_channels = {
-                'channels': [],
-            }
+    user_channels = []
     
     for i in range(total_channels):
         if user_uid in other.data['channels'][i]['all_members']:
-            user_channels['channels'].append(other.data['channels'][i])
+            user_channels.append(other.data['channels'][i])
             
     return user_channels
 
@@ -24,7 +22,7 @@ def channels_list(token):
 # Provide a list of all channels (and their associated details)
 def channels_listall(token):
     # Simply return data strcture which stores all channel information. 
-    return other.data
+    return other.data['channels']
 
 # Creates a new channel with that name that is either 
 # a public or private channel
