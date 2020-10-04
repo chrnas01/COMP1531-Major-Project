@@ -1,12 +1,19 @@
 import auth
 import channels
 
+data = {
+    'users': [],
+    'channels': [],
+    'messages': [],
+}
+
 def clear():
-    auth.delete_users()
-    channels.delete_data()
+    data['users'].clear()
+    data['channels'].clear()
+    data['messages'].clear()
 
 def users_all(token):
-    return auth.all_users
+    return data['users']
 
 def search(token, query_str):
     return {

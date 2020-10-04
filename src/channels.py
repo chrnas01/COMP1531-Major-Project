@@ -1,13 +1,6 @@
 from error import InputError
 import auth
-
-# Data structure to store all channels and their associated information. 
-# Will be used to store users and other data in later iterations. 
-data = {
-    'channels': [
-
-    ]   
-}
+import other
 
 # Provide a list of all channels (and their associated details) 
 # that the authorised user is part of:
@@ -15,15 +8,15 @@ def channels_list(token):
     # User of interest
     user_uid = token_to_uid(token)
     # Total number of channels  
-    total_channels = len(data['channels'])
+    total_channels = len(other.data['channels'])
     # Output (Mimics data stucture already put in place)
     user_channels = {
                 'channels': [],
             }
     
     for i in range(total_channels):
-        if user_uid in data['channels'][i]['all_members']:
-            user_channels['channels'].append(data['channels'][i])
+        if user_uid in other.data['channels'][i]['all_members']:
+            user_channels['channels'].append(other.data['channels'][i])
             
     return user_channels
 
@@ -31,7 +24,7 @@ def channels_list(token):
 # Provide a list of all channels (and their associated details)
 def channels_listall(token):
     # Simply return data strcture which stores all channel information. 
-    return data
+    return other.data
 
 # Creates a new channel with that name that is either 
 # a public or private channel
@@ -44,17 +37,17 @@ def channels_create(token, name, is_public):
     if len(name) == 0:
         raise InputError('Field, "Channel name" left blank - Cannot create channel')
     # Name cannot already exist 
-    total_channels = len(data['channels'])
+    total_channels = len(other.data['channels'])
     user_uid = token_to_uid(token)
     for i in range(total_channels):
-        if name in data['channels'][i]['channel_name']:
+        if name in other.data['channels'][i]['channel_name']:
             raise InputError('Channel name already exists - Cannot create channel')
     
     # Testing if this is the first channel being created. 
-    if not data['channels']: 
+    if not other.data['channels']: 
         channel_id = 1 
     else:
-        channel_id = len(data['channels'])
+        channel_id = len(other.data['channels'])
 
     # Assumtpion: When a channel is created the creator becomes owner by default 
     # (Will be added to assumptions)
@@ -66,7 +59,7 @@ def channels_create(token, name, is_public):
             'all_members': [token_to_uid(token),],
     }   
 
-    data['channels'].append(new_channel)
+    other.data['channels'].append(new_channel)
    
     return {
         'channel_id': channel_id,
@@ -74,14 +67,8 @@ def channels_create(token, name, is_public):
 
 # Coverts the users token to a valid user_id 
 def token_to_uid(token):
-    for user in auth.all_users:
+    for user in other.data['users']:
         if user['token'] == token:
             return user['u_id']
     else:
         return -1 
-
-# Clears data structure
-# For testing purposes
-def delete_data():
-    data['channels'].clear()
-    return
