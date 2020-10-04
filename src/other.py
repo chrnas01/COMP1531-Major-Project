@@ -1,22 +1,19 @@
 import auth
-import channel
 import channels
 
+data = {
+    'users': [],
+    'channels': [],
+    'messages': [],
+}
+
 def clear():
-    auth.delete_users()
+    data['users'].clear()
+    data['channels'].clear()
+    data['messages'].clear()
 
 def users_all(token):
-    return {
-        'users': [
-            {
-                'u_id': 1,
-                'email': 'cs1531@cse.unsw.edu.au',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'hjacobs',
-            },
-        ],
-    }
+    return data['users']
 
 def search(token, query_str):
     return {
@@ -29,3 +26,11 @@ def search(token, query_str):
             }
         ],
     }
+
+# Coverts the users token to a valid user_id 
+def token_to_uid(token):
+    for user in data['users']:
+        if user['token'] == token:
+            return user['u_id']
+    else:
+        return -1 

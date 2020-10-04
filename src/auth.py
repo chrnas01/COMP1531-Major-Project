@@ -1,8 +1,7 @@
 import re
 from error import InputError
+import other
 
-all_users = []
-handle_strs = {}
 
 # input email and password
 def auth_login(email, password):
@@ -30,14 +29,10 @@ def auth_login(email, password):
 
 # provided a token, determines if logout is_success
 def auth_logout(token):
-    for user in all_users:
+    for user in other.data['users']:
         if user['token'] == token:
-            return {
-                'is_success': True,
-            }
-    return {
-        'is_success': False,
-    }
+            return True
+    return False
 
 # provided email, password, name_first, name_last
 # validate no input error was made
@@ -65,29 +60,25 @@ def auth_register(email, password, name_first, name_last):
         raise InputError('Email is already registered - Cannot register')
 
     # register
-    u_id = len(all_users) + 1 # first person u_id 1, second 2,...
+    u_id = len(other.data['users']) + 1 # first person u_id 1, second 2,...
     token = email # iteration 1, token is email
 
-    # Determine handle_str
-    prefix = name_first.lower()
-    handle_str = name_last.lower()
-
     # concatenate
-    handle_str = prefix + handle_str
+    handle_str = name_first.lower() + name_last.lower()
+    handle_str = handle_str[:20]
+    handle_exists = False
 
     # Make handle unique
-    if handle_str in handle_strs:
-        handle_id = handle_strs[handle_str]
-        handle_strs[handle_str] += 1
-    else:
-        handle_id = ""
-        handle_strs[handle_str] = 1
+    if other.data['users']:
+        for user in other.data['users']:
+            handle = user.get('handle_str')
+            #check if handle exists
+            if handle_str == handle:
+                handle_exists = True
     
-    # Determine length to cut from end to replace with id to make it unqiue 
-    suffix_length = len(str(handle_id))
-    reduced_handle = handle_str[:20 - suffix_length]
-    handle_str = reduced_handle + str(handle_id)
-    
+    if handle_exists:
+        handle_str = handle_str + str(u_id)
+
     new_register = {
         'u_id': u_id, 
         'token': token, 
@@ -97,7 +88,8 @@ def auth_register(email, password, name_first, name_last):
         'name_last': name_last, 
         'handle_str': handle_str,
     }
-    all_users.append(new_register)
+
+    other.data['users'].append(new_register)
     
     return {
         'u_id': u_id,
@@ -106,7 +98,7 @@ def auth_register(email, password, name_first, name_last):
 
 # given an email, check if it is already registered
 def is_email_registered(email):
-    for user in all_users:
+    for user in other.data['users']:
         if user['email'] == email:
             return user['u_id']
     return False
@@ -114,12 +106,6 @@ def is_email_registered(email):
 # given u_id and password, check if they match the user
 def is_password_correct(u_id, password):
     # index 0 holds u_id 1
-    if all_users[u_id - 1]['password'] == password:
+    if other.data['users'][u_id - 1]['password'] == password:
         return True
     return False
-
-# clear data stored
-def delete_users():
-    all_users.clear()
-    handle_strs.clear()
-    return

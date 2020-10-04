@@ -11,12 +11,11 @@ import other
 def setup():
     # Clear database
     other.clear()
-    channels.delete_data()
 
     # Setup users
-    u1 = auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
-    u2 = auth.auth_register("Steven@gmail.com", "password", "Steven", "Luong")
-    u3 = auth.auth_register("sam@gmail.com", "password", "Sam", "He") 
+    u1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
+    u2 = auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong')
+    u3 = auth.auth_register('sam@gmail.com', 'password', 'Sam', 'He') 
     
     return u1, u2, u3
 
@@ -27,40 +26,40 @@ def test_channel_invite_invalid_channel_id(setup):
     u1, u2, u3 = setup
     
     with pytest.raises(InputError) as e:
-        assert channel.channel_invite(u1["token"], 99, u2["u_id"])
+        assert channel.channel_invite(u1['token'], 99, u2['u_id'])
 
 def test_channel_invite_invalid_uid(setup):
     # Setup pytest
     u1, u2, u3 = setup
     
     # Create a private channel
-    channel_data = channels.channels_create(u1["token"], "test channel", False)
+    channel_data = channels.channels_create(u1['token'], 'test channel', False)
 
     with pytest.raises(InputError) as e:
-        assert channel.channel_invite(u1["token"], channel_data["channel_id"], 99)
+        assert channel.channel_invite(u1['token'], channel_data, 99)
 
 def test_channel_invite_invalid_access(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', False) # channel_id 1
 
     # Invite sam as steven
     with pytest.raises(AccessError) as e:
-        assert channel.channel_invite(u2["token"], channel_data["channel_id"], u3["u_id"])
+        assert channel.channel_invite(u2['token'], channel_data, u3['u_id'])
 
 def test_channel_invite_success(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Successful channel invite
-    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_invite(u1['token'], channel_data, u2['u_id'])
 
-    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+    result = channel.channel_details(u1['token'], channel_data)
 
     expected_result = {
         'name': 'test channel',
@@ -96,30 +95,30 @@ def test_channel_details_invalid_channel_id(setup):
 
     # Channel does not exist
     with pytest.raises(InputError) as e:
-        assert channel.channel_details(u1["token"], 99)
+        assert channel.channel_details(u1['token'], 99)
 
 def test_channel_details_invalid_access(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', False) # channel_id 1
 
     # Call channel_details with the user that is not in the channel
     with pytest.raises(AccessError) as e:
-        assert channel.channel_details(u2["token"], channel_data["channel_id"])
+        assert channel.channel_details(u2['token'], channel_data)
 
 def test_channel_details_success(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Successful channel invite
-    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_invite(u1['token'], channel_data, u2['u_id'])
 
-    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+    result = channel.channel_details(u2['token'], channel_data)
 
     expected_result = {
         'name': 'test channel',
@@ -151,25 +150,47 @@ def test_channel_details_success(setup):
 def test_channel_messages_invalid_channel_id(setup):
     # Setup pytest
     u1, u2, u3 = setup
-    pass
+
+    # Throw InputError 
+    with pytest.raises(InputError) as e:
+        assert channel.channel_messages(u1['token'], 1, 0)
+
 
 def test_channel_messages_invalid_start(setup):
     # Setup pytest
     u1, u2, u3 = setup
+
+    # Create a private channel
+    channel_data = channels.channels_create(u3['token'], 'test channel', True)
+
+    # Successful channel invite
+    channel.channel_invite(u3['token'], channel_data, u2['u_id'])
+
     # Throw InputError 
-    pass
+    with pytest.raises(InputError) as e:
+        assert channel.channel_messages(u3['token'], channel_data, 99)
+
 
 def test_channel_messages_invalid_access(setup):
     # Setup pytest
     u1, u2, u3 = setup
+    
+    # Create a private channel
+    channel_data = channels.channels_create(u3['token'], 'test channel', True)
+
     # Throw AccessError 
-    pass
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_messages(u1['token'], channel_data, 0)
 
 
 def test_channel_messages_success(setup):
     # Setup pytest
     u1, u2, u3 = setup
-    pass
+
+    # Create a private channel
+    channel_data = channels.channels_create(u3['token'], 'test channel', True)
+
+    assert channel.channel_messages(u3['token'], channel_data, 0) == {'messages': [], 'start': 0, 'end': -1}
 
 ########################################################
 
@@ -179,33 +200,33 @@ def test_channel_leave_invalid_channel_id(setup):
 
     # Call channel_leave to a channel that does not exist
     with pytest.raises(InputError) as e:
-        assert channel.channel_leave(u1["token"], 99)
+        assert channel.channel_leave(u1['token'], 99)
 
 def test_channel_leave_not_already_in_channel(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', False) # channel_id 1
 
     # Call channel_leave when the user is not in the channel
     with pytest.raises(AccessError) as e:
-        assert channel.channel_leave(u2["token"], channel_data["channel_id"])
+        assert channel.channel_leave(u2['token'], channel_data)
 
 def test_channel_leave_success_all_members(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', False) # channel_id 1
 
     # Join channel 
-    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_invite(u1['token'], channel_data, u2['u_id'])
 
     # Leave channel
-    channel.channel_leave(u2["token"], channel_data["channel_id"])
+    channel.channel_leave(u2['token'], channel_data)
 
-    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+    result = channel.channel_details(u1['token'], channel_data)
 
     assert not u2['u_id'] in result['owner_members']
     assert not u2['u_id'] in result['all_members']
@@ -215,17 +236,17 @@ def test_channel_leave_empty_channel(setup):
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', False) # channel_id 1
 
     # Join channel 
-    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_invite(u1['token'], channel_data, u2['u_id'])
 
     # Leave channel
-    channel.channel_leave(u2["token"], channel_data["channel_id"])
-    channel.channel_leave(u1["token"], channel_data["channel_id"])
+    channel.channel_leave(u2['token'], channel_data)
+    channel.channel_leave(u1['token'], channel_data)
 
-    assert not u1["u_id"] in channels.data['channels'][channel_data["channel_id"] - 1]['all_members']
-    assert not u2["u_id"] in channels.data['channels'][channel_data["channel_id"] - 1]['all_members']
+    assert not u1['u_id'] in other.data['channels'][channel_data - 1]['all_members']
+    assert not u2['u_id'] in other.data['channels'][channel_data - 1]['all_members']
 
 ########################################################
 
@@ -234,29 +255,29 @@ def test_channel_join_invalid_channel_id(setup):
     u1, u2, u3 = setup
     
     with pytest.raises(InputError) as e:
-        assert channel.channel_join(u1["token"], 99)
+        assert channel.channel_join(u1['token'], 99)
  
 def test_channel_join_invalid_access(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', False) # channel_id 1
 
     with pytest.raises(AccessError) as e:
-        assert channel.channel_join(u2["token"], channel_data["channel_id"])
+        assert channel.channel_join(u2['token'], channel_data)
 
 def test_channel_join_as_flockr_owner(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a private channel as u2
-    channel_data = channels.channels_create(u2["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u2['token'], 'test channel', False) # channel_id 1
 
     # join private channel as flockr owner
-    channel.channel_join(u1["token"], channel_data["channel_id"])
+    channel.channel_join(u1['token'], channel_data)
 
-    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+    result = channel.channel_details(u1['token'], channel_data)
     
     expected_result = {
         'name': 'test channel',
@@ -289,13 +310,13 @@ def test_channel_join_success(setup):
     u1, u2, u3 = setup
 
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Join channel 
-    channel.channel_join(u2["token"], channel_data["channel_id"])
-    channel.channel_join(u3["token"], channel_data["channel_id"])
+    channel.channel_join(u2['token'], channel_data)
+    channel.channel_join(u3['token'], channel_data)
 
-    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+    result = channel.channel_details(u2['token'], channel_data)
 
     expected_result = {
         'name': 'test channel',
@@ -334,62 +355,62 @@ def test_channel_addowner_invalid_channel_id(setup):
     u1, u2, u3 = setup
     
     with pytest.raises(InputError) as e:
-        assert channel.channel_addowner(u1["token"], 99, u2["u_id"])
+        assert channel.channel_addowner(u1['token'], 99, u2['u_id'])
 
 def test_channel_addowner_already_existing_owner(setup):
     # Setup pytest
     u1, u2, u3 = setup
     
     # Create a private channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', False) # channel_id 1
 
     # Add yourself into the channel
     with pytest.raises(InputError) as e:
-        assert channel.channel_addowner(u1["token"], channel_data["channel_id"], u1["u_id"])
+        assert channel.channel_addowner(u1['token'], channel_data, u1['u_id'])
 
 def test_channel_addowner_not_owner_of_flockr(setup):
     # Setup pytest
     u1, u2, u3 = setup
     
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Get a user to join the channel
-    channel.channel_join(u2["token"], channel_data["channel_id"])
+    channel.channel_join(u2['token'], channel_data)
 
     with pytest.raises(AccessError) as e:
-        assert channel.channel_addowner(u2["token"], channel_data["channel_id"], u2["u_id"])
+        assert channel.channel_addowner(u2['token'], channel_data, u2['u_id'])
 
 def test_channel_addowner_not_owner_of_channel(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Get both users to join the channel
-    channel.channel_join(u2["token"], channel_data["channel_id"])
-    channel.channel_join(u3["token"], channel_data["channel_id"])
+    channel.channel_join(u2['token'], channel_data)
+    channel.channel_join(u3['token'], channel_data)
 
     with pytest.raises(AccessError) as e:
-        assert channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+        assert channel.channel_addowner(u2['token'], channel_data, u3['u_id'])
 
 def test_channel_addowner_success(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Join channel 
-    channel.channel_join(u2["token"], channel_data["channel_id"])
-    channel.channel_join(u3["token"], channel_data["channel_id"])
+    channel.channel_join(u2['token'], channel_data)
+    channel.channel_join(u3['token'], channel_data)
 
     # add owners
-    channel.channel_addowner(u1["token"], channel_data["channel_id"], u2["u_id"])
-    channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+    channel.channel_addowner(u1['token'], channel_data, u2['u_id'])
+    channel.channel_addowner(u2['token'], channel_data, u3['u_id'])
 
-    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+    result = channel.channel_details(u2['token'], channel_data)
 
     expected_result = {
         'name': 'test channel',
@@ -437,19 +458,19 @@ def test_channel_addowner_as_flockr_owner(setup):
     u1, u2, u3 = setup
 
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u2["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u2['token'], 'test channel', True) # channel_id 1
 
     # Join channel 
-    channel.channel_join(u1["token"], channel_data["channel_id"])
-    channel.channel_join(u3["token"], channel_data["channel_id"])
+    channel.channel_join(u1['token'], channel_data)
+    channel.channel_join(u3['token'], channel_data)
 
     # add owners
-    channel.channel_addowner(u1["token"], channel_data["channel_id"], u3["u_id"])
+    channel.channel_addowner(u1['token'], channel_data, u3['u_id'])
 
     # add himself
-    channel.channel_addowner(u1["token"], channel_data["channel_id"], u1["u_id"])
+    channel.channel_addowner(u1['token'], channel_data, u1['u_id'])
 
-    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+    result = channel.channel_details(u2['token'], channel_data)
 
     expected_result = {
         'name': 'test channel',
@@ -498,55 +519,55 @@ def test_channel_removeowner_invalid_channel_id(setup):
     u1, u2, u3 = setup
     
     with pytest.raises(InputError) as e:
-        assert channel.channel_removeowner(u1["token"], 99, u2["u_id"])
+        assert channel.channel_removeowner(u1['token'], 99, u2['u_id'])
 
 def test_channel_removeowner_not_owner_of_channel(setup):
     # Setup pytest
     u1, u2, u3 = setup
     
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Get a user to join the channel
-    channel.channel_join(u2["token"], channel_data["channel_id"])
+    channel.channel_join(u2['token'], channel_data)
 
     with pytest.raises(InputError) as e:
-        assert channel.channel_removeowner(u1["token"], channel_data["channel_id"], u2["u_id"])
+        assert channel.channel_removeowner(u1['token'], channel_data, u2['u_id'])
 
 def test_channel_removeowner_not_owner_of_flockr(setup):
     # Setup pytest
     u1, u2, u3 = setup
     
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Get a user to join the channel
-    channel.channel_join(u2["token"], channel_data["channel_id"])
+    channel.channel_join(u2['token'], channel_data)
 
     with pytest.raises(AccessError) as e:
-        assert channel.channel_removeowner(u2["token"], channel_data["channel_id"], u1["u_id"])
+        assert channel.channel_removeowner(u2['token'], channel_data, u1['u_id'])
 
 def test_channel_removeowner_success(setup):
     # Setup pytest
     u1, u2, u3 = setup
 
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u1['token'], 'test channel', True) # channel_id 1
 
     # Join channel 
-    channel.channel_join(u2["token"], channel_data["channel_id"])
-    channel.channel_join(u3["token"], channel_data["channel_id"])
+    channel.channel_join(u2['token'], channel_data)
+    channel.channel_join(u3['token'], channel_data)
 
     # add owners
-    channel.channel_addowner(u1["token"], channel_data["channel_id"], u2["u_id"])
-    channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+    channel.channel_addowner(u1['token'], channel_data, u2['u_id'])
+    channel.channel_addowner(u2['token'], channel_data, u3['u_id'])
 
     # remove owners
-    channel.channel_removeowner(u3["token"], channel_data["channel_id"], u2["u_id"])
-    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u3["u_id"])
-    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u1["u_id"])
+    channel.channel_removeowner(u3['token'], channel_data, u2['u_id'])
+    channel.channel_removeowner(u1['token'], channel_data, u3['u_id'])
+    channel.channel_removeowner(u1['token'], channel_data, u1['u_id'])
 
-    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+    result = channel.channel_details(u2['token'], channel_data)
 
     expected_result = {
         'name': 'test channel',
@@ -579,20 +600,20 @@ def test_channel_removeowner_as_flockr_owner(setup):
     u1, u2, u3 = setup
 
     # Create a public channel as jayden
-    channel_data = channels.channels_create(u2["token"], "test channel", True) # channel_id 1
+    channel_data = channels.channels_create(u2['token'], 'test channel', True) # channel_id 1
 
     # Join channel 
-    channel.channel_join(u1["token"], channel_data["channel_id"])
-    channel.channel_join(u3["token"], channel_data["channel_id"])
+    channel.channel_join(u1['token'], channel_data)
+    channel.channel_join(u3['token'], channel_data)
 
     # add owner
-    channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+    channel.channel_addowner(u2['token'], channel_data, u3['u_id'])
 
     # remove owners
-    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u2["u_id"])
-    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u3["u_id"])
+    channel.channel_removeowner(u1['token'], channel_data, u2['u_id'])
+    channel.channel_removeowner(u1['token'], channel_data, u3['u_id'])
 
-    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+    result = channel.channel_details(u1['token'], channel_data)
 
     expected_result = {
         'name': 'test channel',
