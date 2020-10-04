@@ -1,5 +1,7 @@
 Assumptions:
 
+-   All individual return values are returned as single values rather than being stored in a dictionary
+
 Authentication:
 
 -   Email

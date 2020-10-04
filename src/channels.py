@@ -57,6 +57,4 @@ def channels_create(token, name, is_public):
 
     other.data['channels'].append(new_channel)
    
-    return {
-        'channel_id': channel_id,
-    }
+    return channel_id

@@ -31,12 +31,8 @@ def auth_login(email, password):
 def auth_logout(token):
     for user in other.data['users']:
         if user['token'] == token:
-            return {
-                'is_success': True,
-            }
-    return {
-        'is_success': False,
-    }
+            return True
+    return False
 
 # provided email, password, name_first, name_last
 # validate no input error was made
