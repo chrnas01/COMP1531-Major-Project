@@ -35,6 +35,7 @@ Channels:
 -   The user is registered and logged in with a valid token to access any of channels.py functions
 -   channels_list will only return a list of channels the logged in user is part of.
 -   channels_listall returns a list of all channels and their details (both private and public) regardless of if the user is apart of them.
+-   channels_list and channels_listall will return a list and not a dictionary containing a list
 
 -   channels_create:
     -   When a channel is created the creator becomes owner by default

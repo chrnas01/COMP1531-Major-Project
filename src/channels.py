@@ -15,7 +15,7 @@ def channels_list(token):
     for i in range(total_channels):
         if user_uid in other.data['channels'][i]['all_members']:
             user_channels.append(other.data['channels'][i])
-            
+
     return user_channels
 
 
