@@ -22,3 +22,15 @@ Channel:
     - channel_addowner will raise an input error if u_id is invalid
     - channel_removeowner will raise an input error if u_id is invalid
     - Flockr owner needs to be in the channel before they can add or remove owners in the channel
+
+Channels:
+    - General: 
+    - The user is registered and logged in with a valid token to access any of channels.py functions
+    - channels_list will only return a list of channels the logged in user is part of. 
+    - channels_listall returns a list of all channels and their details (both private and public) regardless of if the user is apart of them. 
+    
+    - channels_create:
+    - When a channel is created the creator becomes owner by default 
+    - channels_create will raise an input error if the channel name is left blank i.e. Cannot create a channel without a name
+    - channels_create will raise an input error if the channel name already exists i.e. Channel names must be unique 
+    - The is-public variable stores a boolean: If True the channel is Public, if false the channel is private 
