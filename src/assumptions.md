@@ -27,3 +27,4 @@ Channel:
 -   channel_addowner will raise an input error if u_id is invalid
 -   channel_removeowner will raise an input error if u_id is invalid
 -   Flockr owner needs to be in the channel before they can add or remove owners in the channel
+-   Start index for channel_messages cannot be negative

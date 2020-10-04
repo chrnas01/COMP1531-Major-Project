@@ -168,7 +168,7 @@ def test_channel_messages_invalid_start(setup):
 
     # Throw InputError 
     with pytest.raises(InputError) as e:
-        assert channel.channel_messages(u3['token'], channel_data["channel_id"], -1)
+        assert channel.channel_messages(u3['token'], channel_data["channel_id"], 99)
 
 
 def test_channel_messages_invalid_access(setup):
@@ -180,7 +180,7 @@ def test_channel_messages_invalid_access(setup):
 
     # Throw AccessError 
     with pytest.raises(AccessError) as e:
-        assert channel.channel_messages(u1['token'], 1, 0)
+        assert channel.channel_messages(u1['token'], channel_data['channel_id'], 0)
 
 
 def test_channel_messages_success(setup):
@@ -190,7 +190,7 @@ def test_channel_messages_success(setup):
     # Create a private channel
     channel_data = channels.channels_create(u3["token"], "test channel", True)
 
-    assert channel.channel_messages(u3["token"], 1, 0) == {[], 0, -1}
+    assert channel.channel_messages(u3["token"], channel_data['channel_id'], 0) == {'messages': [], 'start': 0, 'end': -1}
 
 ########################################################
 
