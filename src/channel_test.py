@@ -1,154 +1,622 @@
 import pytest
-import auth 
-import channel 
-import channels 
-from error import InputError         
+import auth
+import channel
+import channels
+from error import InputError, AccessError
+import other
 
-# Assumptions for these tests: (Will also be included in Assumptions document)
-    # The user is registered and logged in with a valid token. 
-    # The user cannot join channels with invalid access i.e. can join a private channel if they have been invited only.
-    # The user can successfully join and leave channels.
+########################################################
 
-    # channel_create Assumptions:
-    # An InputError will be made and a channel will not be made if the channel name already exists, is left blank
-    # or is greather than 20 characters long. 
+@pytest.fixture
+def setup():
+    # Clear database
+    other.clear()
 
-# Tests for channels_list() function. 
-################################################################################################################################
-
-# Successfuly provides a list of all channels that the authorized user is part of: 
-def test_channels_list_successful():
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif") 
-    user2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
-
-    # Creating a private and a public channel 
-    channel1 = channels.channels_create(user1['token'], "Channel_1", True) 
-    channel2 = channels.channels_create(user2['token'], "Channel_2", False)
-
-    # Shouldn't include channel 2 as user1 is not in this channel 
-    assert channels.channels_list(user1['token']) == {
-                                            'channels': [ 
-                                                {
-                                                'channel_name': 'Channel_1',  
-                                                'channel_id': channel1['channel_id'],
-                                                'is_public': True,
-                                                'owner_members': [user1['u_id'],],
-                                                'all_members': [user1['u_id'],],
-                                                },
-                                            ],
-                                        }
-
-# User doesnt belong to any channels
-def test_channels_list_no_channels(): 
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif") 
-    user2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
-
-    # Only user 1 creates channel 
-    channel1 = channels.channels_create(user1['token'], "Channel_1", True) 
+    # Setup users
+    u1 = auth.auth_register("jayden@gmail.com", "password", "Jayden", "Leung") # Flockr Owner
+    u2 = auth.auth_register("Steven@gmail.com", "password", "Steven", "Luong")
+    u3 = auth.auth_register("sam@gmail.com", "password", "Sam", "He") 
     
-    # User 2 belongs to no channels hence an empty list is returned 
-    assert channels.channels_list(user2['token']) == {'channels':[],}
+    return u1, u2, u3
 
-# Tests for channels_listall() function. 
-###############################################################################################################################
+########################################################
 
-# Successfully provides a list of all channels and their associated details 
-def test_channels_listall_successful(): 
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
-    user2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
-
-    # Created a private and a public channel 
-    channel1 = channels.channels_create(user1['token'], "Channel_1", True) 
-    channel2 = channels.channels_create(user2['token'], "Channel_2", False)
+def test_channel_invite_invalid_channel_id(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
     
-    assert channels.channels_listall(user1['token']) == {
-                                            'channels': [ 
-                                                {
-                                                'channel_name': 'Channel_1',  
-                                                'channel_id': channel1['channel_id'],
-                                                'is_public': True,
-                                                'owner_members': [user1['u_id'],],
-                                                'all_members': [user1['u_id'],],
-                                                },
-                                                {
-                                                'channel_name': 'Channel_2',  
-                                                'channel_id': channel2['channel_id'],
-                                                'is_public': False,
-                                                'owner_members': [user2['u_id'],],
-                                                'all_members': [user2['u_id'],],
-                                                },
-                                            ],
-                                        }
+    with pytest.raises(InputError) as e:
+        assert channel.channel_invite(u1["token"], 99, u2["u_id"])
 
-# If there are no existing channels channels_listall() should return an empty list 
-def test_channels_listall_no_existing_channels():
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
-    assert channels.channels_listall(user1['token']) == {'channels':[],}
+def test_channel_invite_invalid_uid(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
+    # Create a private channel
+    channel_data = channels.channels_create(u1["token"], "test channel", False)
 
+    with pytest.raises(InputError) as e:
+        assert channel.channel_invite(u1["token"], channel_data["channel_id"], 99)
+
+def test_channel_invite_invalid_access(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+
+    # Invite sam as steven
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_invite(u2["token"], channel_data["channel_id"], u3["u_id"])
+
+def test_channel_invite_success(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Successful channel invite
+    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+
+    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+
+########################################################
+
+def test_channel_details_invalid_channel_id(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Channel does not exist
+    with pytest.raises(InputError) as e:
+        assert channel.channel_details(u1["token"], 99)
+
+def test_channel_details_invalid_access(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+
+    # Call channel_details with the user that is not in the channel
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_details(u2["token"], channel_data["channel_id"])
+
+def test_channel_details_success(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Successful channel invite
+    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+
+    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+########################################################
+
+def test_channel_messages_invalid_channel_id(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    pass
+
+def test_channel_messages_invalid_start(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    # Throw InputError 
+    pass
+
+def test_channel_messages_invalid_access(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    # Throw AccessError 
+    pass
+
+
+def test_channel_messages_success(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    pass
+
+########################################################
+
+def test_channel_leave_invalid_channel_id(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Call channel_leave to a channel that does not exist
+    with pytest.raises(InputError) as e:
+        assert channel.channel_leave(u1["token"], 99)
+
+def test_channel_leave_not_already_in_channel(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+
+    # Call channel_leave when the user is not in the channel
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_leave(u2["token"], channel_data["channel_id"])
+
+def test_channel_leave_success_all_members(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+
+    # Join channel 
+    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+
+    # Leave channel
+    channel.channel_leave(u2["token"], channel_data["channel_id"])
+
+    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+
+    assert not u2['u_id'] in result['owner_members']
+    assert not u2['u_id'] in result['all_members']
+
+def test_channel_leave_empty_channel(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+
+    # Join channel 
+    channel.channel_invite(u1["token"], channel_data["channel_id"], u2["u_id"])
+
+    # Leave channel
+    channel.channel_leave(u2["token"], channel_data["channel_id"])
+    channel.channel_leave(u1["token"], channel_data["channel_id"])
+
+    assert not u1["u_id"] in other.data['channels'][channel_data["channel_id"] - 1]['all_members']
+    assert not u2["u_id"] in other.data['channels'][channel_data["channel_id"] - 1]['all_members']
+
+########################################################
+
+def test_channel_join_invalid_channel_id(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
+    with pytest.raises(InputError) as e:
+        assert channel.channel_join(u1["token"], 99)
  
-# Tests for channels_create() function.
-################################################################################################################################
+def test_channel_join_invalid_access(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
 
-# Public channel name is greather than 20 charcters long 
-def test_channels_create_invalid_channel_name1(): 
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_join(u2["token"], channel_data["channel_id"])
+
+def test_channel_join_as_flockr_owner(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a private channel as u2
+    channel_data = channels.channels_create(u2["token"], "test channel", False) # channel_id 1
+
+    # join private channel as flockr owner
+    channel.channel_join(u1["token"], channel_data["channel_id"])
+
+    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+    
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+
+def test_channel_join_success(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Join channel 
+    channel.channel_join(u2["token"], channel_data["channel_id"])
+    channel.channel_join(u3["token"], channel_data["channel_id"])
+
+    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': u3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+########################################################
+
+def test_channel_addowner_invalid_channel_id(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
     with pytest.raises(InputError) as e:
-        assert channels.channels_create(user1['token'], "ChannelNameGreaterthan20characters", True)            # For Public Channel. 
+        assert channel.channel_addowner(u1["token"], 99, u2["u_id"])
 
-# Private channel name is greather than 20 characters long   
-def test_channels_create_invalid_channel_name2():
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
+def test_channel_addowner_already_existing_owner(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", False) # channel_id 1
+
+    # Add yourself into the channel
     with pytest.raises(InputError) as e:
-        assert channels.channels_create(user1['token'], "ChannelNameGreaterthan20characters", False)           # For Private Channel. 
+        assert channel.channel_addowner(u1["token"], channel_data["channel_id"], u1["u_id"])
 
-# Boundary Test: Channel name is exactly 20 characters long 
-def test_channels_create_20char_channel_name():
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
-    assert channels.channels_create(user1['token'], 20*"a", True) == {'channel_id': 1}  
+def test_channel_addowner_not_owner_of_flockr(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
 
-# Public channel is successfully created 
-def test_channels_create_successful_public():
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
-    assert channels.channels_create(user1['token'], "ChannelName", True) == {'channel_id': 1}                  
-    
-# Private channel is successfully created 
-def test_channels_create_successful_private():
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
-    assert channels.channels_create(user1['token'], "ChannelName", False) == {'channel_id': 1}   
-    
-# Channel name already exists 
-def test_channels_create_name_exists():
-    channels.delete_data()
-    auth.delete_users() 
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
-    user2 = auth.auth_register("johnsmith@gmail.com", "password", "John", "Smith")
-    
-    channels.channels_create(user1['token'], "ChannelName", True)
-    with pytest.raises(InputError) as e: 
-        assert channels.channels_create(user2['token'], "ChannelName", True)
+    # Get a user to join the channel
+    channel.channel_join(u2["token"], channel_data["channel_id"])
 
-# Channel name is not input i.e. trying to make a channel without a name
-def test_channels_create_nameless_channel():
-    channels.delete_data()
-    auth.delete_users()
-    user1 = auth.auth_register("chris@gmail.com", "password", "Chris", "Nassif")
-    with pytest.raises(InputError) as e: 
-        assert channels.channels_create(user1['token'], "", True)
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_addowner(u2["token"], channel_data["channel_id"], u2["u_id"])
+
+def test_channel_addowner_not_owner_of_channel(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Get both users to join the channel
+    channel.channel_join(u2["token"], channel_data["channel_id"])
+    channel.channel_join(u3["token"], channel_data["channel_id"])
+
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+
+def test_channel_addowner_success(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Join channel 
+    channel.channel_join(u2["token"], channel_data["channel_id"])
+    channel.channel_join(u3["token"], channel_data["channel_id"])
+
+    # add owners
+    channel.channel_addowner(u1["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+
+    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': u3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': u3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+
+def test_channel_addowner_as_flockr_owner(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u2["token"], "test channel", True) # channel_id 1
+
+    # Join channel 
+    channel.channel_join(u1["token"], channel_data["channel_id"])
+    channel.channel_join(u3["token"], channel_data["channel_id"])
+
+    # add owners
+    channel.channel_addowner(u1["token"], channel_data["channel_id"], u3["u_id"])
+
+    # add himself
+    channel.channel_addowner(u1["token"], channel_data["channel_id"], u1["u_id"])
+
+    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': u3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': u3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+    
+    assert result == expected_result
+
+########################################################
+
+def test_channel_removeowner_invalid_channel_id(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
+    with pytest.raises(InputError) as e:
+        assert channel.channel_removeowner(u1["token"], 99, u2["u_id"])
+
+def test_channel_removeowner_not_owner_of_channel(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Get a user to join the channel
+    channel.channel_join(u2["token"], channel_data["channel_id"])
+
+    with pytest.raises(InputError) as e:
+        assert channel.channel_removeowner(u1["token"], channel_data["channel_id"], u2["u_id"])
+
+def test_channel_removeowner_not_owner_of_flockr(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+    
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Get a user to join the channel
+    channel.channel_join(u2["token"], channel_data["channel_id"])
+
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_removeowner(u2["token"], channel_data["channel_id"], u1["u_id"])
+
+def test_channel_removeowner_success(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u1["token"], "test channel", True) # channel_id 1
+
+    # Join channel 
+    channel.channel_join(u2["token"], channel_data["channel_id"])
+    channel.channel_join(u3["token"], channel_data["channel_id"])
+
+    # add owners
+    channel.channel_addowner(u1["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+
+    # remove owners
+    channel.channel_removeowner(u3["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u3["u_id"])
+    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u1["u_id"])
+
+    result = channel.channel_details(u2["token"], channel_data["channel_id"])
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': u3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+    
+    assert result == expected_result
+
+def test_channel_removeowner_as_flockr_owner(setup):
+    # Setup pytest
+    u1, u2, u3 = setup
+
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(u2["token"], "test channel", True) # channel_id 1
+
+    # Join channel 
+    channel.channel_join(u1["token"], channel_data["channel_id"])
+    channel.channel_join(u3["token"], channel_data["channel_id"])
+
+    # add owner
+    channel.channel_addowner(u2["token"], channel_data["channel_id"], u3["u_id"])
+
+    # remove owners
+    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u2["u_id"])
+    channel.channel_removeowner(u1["token"], channel_data["channel_id"], u3["u_id"])
+
+    result = channel.channel_details(u1["token"], channel_data["channel_id"])
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+
+        ],
+        'all_members': [
+            {
+                'u_id': u1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': u2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': u3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+    
+    assert result == expected_result
+
+########################################################
