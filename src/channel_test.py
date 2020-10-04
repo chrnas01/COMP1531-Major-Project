@@ -150,25 +150,47 @@ def test_channel_details_success(setup):
 def test_channel_messages_invalid_channel_id(setup):
     # Setup pytest
     u1, u2, u3 = setup
-    pass
+
+    # Throw InputError 
+    with pytest.raises(InputError) as e:
+        assert channel.channel_messages(u1['token'], 1, 0)
+
 
 def test_channel_messages_invalid_start(setup):
     # Setup pytest
     u1, u2, u3 = setup
+
+    # Create a private channel
+    channel_data = channels.channels_create(u3["token"], "test channel", True)
+
+    # Successful channel invite
+    channel.channel_invite(u3["token"], channel_data["channel_id"], u2["u_id"])
+
     # Throw InputError 
-    pass
+    with pytest.raises(InputError) as e:
+        assert channel.channel_messages(u3['token'], channel_data["channel_id"], -1)
+
 
 def test_channel_messages_invalid_access(setup):
     # Setup pytest
     u1, u2, u3 = setup
+    
+    # Create a private channel
+    channel_data = channels.channels_create(u3["token"], "test channel", True)
+
     # Throw AccessError 
-    pass
+    with pytest.raises(AccessError) as e:
+        assert channel.channel_messages(u1['token'], 1, 0)
 
 
 def test_channel_messages_success(setup):
     # Setup pytest
     u1, u2, u3 = setup
-    pass
+
+    # Create a private channel
+    channel_data = channels.channels_create(u3["token"], "test channel", True)
+
+    assert channel.channel_messages(u3["token"], 1, 0) == {[], 0, -1}
 
 ########################################################
 
