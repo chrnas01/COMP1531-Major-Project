@@ -15,6 +15,9 @@ def clear():
 def users_all(token):
     return data['users']
 
+def admin_userpermission_change(token, u_id, permission_id):
+    pass
+
 def search(token, query_str):
     return {
         'messages': [
