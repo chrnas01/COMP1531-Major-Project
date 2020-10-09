@@ -8,13 +8,13 @@ from error import InputError
 # Email entered is not valid
 def test_auth_login_invalid_email():
     other.clear() # Blackbox testing, clear users
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_login('EMAIL', 'PASSWORD')
     
 # Email entered does not belong to a user
 def test_auth_login_not_registered():
     other.clear()
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_login('NOTANEMAIL@gmail.com', 'PASSWORD')
     
 
@@ -22,7 +22,7 @@ def test_auth_login_not_registered():
 def test_auth_login_incorrect_password():
     other.clear()
     assert auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'LASTNAME') == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_login('EMAIL@gmail.com', 'NOTTHEPASSWORD')
     
 # Password is correct
@@ -37,14 +37,14 @@ def test_auth_login_correct_password():
 # Email entered is not valid
 def test_auth_register_invalid_email():
     other.clear()
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_register('EMAIL', 'PASSWORD', 'FIRSTNAME', 'LASTNAME')
     
 # Email address is already being used
 def test_auth_register_used_email():
     other.clear()
     auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'LASTNAME')
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'LASTNAME')
     
 
@@ -54,7 +54,7 @@ def test_auth_register_used_email():
 # Test edge cases
 def test_auth_register_password_short():
     other.clear()
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_register('EMAIL@gmail.com', 'WORDS', 'FIRSTNAME', 'LASTNAME') # Password is length 5
     
 def test_auth_register_password_correct():
@@ -67,12 +67,12 @@ def test_auth_register_password_correct():
 # name_first is of valid length
 def test_auth_register_firstname_short():
     other.clear()
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_register('EMAIL@gmail.com', 'PASSWORD', '', 'LASTNAME') # name_first is length 0
     
 def test_auth_register_firstname_long():
     other.clear()
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'A'*51, 'LASTNAME') # name_first is length 51
     
 def test_auth_register_firstname_valid1():
@@ -89,12 +89,12 @@ def test_auth_register_firstname_valid2():
 # name_last is of valid length
 def test_auth_register_lastname_short():
     other.clear()
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', '') # name_last is length 0
     
 def test_auth_register_lastname_long():
     other.clear()
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'A'*51) # name_last is length 51
     
 def test_auth_register_lastname_valid1():
