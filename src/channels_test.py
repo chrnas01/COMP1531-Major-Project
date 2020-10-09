@@ -117,7 +117,7 @@ def test_channels_create_invalid_channel_name1():
     other.clear()
     
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert channels.channels_create(user1['token'], 'ChannelNameGreaterthan20characters', True)            # For Public Channel. 
 
 # Private channel name is greater than 20 characters long    
@@ -125,7 +125,7 @@ def test_channels_create_invalid_channel_name2():
     other.clear()
     
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         assert channels.channels_create(user1['token'], 'ChannelNameGreaterthan20characters', False)           # For Private Channel. 
 
 # Boundary Test: Channel name is exactly 20 characters long 
@@ -157,7 +157,7 @@ def test_channels_create_name_exists():
     user2 = auth.auth_register('johnsmith@gmail.com', 'password', 'John', 'Smith')
     
     channels.channels_create(user1['token'], 'ChannelName', True)
-    with pytest.raises(InputError) as e: 
+    with pytest.raises(InputError): 
         assert channels.channels_create(user2['token'], 'ChannelName', True)
 
 # Channel name is not input i.e. trying to make a channel without a name
@@ -165,5 +165,5 @@ def test_channels_create_nameless_channel():
     other.clear()
     
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
-    with pytest.raises(InputError) as e: 
+    with pytest.raises(InputError): 
         assert channels.channels_create(user1['token'], '', True)
