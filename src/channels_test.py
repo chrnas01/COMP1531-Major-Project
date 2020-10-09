@@ -19,15 +19,15 @@ def test_channels_list_successful():
     channel2 = channels.channels_create(user2['token'], 'Channel_2', False)
 
     # Shouldn't include channel 2 as user1 is not in this channel 
-    assert channels.channels_list(user1['token']) == [ 
+    assert channels.channels_list(user1['token']) == { 'channels': [ 
                                                 {
                                                 'channel_name': 'Channel_1',  
-                                                'channel_id': channel1,
+                                                'channel_id': channel1['channel_id'],
                                                 'is_public': True,
                                                 'owner_members': [user1['u_id'],],
                                                 'all_members': [user1['u_id'],],
                                                 },
-                                            ]
+                                            ] }
 
 # Successfuly provides a list of all channels that the authorized user is part of: 
 def test_channels_list_successful_two_channels():
@@ -39,22 +39,22 @@ def test_channels_list_successful_two_channels():
     channel1 = channels.channels_create(user1['token'], 'Channel_1', True) 
     channel2 = channels.channels_create(user1['token'], 'Channel_2', False)
     
-    assert channels.channels_listall(user1['token']) == [ 
+    assert channels.channels_listall(user1['token']) == { 'channels': [ 
                                                 {
                                                 'channel_name': 'Channel_1',  
-                                                'channel_id': channel1,
+                                                'channel_id': channel1['channel_id'],
                                                 'is_public': True,
                                                 'owner_members': [user1['u_id'],],
                                                 'all_members': [user1['u_id'],],
                                                 },
                                                 {
                                                 'channel_name': 'Channel_2',  
-                                                'channel_id': channel2,
+                                                'channel_id': channel2['channel_id'],
                                                 'is_public': False,
                                                 'owner_members': [user1['u_id'],],
                                                 'all_members': [user1['u_id'],],
                                                 },
-                                            ]
+                                            ] }
     
 
 # User doesnt belong to any channels
@@ -68,7 +68,7 @@ def test_channels_list_no_channels():
     channel1 = channels.channels_create(user1['token'], 'Channel_1', True) 
     
     # User 2 belongs to no channels hence an empty list is returned 
-    assert channels.channels_list(user2['token']) == []
+    assert channels.channels_list(user2['token']) == { 'channels': [] }
 
 # Tests for channels_listall() function. 
 ###############################################################################################################################
@@ -84,29 +84,29 @@ def test_channels_listall_successful():
     channel1 = channels.channels_create(user1['token'], 'Channel_1', True) 
     channel2 = channels.channels_create(user2['token'], 'Channel_2', False)
     
-    assert channels.channels_listall(user1['token']) == [ 
+    assert channels.channels_listall(user1['token']) == { 'channels': [ 
                                                 {
                                                 'channel_name': 'Channel_1',  
-                                                'channel_id': channel1,
+                                                'channel_id': channel1['channel_id'],
                                                 'is_public': True,
                                                 'owner_members': [user1['u_id'],],
                                                 'all_members': [user1['u_id'],],
                                                 },
                                                 {
                                                 'channel_name': 'Channel_2',  
-                                                'channel_id': channel2,
+                                                'channel_id': channel2['channel_id'],
                                                 'is_public': False,
                                                 'owner_members': [user2['u_id'],],
                                                 'all_members': [user2['u_id'],],
                                                 },
-                                            ]
+                                            ] }
 
 # If there are no existing channels channels_listall() should return an empty list 
 def test_channels_listall_no_existing_channels():
     other.clear()
     
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
-    assert channels.channels_listall(user1['token']) == []
+    assert channels.channels_listall(user1['token']) == { 'channels': [] }
 
  
 # Tests for channels_create() function.
@@ -133,21 +133,21 @@ def test_channels_create_20char_channel_name():
     other.clear()
     
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
-    assert channels.channels_create(user1['token'], 20*'a', True) == 1
+    assert channels.channels_create(user1['token'], 20*'a', True) == {'channel_id': 1}
 
 # Public channel is successfully created 
 def test_channels_create_successful_public():
     other.clear()
     
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
-    assert channels.channels_create(user1['token'], 'ChannelName', True) == 1
+    assert channels.channels_create(user1['token'], 'ChannelName', True) == {'channel_id': 1}
     
 # Private channel is successfully created 
 def test_channels_create_successful_private():
     other.clear()
     
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
-    assert channels.channels_create(user1['token'], 'ChannelName', False) == 1
+    assert channels.channels_create(user1['token'], 'ChannelName', False) == {'channel_id': 1}
     
 # Channel name already exists 
 def test_channels_create_name_exists():

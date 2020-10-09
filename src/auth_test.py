@@ -112,11 +112,11 @@ def test_auth_successful_logout():
     other.clear()
     assert auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'LASTNAME') == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
     assert auth.auth_login('EMAIL@gmail.com', 'PASSWORD') == {'u_id': 1, 'token': 'EMAIL@gmail.com',}
-    assert auth.auth_logout('EMAIL@gmail.com') == True
+    assert auth.auth_logout('EMAIL@gmail.com') == {'is_success ': True}
     
 def test_auth_unsuccessful_logout():
     other.clear()
-    assert auth.auth_logout('EMAIL@gmail.com') == False
+    assert auth.auth_logout('EMAIL@gmail.com') == {'is_success ': False}
 
 ################################################################################
 # Tests for handle_str
