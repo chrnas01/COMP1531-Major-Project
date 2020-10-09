@@ -16,13 +16,13 @@ def channels_list(token):
         if user_uid in other.data['channels'][i]['all_members']:
             user_channels.append(other.data['channels'][i])
 
-    return user_channels
+    return {'channels': user_channels}
 
 
 # Provide a list of all channels (and their associated details)
 def channels_listall(token):
     # Simply returns data strcture which stores all channels information.
-    return other.data['channels']
+    return {'channels': other.data['channels']} 
 
 # Creates a new channel with that name that is either 
 # a public or private channel
@@ -57,4 +57,4 @@ def channels_create(token, name, is_public):
 
     other.data['channels'].append(new_channel)
    
-    return channel_id
+    return {'channel_id': channel_id}
