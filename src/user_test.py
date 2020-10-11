@@ -151,6 +151,7 @@ def test_user_profile_setemail_used_email():
 
     # Setup users
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
+    auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong') # Flockr Owner
 
     with pytest.raises(InputError):
         assert user.user_profile_setemail(user_1['token'], 'Steven@gmail.com')
@@ -183,6 +184,7 @@ def test_user_profile_sethandle_already_exists():
     '''
     other.clear()
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
+    auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong') # Flockr Owner
 
     user.user_profile_sethandle(user_1['token'], 'stevenluong')
 
