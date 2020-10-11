@@ -426,6 +426,19 @@ def test_channel_addowner_invalid_channel_id(setup):
     with pytest.raises(InputError):
         assert channel.channel_addowner(user_1['token'], 99, user_2['u_id'])
 
+def test_channel_addowner_invalid_uid(setup):
+    '''
+    uid does not exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False) # channel_id 1
+
+    with pytest.raises(InputError):
+        assert channel.channel_addowner(user_1['token'], channel_data['channel_id'], 99)
+
 def test_channel_addowner_already_existing_owner(setup):
     '''
     the user is already an owner
@@ -607,6 +620,23 @@ def test_channel_removeowner_invalid_channel_id(setup):
 
     with pytest.raises(InputError):
         assert channel.channel_removeowner(user_1['token'], 99, user_2['u_id'])
+
+def test_channel_removeowner_not_valid_uid(setup):
+    '''
+    uid is invalid
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    # Create a public channel as jayden
+    channel_data = channels.channels_create(user_1['token'], 'test channel', True) # channel_id 1
+
+    # Get a user to join the channel
+    channel.channel_join(user_2['token'], channel_data['channel_id'])
+
+    with pytest.raises(InputError):
+        assert channel.channel_removeowner(user_1['token'], channel_data[
+            'channel_id'], 99)
 
 def test_channel_removeowner_not_owner_of_channel(setup):
     '''

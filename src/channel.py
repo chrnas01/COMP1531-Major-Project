@@ -22,10 +22,6 @@ def channel_invite(token, channel_id, u_id):
     if channel_id > len(other.data['channels']):
         raise InputError('channel_id does not refer to a valid')
 
-    # Check if token user exists
-    if not valid_user(other.token_to_uid(token)):
-        raise InputError('token does not refer to a valid user')
-
     # Check if user exists
     if not valid_user(u_id):
         raise InputError('u_id does not refer to a valid user')
