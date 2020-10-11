@@ -4,9 +4,6 @@ import auth
 from error import InputError, AccessError
 
 def user_profile(token, u_id):
-    # Check that the token is valid
-    if other.token_to_uid(token) <= 0:
-        raise AccessError("user_profile bad token")
     
     # seach for uid
     for user in other.data['users']:
@@ -26,9 +23,6 @@ def user_profile(token, u_id):
 
 def user_profile_setname(token, name_first, name_last):
     current_user = other.token_to_uid(token)
-    # Check that the token is valid
-    if current_user <= 0:
-        raise AccessError("user_profile_setname bad token")
 
     # name_first valid length
     if len(name_first) < 1 or len(name_first) > 50:
@@ -43,17 +37,13 @@ def user_profile_setname(token, name_first, name_last):
             user['name_first'] = name_first
             user['name_last'] = name_last
             break
-    else: 
-        raise InputError('u_id does not refer to a valid user')            
+          
 
     return {
     }
 
 def user_profile_setemail(token, email):
     current_user = other.token_to_uid(token)
-    # Check that the token is valid
-    if current_user <= 0:
-        raise AccessError("user_profile_setemail bad token")
 
     # is email format valid
     regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
@@ -68,17 +58,13 @@ def user_profile_setemail(token, email):
         if user['u_id'] == current_user:
             user['email'] = email
             break
-    else: 
-        raise InputError('u_id does not refer to a valid user')            
+         
 
     return {
     }
 
 def user_profile_sethandle(token, handle_str):
     current_user = other.token_to_uid(token)
-    # Check that the token is valid
-    if current_user <= 0:
-        raise AccessError("user_profile_sethandle bad token")
 
     handle_exists = False
 
@@ -97,8 +83,7 @@ def user_profile_sethandle(token, handle_str):
         if user['u_id'] == current_user:
             user['handle_str'] = handle_str
             break
-    else: 
-        raise InputError('u_id does not refer to a valid user')            
+         
 
     return {
     }

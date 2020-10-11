@@ -146,7 +146,7 @@ def test_user_profile_sethandle_already_exists():
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
     user_2 = auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong')
     
-    user.user_profile_sethandle(user_1['token'], 'stevenluong1')
+    user.user_profile_sethandle(user_1['token'], 'stevenluong')
 
     assert user.user_profile(user_1['token'], user_1['u_id']) == {
         'user': {
