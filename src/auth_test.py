@@ -1,5 +1,5 @@
 '''
-Tests for auth.py
+tests for auth.py
 '''
 import pytest
 import auth
