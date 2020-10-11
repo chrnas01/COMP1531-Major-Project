@@ -1,10 +1,17 @@
-import other
+'''
+    contains functions that manipulate user data
+'''
 import re
+import other
 import auth
-from error import InputError, AccessError
+from error import InputError
 
-def user_profile(token, u_id):
-    
+def user_profile(_, u_id):
+    '''
+    Given a u_id it will return a dictionary of a user
+    returning email, u_id first name last name and handle str
+    '''
+
     # seach for uid
     for user in other.data['users']:
         if user['u_id'] == u_id:
@@ -16,18 +23,25 @@ def user_profile(token, u_id):
                 'handle_str': user['handle_str'],
             }
             return {'user': temp_dict}
-    else: 
-        raise InputError('u_id does not refer to a valid user')
+
+    # Didnt find the user
+    raise InputError('u_id does not refer to a valid user')
+
 
 
 
 def user_profile_setname(token, name_first, name_last):
+    '''
+    Given a first and last name,
+    changes the first and last name of current user
+    '''
+
     current_user = other.token_to_uid(token)
 
     # name_first valid length
     if len(name_first) < 1 or len(name_first) > 50:
         raise InputError('length of first name is invalid - Cannot register')
-    
+
     # name_last valid length
     if len(name_last) < 1 or len(name_last) > 50:
         raise InputError('length of last name is invalid - Cannot register')
@@ -37,12 +51,16 @@ def user_profile_setname(token, name_first, name_last):
             user['name_first'] = name_first
             user['name_last'] = name_last
             break
-          
+
 
     return {
     }
 
 def user_profile_setemail(token, email):
+    '''
+    Given email changed the email of the current user
+    '''
+
     current_user = other.token_to_uid(token)
 
     # is email format valid
@@ -51,19 +69,23 @@ def user_profile_setemail(token, email):
         raise InputError('Email not of valid format - Cannot register')
 
     # check if already registered email
-    elif auth.is_email_registered(email):
+    if auth.is_email_registered(email):
         raise InputError('Email is already registered - Cannot register')
 
     for user in other.data['users']:
         if user['u_id'] == current_user:
             user['email'] = email
             break
-         
+
 
     return {
     }
 
 def user_profile_sethandle(token, handle_str):
+    '''
+    Given handle string changed the handle_str of the current user
+    '''
+
     current_user = other.token_to_uid(token)
 
     handle_exists = False
@@ -75,7 +97,7 @@ def user_profile_sethandle(token, handle_str):
             #check if handle exists
             if handle_str == handle:
                 handle_exists = True
-    
+
     if handle_exists:
         handle_str = handle_str + str(current_user)
 
@@ -83,7 +105,7 @@ def user_profile_sethandle(token, handle_str):
         if user['u_id'] == current_user:
             user['handle_str'] = handle_str
             break
-         
+
 
     return {
     }
