@@ -186,16 +186,28 @@ def test_user_profile_sethandle_already_exists():
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
     auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong') # Flockr Owner
 
-    user.user_profile_sethandle(user_1['token'], 'stevenluong')
+    with pytest.raises(InputError):
+        user.user_profile_sethandle(user_1['token'], 'stevenluong')
 
-    assert user.user_profile(user_1['token'], user_1['u_id']) == {
-        'user': {
-            'email': 'jayden@gmail.com',
-            'u_id': 1,
-            'name_first': 'Jayden',
-            'name_last': 'Leung',
-            'handle_str': 'stevenluong1',
-            }
-        }
+def test_user_profile_sethandle_short():
+    '''
+    Tests that user_profile_sethandle sets the correct handle_str when there are duplicates
+    '''
+    other.clear()
+    user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
+    auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong') # Flockr Owner
 
+    with pytest.raises(InputError):
+        user.user_profile_sethandle(user_1['token'], '')
+
+def test_user_profile_sethandle_long():
+    '''
+    Tests that user_profile_sethandle sets the correct handle_str when there are duplicates
+    '''
+    other.clear()
+    user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
+    auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong') # Flockr Owner
+
+    with pytest.raises(InputError):
+        user.user_profile_sethandle(user_1['token'], 'A'*20)
 ########################################################
