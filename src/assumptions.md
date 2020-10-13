@@ -44,3 +44,6 @@ Channels:
     -   channels_create will raise an input error if the channel name is left blank i.e. Cannot create a channel without a name
     -   channels_create will raise an input error if the channel name already exists i.e. Channel names must be unique
     -   The is-public variable stores a boolean: If True the channel is Public, if false the channel is private
+
+User:
+- handle_str must be between 3 and 20 characters not inclusive
