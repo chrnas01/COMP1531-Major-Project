@@ -20,7 +20,7 @@ def setup():
 
     # Setup users
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
-    user_2 = auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong')
+    user_2 = auth.auth_register('steven@gmail.com', 'password', 'Steven', 'Luong')
     user_3 = auth.auth_register('sam@gmail.com', 'password', 'Sam', 'He')
 
     return (user_1, user_2, user_3)
