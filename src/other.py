@@ -6,6 +6,7 @@ from error import InputError, AccessError
 data = {
     'users': [],
     'channels': [],
+    'messages': [],
 }
 
 
@@ -15,6 +16,7 @@ def clear():
     '''
     data['users'].clear()
     data['channels'].clear()
+    data['messages'].clear()
     return {}
 
 
