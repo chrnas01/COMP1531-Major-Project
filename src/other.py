@@ -4,13 +4,11 @@ import channels
 data = {
     'users': [],
     'channels': [],
-    'messages': [],
 }
 
 def clear():
     data['users'].clear()
     data['channels'].clear()
-    data['messages'].clear()
 
 def users_all(token):
     return data['users']
