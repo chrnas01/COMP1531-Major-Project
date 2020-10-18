@@ -298,6 +298,7 @@ def test_channel_leave_invalid_channel_id(url, setup):
     with pytest.raises(InputError):
         requests.post(url + 'channel/leave', params=payload)
 
+
 def test_channel_leave_not_already_in_channel(url, setup):
     '''
     user is not in the channel
@@ -413,6 +414,7 @@ def test_channel_join_invalid_channel_id(url, setup):
     with pytest.raises(InputError):
         requests.post(url + 'channel/join', params=payload)
 
+
 def test_channel_join_invalid_access(url, setup):
     '''
     user does not have permissions to join the channel
@@ -494,7 +496,6 @@ def test_channel_join_success(url, setup):
     '''
     user_1, user_2, user_3 = setup
 
-
     payload = {
         'token': user_1['token'],
         'name': 'test channel',
@@ -552,6 +553,7 @@ def test_channel_join_success(url, setup):
 
 ########################################################
 
+
 def test_channel_addowner_invalid_channel_id(url, setup):
     '''
     channel does not exist
@@ -564,6 +566,7 @@ def test_channel_addowner_invalid_channel_id(url, setup):
         'u_id': user_2['u_id']
     }
     requests.post(url + 'channel/addowner', params=payload)
+
 
 def test_channel_addowner_invalid_uid(url, setup):
     '''
@@ -586,6 +589,7 @@ def test_channel_addowner_invalid_uid(url, setup):
 
     with pytest.raises(InputError):
         requests.post(url + 'channel/addowner', params=payload)
+
 
 def test_channel_addowner_already_existing_owner(url, setup):
     '''
@@ -639,6 +643,7 @@ def test_channel_addowner_self_escalation(url, setup):
     with pytest.raises(AccessError):
         requests.post(url + 'channel/addowner', params=payload)
 
+
 def test_channel_addowner_not_owner_of_channel(url, setup):
     '''
     user does not have permissions to set other user as owner
@@ -671,9 +676,9 @@ def test_channel_addowner_not_owner_of_channel(url, setup):
         'u_id': user_3['u_id']
     }
 
-
     with pytest.raises(AccessError):
         requests.post(url + 'channel/addowner', params=payload)
+
 
 def test_channel_addowner_success(url, setup):
     '''
@@ -763,6 +768,7 @@ def test_channel_addowner_success(url, setup):
 
 ########################################################
 
+
 def test_channel_removeowner_invalid_channel_id(url, setup):
     '''
     channel does not exist
@@ -799,7 +805,6 @@ def test_channel_removeowner_not_valid_uid(url, setup):
         'channel_id': channel_data['channel_id']
     }
     requests.post(url + 'channel/join', params=payload)
-
 
     payload = {
         'token': user_1['token'],
@@ -840,6 +845,7 @@ def test_channel_removeowner_not_owner_of_channel(url, setup):
     with pytest.raises(InputError):
         requests.post(url + 'channel/removeowner', params=payload)
 
+
 def test_channel_removeowner_invalid_perm(url, setup):
     '''
     the user, removing perms, is not an owner of the channel
@@ -869,6 +875,7 @@ def test_channel_removeowner_invalid_perm(url, setup):
     with pytest.raises(AccessError):
         requests.post(url + 'channel/removeowner', params=payload)
 
+
 def test_channel_removeowner_success(url, setup):
     '''
     successful call
@@ -894,7 +901,6 @@ def test_channel_removeowner_success(url, setup):
         'channel_id': channel_data['channel_id']
     }
     requests.post(url + 'channel/join', params=payload)
-
 
     payload = {
         'token': user_1['token'],
@@ -962,6 +968,7 @@ def test_channel_removeowner_success(url, setup):
     }
 
     assert result == expected_result
+
 
 def test_channel_removeowner_as_flockr_owner(url, setup):
     '''
