@@ -2,6 +2,7 @@
 Contains miscellaneous functions
 '''
 from error import InputError, AccessError
+import channels
 
 data = {
     'users': [],
@@ -55,17 +56,20 @@ def admin_userpermission_change(token, u_id, permission_id):
 
 def search(token, query_str):
     '''
-    Given a token and query_str searches for a message
+    Given a query string, return a collection of messages in all of
+    the channels that the user has joined that match the query
     '''
+
+    messages = []
+    user_channels = channels.channels_list(token)
+
+    for msg in data['messages']:
+        if any(channel['channel_id'] == msg['channel_id'] for channel in user_channels['channels']):
+            if query_str in msg['message']:
+                messages.append(msg)
+
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
+        'messages': messages
     }
 
 # Coverts the users token to a valid user_id
