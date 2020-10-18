@@ -93,7 +93,7 @@ def channel_messages(token, channel_id, start):
         raise InputError('Channel ID is not a valid channel')
 
     #Check that the start is within the number of messages
-    if start > len(other.data['channels'][channel_id - 1].get('messages')):
+    if start > len(other.data['messages']):
         raise InputError('Start is greater than the total number of messages in the channel')
 
     # Check that the user is a member of the channel
@@ -103,12 +103,12 @@ def channel_messages(token, channel_id, start):
     end = start + 50
     end_index = end
 
-    if (start + 50) >= len(other.data['channels'][channel_id - 1].get('messages')):
-        end_index = len(other.data['channels'][channel_id - 1].get('messages')) - 1
+    if (start + 50) >= len(other.data['messages']):
+        end_index = len(other.data['messages']) - 1
         end = -1
 
     return {
-        'messages': other.data['channels'][channel_id - 1].get('messages')[start:end_index],
+        'messages': other.data['messages'][start:end_index],
         'start': start,
         'end': end
     }
