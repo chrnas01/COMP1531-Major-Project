@@ -57,7 +57,7 @@ def channels_create(token, name, is_public):
     if not other.data['channels']:
         channel_id = 1
     else:
-        channel_id = len(other.data['channels'])
+        channel_id = len(other.data['channels']) + 1
 
     new_channel = {
         'channel_name': name,
