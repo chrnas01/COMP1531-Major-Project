@@ -118,7 +118,6 @@ def test_message_remove_nonexistent(setup):
     with pytest.raises(InputError):
         assert message.message_remove(user_1['token'], 1)
 
-
 def test_message_remove_other_user(setup):
     '''
     removing a message sent by another user
@@ -136,10 +135,9 @@ def test_message_remove_other_user(setup):
     with pytest.raises(AccessError):
         assert message.message_remove(user_1['token'], 1)
 
-
 def test_message_remove_no_perm(setup):
     '''
-    removing a message sent by another user
+    removing a message sent by self but user is not an owner
     '''
     # Setup pytest
     user_1, user_2, _ = setup
@@ -148,16 +146,15 @@ def test_message_remove_no_perm(setup):
     channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
     msg = 'test'
 
-    message.message_send(user_1['token'], channel_data['channel_id'], msg)
-    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
 
     with pytest.raises(AccessError):
         assert message.message_remove(user_2['token'], 1)
 
-
 def test_message_remove_valid(setup):
     '''
-    removing a message sent by another user
+    removing a valid message
     '''
     # Setup pytest
     user_1, user_2, _ = setup
@@ -170,6 +167,93 @@ def test_message_remove_valid(setup):
     message.message_send(user_1['token'], channel_data['channel_id'], msg)
 
     message.message_remove(user_1['token'], 1)
+
+    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
+        {
+        'message_id': 2,
+        'token': user_1['token'],
+        'message': msg
+        }
+    ]
+
+def test_message_edit_other_user(setup):
+    '''
+    editing a message sent by another user
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = 'test'
+
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+
+    with pytest.raises(AccessError):
+        assert message.message_edit(user_1['token'], 1, 'tset')
+
+def test_message_edit_other_no_perm(setup):
+    '''
+    editing a message sent by self but user is not an owner
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = 'test'
+
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+
+    with pytest.raises(AccessError):
+        assert message.message_edit(user_2['token'], 1, 'tset')
+
+def test_message_edit_valid(setup):
+    '''
+    editing a valid message
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = 'test'
+
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+
+    message.message_edit(user_1['token'], 1, 'tset')
+
+    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
+        {
+        'message_id': 1,
+        'token': user_1['token'],
+        'message': 'tset'
+        },
+        {
+        'message_id': 2,
+        'token': user_1['token'],
+        'message': msg
+        }
+    ]
+
+def test_message_edit_valid_remove(setup):
+    '''
+    editing a valid message into an empty string
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = 'test'
+
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+
+    message.message_edit(user_1['token'], 1, '')
 
     assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
         {
