@@ -1,5 +1,5 @@
-from error import InputError, AccessError
 from datetime import datetime, timezone
+from error import InputError, AccessError
 import other
 
 def message_send(token, channel_id, message):
@@ -11,7 +11,7 @@ def message_send(token, channel_id, message):
     if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
         raise AccessError('Authorised user is not a member of channel with channel_id')
 
-    # Check that the message is within the character limit 
+    # Check that the message is within the character limit
     if len(message) > 1000:
         raise InputError('Message is more than 1000 characters')
 
@@ -52,10 +52,12 @@ def message_remove(token, message_id):
 
     #check they are deleting their own message
     if msg['u_id'] != other.token_to_uid(token):
-        raise AccessError('Message with message_id was not sent by the authorised user making this request')
+        raise AccessError('''Message with message_id was not sent by
+                 the authorised user making this request''')
 
     #check if they are a channel owner
-    if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['owner_members']:
+    if other.token_to_uid(token) not in other.data['channels'][
+                msg['channel_id'] - 1]['owner_members']:
         raise AccessError('When user with user id u_id is not an owner of the channel')
 
     other.data['messages'].remove(msg)
@@ -75,7 +77,8 @@ def message_edit(token, message_id, message):
 
     #check they are deleting their own message
     if other.data['messages'][i]['u_id'] != other.token_to_uid(token):
-        raise AccessError('Message with message_id was not sent by the authorised user making this request')
+        raise AccessError('''Message with message_id was not sent
+                 by the authorised user making this request''')
 
     #check if they are a channel owner
     if other.token_to_uid(token) not in other.data['channels'][

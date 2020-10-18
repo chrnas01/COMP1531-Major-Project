@@ -87,6 +87,9 @@ def test_admin_userpermission_change_success(setup):
 ################################################################################
 
 def test_search(setup):
+    '''
+    searching in a channel
+    '''
     user_1, user_2, _ = setup
 
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
@@ -117,6 +120,9 @@ def test_search(setup):
     }
 
 def test_search_other_channel(setup):
+    '''
+    searching in a separate channel
+    '''
     user_1, user_2, _ = setup
 
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
