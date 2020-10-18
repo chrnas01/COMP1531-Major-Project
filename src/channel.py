@@ -4,15 +4,6 @@ functions to manage users within a channel
 from error import InputError, AccessError
 import other
 
-def valid_user(u_id):
-    '''
-    Checks if the given u_id is a valid user
-    '''
-    for user in other.data['users']:
-        if user['u_id'] == u_id:
-            return True
-    return False
-
 def channel_invite(token, channel_id, u_id):
     '''
     Invites a user (with user id u_id) to join a channel with ID channel_id.
@@ -23,7 +14,7 @@ def channel_invite(token, channel_id, u_id):
         raise InputError('channel_id does not refer to a valid')
 
     # Check if user exists
-    if not valid_user(u_id):
+    if not other.valid_user(u_id):
         raise InputError('u_id does not refer to a valid user')
 
     # Check that the user is a member of the channel
@@ -34,6 +25,8 @@ def channel_invite(token, channel_id, u_id):
     other.data['channels'][channel_id - 1]['all_members'].append(u_id)
 
     other.data['channels'][channel_id - 1]['all_members'].sort()
+    
+    return {}
 
 def channel_details(token, channel_id):
     '''
@@ -114,7 +107,6 @@ def channel_messages(token, channel_id, start):
         end_index = len(other.data['channels'][channel_id - 1].get('messages')) - 1
         end = -1
 
-
     return {
         'messages': other.data['channels'][channel_id - 1].get('messages')[start:end_index],
         'start': start,
@@ -140,6 +132,8 @@ def channel_leave(token, channel_id):
     if other.token_to_uid(token) in other.data['channels'][channel_id - 1]['owner_members']:
         other.data['channels'][channel_id - 1]['owner_members'].remove(other.token_to_uid(token))
 
+    return {}
+
 def channel_join(token, channel_id):
     '''
     Given a channel_id of a channel that the authorised user can
@@ -150,7 +144,7 @@ def channel_join(token, channel_id):
         raise InputError('Channel ID is not a valid channel')
 
     # for not global owner(flockr owner)
-    if other.token_to_uid(token) != 1:
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
         if not other.data['channels'][channel_id - 1]['is_public']:
             raise AccessError('channel_id refers to a channel that is private')
 
@@ -162,6 +156,8 @@ def channel_join(token, channel_id):
 
     other.data['channels'][channel_id - 1]['all_members'].sort()
 
+    return {}
+
 def channel_addowner(token, channel_id, u_id):
     '''
     Make user with user id u_id an owner of this channel
@@ -171,7 +167,7 @@ def channel_addowner(token, channel_id, u_id):
         raise InputError('Channel ID is not a valid channel')
 
     # Check if user exists
-    if not valid_user(u_id):
+    if not other.valid_user(u_id):
         raise InputError('u_id does not refer to a valid user')
 
     # Check for already an owner
@@ -179,7 +175,7 @@ def channel_addowner(token, channel_id, u_id):
         raise InputError('When user with user id u_id is already an owner of the channel')
 
     # Check for not flockr owner and a member
-    if other.token_to_uid(token) != 1:
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
         if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['owner_members']:
             raise AccessError('''The authorised user is not an
                  owner of the flockr, or an owner of this channel''')
@@ -192,6 +188,8 @@ def channel_addowner(token, channel_id, u_id):
 
     other.data['channels'][channel_id - 1]['owner_members'].sort()
 
+    return {}
+
 def channel_removeowner(token, channel_id, u_id):
     '''
     Remove user with user id u_id an owner of this channel
@@ -201,7 +199,7 @@ def channel_removeowner(token, channel_id, u_id):
         raise InputError('Channel ID is not a valid channel')
 
     # Check if user exists
-    if not valid_user(u_id):
+    if not other.valid_user(u_id):
         raise InputError('u_id does not refer to a valid user')
 
     # Check if they are in owner_members
@@ -209,7 +207,7 @@ def channel_removeowner(token, channel_id, u_id):
         raise InputError('When user with user id u_id is not an owner of the channel')
 
     # Check for not flockr owner and a member
-    if other.token_to_uid(token) != 1:
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
         if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['owner_members']:
             raise AccessError('''The authorised user is not an
                  owner of the flockr, or an owner of this channel''')
@@ -217,3 +215,5 @@ def channel_removeowner(token, channel_id, u_id):
     other.data['channels'][channel_id - 1]['owner_members'].remove(u_id)
 
     other.data['channels'][channel_id - 1]['owner_members'].sort()
+
+    return {}
