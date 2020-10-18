@@ -67,8 +67,9 @@ def test_valid_message(setup):
     msg = 'test'
 
     assert message.message_send(user_1['token'], channel_data['channel_id'], msg) == {'message_id': 1}
-    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [{
+    assert other.data['messages'] == [{
         'message_id': 1,
+        'channel_id': channel_data['channel_id'],
         'token': user_1['token'],
         'message': msg
     }]
@@ -86,21 +87,24 @@ def test_valid_message_multi(setup):
     msg2 = 'test2'
 
     assert message.message_send(user_1['token'], channel_data['channel_id'], msg) == {'message_id': 1}
-    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [{
+    assert other.data['messages'] == [{
         'message_id': 1,
+        'channel_id': channel_data['channel_id'],
         'token': user_1['token'],
         'message': msg
     }]
 
     assert message.message_send(user_2['token'], channel_data['channel_id'], msg2) == {'message_id': 2}
-    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
+    assert other.data['messages'] == [
         {
         'message_id': 1,
+        'channel_id': channel_data['channel_id'],
         'token': user_1['token'],
         'message': msg
         },
         {
         'message_id': 2,
+        'channel_id': channel_data['channel_id'],
         'token': user_2['token'],
         'message': msg2
         }
@@ -168,9 +172,10 @@ def test_message_remove_valid(setup):
 
     message.message_remove(user_1['token'], 1)
 
-    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
+    assert other.data['messages'] == [
         {
         'message_id': 2,
+        'channel_id': channel_data['channel_id'],
         'token': user_1['token'],
         'message': msg
         }
@@ -226,14 +231,16 @@ def test_message_edit_valid(setup):
 
     message.message_edit(user_1['token'], 1, 'tset')
 
-    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
+    assert other.data['messages'] == [
         {
         'message_id': 1,
+        'channel_id': channel_data['channel_id'],
         'token': user_1['token'],
         'message': 'tset'
         },
         {
         'message_id': 2,
+        'channel_id': channel_data['channel_id'],
         'token': user_1['token'],
         'message': msg
         }
@@ -255,9 +262,10 @@ def test_message_edit_valid_remove(setup):
 
     message.message_edit(user_1['token'], 1, '')
 
-    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
+    assert other.data['messages'] == [
         {
         'message_id': 2,
+        'channel_id': channel_data['channel_id'],
         'token': user_1['token'],
         'message': msg
         }
