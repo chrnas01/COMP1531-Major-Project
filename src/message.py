@@ -1,4 +1,5 @@
 from error import InputError, AccessError
+from datetime import datetime, timezone
 import other
 
 def message_send(token, channel_id, message):
@@ -23,8 +24,9 @@ def message_send(token, channel_id, message):
     message_struct = {
         'message_id': message_id,
         'channel_id': channel_id,
-        'token': token,
-        'message': message
+        'u_id': other.token_to_uid(token),
+        'message': message,
+        'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
     }
 
     other.data['messages'].append(message_struct)
@@ -49,7 +51,7 @@ def message_remove(token, message_id):
         raise InputError('Message (based on ID) no longer exists')
 
     #check they are deleting their own message
-    if msg['token'] != token:
+    if msg['u_id'] != other.token_to_uid(token):
         raise AccessError('Message with message_id was not sent by the authorised user making this request')
 
     #check if they are a channel owner
@@ -72,7 +74,7 @@ def message_edit(token, message_id, message):
             break
 
     #check they are deleting their own message
-    if other.data['messages'][i]['token'] != token:
+    if other.data['messages'][i]['u_id'] != other.token_to_uid(token):
         raise AccessError('Message with message_id was not sent by the authorised user making this request')
 
     #check if they are a channel owner
