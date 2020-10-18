@@ -105,3 +105,76 @@ def test_valid_message_multi(setup):
         'message': msg2
         }
     ]
+
+def test_message_remove_nonexistent(setup):
+    '''
+    removing a message which doesn't exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channels.channels_create(user_1['token'], 'test channel', False)
+
+    with pytest.raises(InputError):
+        assert message.message_remove(user_1['token'], 1)
+
+
+def test_message_remove_other_user(setup):
+    '''
+    removing a message sent by another user
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = 'test'
+
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+
+    with pytest.raises(AccessError):
+        assert message.message_remove(user_1['token'], 1)
+
+
+def test_message_remove_no_perm(setup):
+    '''
+    removing a message sent by another user
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = 'test'
+
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+
+    with pytest.raises(AccessError):
+        assert message.message_remove(user_2['token'], 1)
+
+
+def test_message_remove_valid(setup):
+    '''
+    removing a message sent by another user
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = 'test'
+
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+
+    message.message_remove(user_1['token'], 1)
+
+    assert other.data['channels'][channel_data['channel_id'] - 1]['messages'] == [
+        {
+        'message_id': 2,
+        'token': user_1['token'],
+        'message': msg
+        }
+    ]
