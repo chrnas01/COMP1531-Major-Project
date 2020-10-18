@@ -142,7 +142,7 @@ def test_channel_invite_success(url, setup):
     payload = {
         'token': user_1['token'],
         'name': 'test channel',
-        'is_public': Talse
+        'is_public': False
     }
     channel_data = requests.post(url + 'channels/create', params=payload)
 
@@ -184,6 +184,862 @@ def test_channel_invite_success(url, setup):
 
     assert channel_details == expected_result
 
+########################################################
+
+
+def test_channel_details_invalid_channel_id(url, setup):
+    '''
+    channel does not exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': 99
+    }
+
+    with pytest.raises(InputError):
+        request.get(url + 'channel/details', params=payload)
+
+
+def test_channel_details_invalid_access(url, setup):
+    '''
+    user is not a member of that channel
+    '''
+
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+
+    with pytest.raises(AccessError):
+        request.get(url + 'channel/details', params=payload)
+
+
+def test_channel_details_success(url, setup):
+    '''
+    successful call
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/invite', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    result = request.get(url + 'channel/details', params=payload)
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
 
 ########################################################
 
+# channel messages
+
+########################################################
+
+
+def test_channel_leave_invalid_channel_id(url, setup):
+    '''
+    channel does not exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': 99
+    }
+
+    with pytest.raises(InputError):
+        requests.post(url + 'channel/leave', params=payload)
+
+def test_channel_leave_not_already_in_channel(url, setup):
+    '''
+    user is not in the channel
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+
+    with pytest.raises(AccessError):
+        requests.post(url + 'channel/leave', params=payload)
+
+
+def test_channel_leave_success_all_members(url, setup):
+    '''
+    successful call for one user to leave the channel
+    '''
+
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/invite', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/leave', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    result = request.get(url + 'channel/details', params=payload)
+
+    assert not user_2['u_id'] in result['owner_members']
+    assert not user_2['u_id'] in result['all_members']
+
+# def test_channel_leave_empty_channel(url, setup):
+#     '''
+#     successful call for both users to leave the channel
+#     '''
+#     user_1, user_2, _ = setup
+
+#     payload = {
+#         'token': user_1['token'],
+#         'name': 'test channel',
+#         'is_public': False
+#     }
+#     channel_data = requests.post(url + 'channels/create', params=payload)
+
+#     payload = {
+#         'token': user_1['token'],
+#         'channel_id': channel_data['channel_id'],
+#         'u_id': user_2['u_id']
+#     }
+#     requests.post(url + 'channel/invite', params=payload)
+
+
+#     payload = {
+#         'token': user_2['token'],
+#         'channel_id': channel_data['channel_id']
+#     }
+#     requests.post(url + 'channel/leave', params=payload)
+
+
+#     payload = {
+#         'token': user_1['token'],
+#         'channel_id': channel_data['channel_id']
+#     }
+#     requests.post(url + 'channel/leave', params=payload)
+
+
+#     assert not user_1['u_id'] in other.data['channels'][channel_data['channel_id'] - 1][
+#         'all_members']
+#     assert not user_2['u_id'] in other.data['channels'][channel_data['channel_id'] - 1][
+#         'all_members']
+
+########################################################
+
+def test_channel_join_invalid_channel_id(url, setup):
+    '''
+    channel does not exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': 99
+    }
+
+    with pytest.raises(InputError):
+        requests.post(url + 'channel/join', params=payload)
+
+def test_channel_join_invalid_access(url, setup):
+    '''
+    user does not have permissions to join the channel
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+
+    with pytest.raises(AccessError):
+        requests.post(url + 'channel/join', params=payload)
+
+
+def test_channel_join_as_flockr_owner(url, setup):
+    '''
+    successful call with user as flockr owner
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_2['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    result = request.get(url + 'channel/details', params=payload)
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+        ],
+        'all_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+
+def test_channel_join_success(url, setup):
+    '''
+    successful call
+    '''
+    user_1, user_2, user_3 = setup
+
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_3['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    result = request.get(url + 'channel/details', params=payload)
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+        ],
+        'all_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': user_3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+########################################################
+
+def test_channel_addowner_invalid_channel_id(url, setup):
+    '''
+    channel does not exist
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': 99,
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/addowner', params=payload)
+
+def test_channel_addowner_invalid_uid(url, setup):
+    '''
+    uid does not exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': 99
+    }
+
+    with pytest.raises(InputError):
+        requests.post(url + 'channel/addowner', params=payload)
+
+def test_channel_addowner_already_existing_owner(url, setup):
+    '''
+    the user is already an owner
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_1['u_id']
+    }
+
+    with pytest.raises(InputError):
+        requests.post(url + 'channel/addowner', params=payload)
+
+
+def test_channel_addowner_self_escalation(url, setup):
+    '''
+    user attempts to set themselves as owner
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+
+    with pytest.raises(AccessError):
+        requests.post(url + 'channel/addowner', params=payload)
+
+def test_channel_addowner_not_owner_of_channel(url, setup):
+    '''
+    user does not have permissions to set other user as owner
+    '''
+    # Setup pytest
+    user_1, user_2, user_3 = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_3['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_3['u_id']
+    }
+
+
+    with pytest.raises(AccessError):
+        requests.post(url + 'channel/addowner', params=payload)
+
+def test_channel_addowner_success(url, setup):
+    '''
+    successful call
+    '''
+    # Setup pytest
+    user_1, user_2, user_3 = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_3['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/addowner', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_3['u_id']
+    }
+    requests.post(url + 'channel/addowner', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    result = request.get(url + 'channel/details', params=payload)
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': user_3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+        'all_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': user_3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+########################################################
+
+def test_channel_removeowner_invalid_channel_id(url, setup):
+    '''
+    channel does not exist
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': 99,
+        'u_id': user_2['u_id']
+    }
+
+    with pytest.raises(InputError):
+        requests.post(url + 'channel/removeowner', params=payload)
+
+
+def test_channel_removeowner_not_valid_uid(url, setup):
+    '''
+    uid is invalid
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': 99
+    }
+
+    with pytest.raises(InputError):
+        requests.post(url + 'channel/removeowner', params=payload)
+
+
+def test_channel_removeowner_not_owner_of_channel(url, setup):
+    '''
+    the user, perms being removed, is not an owner of the channel
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+
+    with pytest.raises(InputError):
+        requests.post(url + 'channel/removeowner', params=payload)
+
+def test_channel_removeowner_invalid_perm(url, setup):
+    '''
+    the user, removing perms, is not an owner of the channel
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_1['u_id']
+    }
+
+    with pytest.raises(AccessError):
+        requests.post(url + 'channel/removeowner', params=payload)
+
+def test_channel_removeowner_success(url, setup):
+    '''
+    successful call
+    '''
+    # Setup pytest
+    user_1, user_2, user_3 = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_3['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/addowner', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_3['u_id']
+    }
+    requests.post(url + 'channel/addowner', params=payload)
+
+    payload = {
+        'token': user_3['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/removeowner', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_3['u_id']
+    }
+    requests.post(url + 'channel/removeowner', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_1['u_id']
+    }
+    requests.post(url + 'channel/removeowner', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    result = request.get(url + 'channel/details', params=payload)
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+
+        ],
+        'all_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': user_3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+def test_channel_removeowner_as_flockr_owner(url, setup):
+    '''
+    successful call with user, removing perms, as flock owner
+    '''
+    # Setup pytest
+    user_1, user_2, user_3 = setup
+
+    payload = {
+        'token': user_2['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_3['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    requests.post(url + 'channel/join', params=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_3['u_id']
+    }
+    requests.post(url + 'channel/addowner', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/removeowner', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_3['u_id']
+    }
+    requests.post(url + 'channel/removeowner', params=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id']
+    }
+    result = request.get(url + 'channel/details', params=payload)
+
+    expected_result = {
+        'name': 'test channel',
+        'owner_members': [
+
+        ],
+        'all_members': [
+            {
+                'u_id': user_1['u_id'],
+                'name_first': 'Jayden',
+                'name_last': 'Leung',
+            },
+            {
+                'u_id': user_2['u_id'],
+                'name_first': 'Steven',
+                'name_last': 'Luong',
+            },
+            {
+                'u_id': user_3['u_id'],
+                'name_first': 'Sam',
+                'name_last': 'He',
+            },
+        ],
+    }
+
+    assert result == expected_result
+
+########################################################
