@@ -60,6 +60,19 @@ def auth_login():
         'token': token
     })
 
+@APP.route("/auth/logout", methods=['POST'])
+def auth_logout():
+    '''
+    Given an active token, invalidates the token to log the user out.
+    If a valid token is given, and the user is successfully logged out,
+    it returns true, otherwise false.
+    '''
+    token = request.get_json('token')
+    for user in other.data['users']:
+        if user['token'] == token:
+            return dumps({'is_success': True})
+    return dumps({'is_success': False})
+
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
