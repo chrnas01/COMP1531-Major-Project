@@ -65,7 +65,6 @@ def channels_create(token, name, is_public):
         'is_public': is_public,
         'owner_members': [other.token_to_uid(token),],
         'all_members': [other.token_to_uid(token),],
-        'messages': []
     }
 
     other.data['channels'].append(new_channel)

@@ -28,7 +28,6 @@ def test_channels_list_successful():
             'is_public': True,
             'owner_members': [user1['u_id'],],
             'all_members': [user1['u_id'],],
-            'messages': []
         },
     ]}
 
@@ -51,7 +50,6 @@ def test_channels_list_successful_two_channels():
             'is_public': True,
             'owner_members': [user1['u_id'],],
             'all_members': [user1['u_id'],],
-            'messages': []
         },
         {
             'channel_name': 'Channel_2',
@@ -59,7 +57,6 @@ def test_channels_list_successful_two_channels():
             'is_public': False,
             'owner_members': [user1['u_id'],],
             'all_members': [user1['u_id'],],
-            'messages': []
         },
     ]}
 
@@ -97,7 +94,6 @@ def test_channels_listall_successful():
             'is_public': True,
             'owner_members': [user1['u_id'],],
             'all_members': [user1['u_id'],],
-            'messages': []
         },
         {
             'channel_name': 'Channel_2',
@@ -105,7 +101,6 @@ def test_channels_listall_successful():
             'is_public': False,
             'owner_members': [user2['u_id'],],
             'all_members': [user2['u_id'],],
-            'messages': []
         },
     ]}
 
