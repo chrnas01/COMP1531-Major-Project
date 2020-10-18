@@ -5,6 +5,7 @@ from flask_cors import CORS
 from error import InputError, AccessError
 import re
 from auth import is_email_registered, is_password_correct
+import other
 
 def defaultHandler(err):
     response = err.get_response()
