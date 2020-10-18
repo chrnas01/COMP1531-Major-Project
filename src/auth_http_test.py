@@ -17,7 +17,7 @@ def test_auth_login_invalid_email(url):
     Test to check auth login invalid email
     '''
     other.clear()
-    resp = requests.post(url + 'auth/login', params={'email': 'nicholas@gmai.l.com', 'password': 'password'})
+    resp = requests.post(url + '/auth/login', params={'email': 'nicholas@gmai.l.com', 'password': 'password'})
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -50,16 +50,14 @@ def test_logout_success(url):
     requests.post(url + 'auth/register', params={'email': 'nicholas@gmail.com', 'password': 'password', 'name_first': 'nicholas', 'name_last': 'tan'})
     requests.post(url + 'auth/login', params={'email': 'nicholas@gmail.com', 'password': 'password'})
     resp = requests.post(url + 'auth/logout', params={'email': 'nicholas@gmail.com', 'password': 'password'})
-    assert "is_success" in resp.json()
-    assert resp.json()['is_success']
+    json.loads(resp.text) == {'is_success': True}
 
-def test_auth_unsuccessful_logout():
+def test_auth_unsuccessful_logout(url):
     '''
     Check logout was unsuccessful
     '''
     resp = requests.post(url + 'auth/logout', params={'email': 'nicholas@gmail.com', 'password': 'password'})
-    assert "is_success" in resp.json()
-    assert resp.json()['is_success'] == False
+    json.loads(resp.text) == {'is_success': False}
 
 ################################################################################
 
@@ -97,10 +95,7 @@ def test_auth_register_password_valid(url):
     '''
     other.clear()
     resp = requests.post(url + 'auth/register', params={'email': 'nicholas@gmail.com', 'password': 'ABCDEF', 'name_first': 'nicholas', 'name_last': 'tan'}) # 6 characters password (valid)
-    assert "u_id" in resp.json()
-    assert "token" in resp.json()
-    assert resp.json()['u_id'] == 1
-    assert other.decrypt_token(resp.json()['token']) == {'token': 1}
+    json.loads(resp.text) == {'u_id': 1, 'token': 1}
 
 ################################################################################
 
@@ -123,27 +118,23 @@ def test_auth_register_firstname_long(url):
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
-def test_auth_register_firstname_valid1():
+def test_auth_register_firstname_valid1(url):
     '''
     name_first is of valid length
     '''
     other.clear()
     # name_first is length 1
-    resp = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'A', 'LASTNAME')
-    assert 'u_id' in resp.json()
-    assert resp.json()['u_id'] == 1
-    assert other.decrypt_token(resp.json()['token']) == {'token': 1}
+    resp = requests.post(url + 'auth/register', params={'email': 'nicholas@gmail.com', 'password': 'password', 'name_first': 'A', 'name_last': 'tan'})
+    json.loads(resp.text) == {'u_id': 1, 'token': 1}
 
-def test_auth_register_firstname_valid2():
+def test_auth_register_firstname_valid2(url):
     '''
     name_first is exactly the character limit
     '''
     other.clear()
     # name_first is length 50
-    resp = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'A'*50, 'LASTNAME')
-    assert 'u_id' in resp.json()
-    assert resp.json()['u_id'] == 1
-    assert other.decrypt_token(resp.json()['token']) == {'token': 1}
+    resp = requests.post(url + 'auth/register', params={'email': 'nicholas@gmail.com', 'password': 'password', 'name_first': 'A'*50, 'name_last': 'tan'})
+    json.loads(resp.text) == {'u_id': 1, 'token': 1}
 
 ################################################################################
 # Tests on name_last
@@ -165,24 +156,20 @@ def test_auth_register_lastname_long(url):
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
-def test_auth_register_lastname_valid1():
+def test_auth_register_lastname_valid1(url):
     '''
     name_last is of valid length
     '''
     other.clear()
     # name_last is length 1
-    resp = test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'A')
-    assert 'u_id' in resp.json()
-    assert resp.json()['u_id'] == 1
-    assert other.decrypt_token(resp.json()['token']) == {'token': 1}
+    resp = requests.post(url + 'auth/register', params={'email': 'nicholas@gmail.com', 'password': 'password', 'name_first': 'nicholas', 'name_last': 'A'})
+    json.loads(resp.text) == {'u_id': 1, 'token': 1}
 
-def test_auth_register_lastname_valid2():
+def test_auth_register_lastname_valid2(url):
     '''
     name_last is of valid length
     '''
     other.clear()
     # name_last is length 50
-    resp = test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'A'*50)
-    assert 'u_id' in resp.json()
-    assert resp.json()['u_id'] == 1
-    assert other.decrypt_token(resp.json()['token']) == {'token': 1}
+    resp = requests.post(url + 'auth/register', params={'email': 'nicholas@gmail.com', 'password': 'password', 'name_first': 'nicholas', 'name_last': 'A'*50})
+    json.loads(resp.text) == {'u_id': 1, 'token': 1}
