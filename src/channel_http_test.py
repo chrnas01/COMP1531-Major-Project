@@ -82,8 +82,10 @@ def test_channel_invite_invalid_channel_id(url, setup):
         'u_id': user_2['u_id']
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/invite', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/invite', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_invite_invalid_uid(url, setup):
@@ -106,8 +108,10 @@ def test_channel_invite_invalid_uid(url, setup):
         'u_id': 99
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/invite', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/invite', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_invite_invalid_access(url, setup):
@@ -128,8 +132,11 @@ def test_channel_invite_invalid_access(url, setup):
         'channel_id': channel_data['channel_id'],
         'u_id': user_3['u_id']
     }
-    with pytest.raises(AccessError):
-        requests.post(url + 'channel/invite', params=payload)
+
+    # AccessError
+    resp = requests.post(url + 'channel/invite', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_invite_success(url, setup):
@@ -157,7 +164,7 @@ def test_channel_invite_success(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    channel_details = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -182,7 +189,7 @@ def test_channel_invite_success(url, setup):
         ],
     }
 
-    assert channel_details == expected_result
+    assert json.loads(resp.text) == expected_result
 
 ########################################################
 
@@ -198,8 +205,10 @@ def test_channel_details_invalid_channel_id(url, setup):
         'channel_id': 99
     }
 
-    with pytest.raises(InputError):
-        request.get(url + 'channel/details', params=payload)
+    # InputError
+    resp = request.get(url + 'channel/details', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_details_invalid_access(url, setup):
@@ -221,8 +230,10 @@ def test_channel_details_invalid_access(url, setup):
         'channel_id': channel_data['channel_id']
     }
 
-    with pytest.raises(AccessError):
-        request.get(url + 'channel/details', params=payload)
+    # AccessError
+    resp = request.get(url + 'channel/details', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_details_success(url, setup):
@@ -249,7 +260,7 @@ def test_channel_details_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    result = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -274,7 +285,7 @@ def test_channel_details_success(url, setup):
         ],
     }
 
-    assert result == expected_result
+    assert json.loads(resp.txt) == expected_result
 
 
 ########################################################
@@ -295,8 +306,10 @@ def test_channel_leave_invalid_channel_id(url, setup):
         'channel_id': 99
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/leave', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/leave', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_leave_not_already_in_channel(url, setup):
@@ -317,8 +330,10 @@ def test_channel_leave_not_already_in_channel(url, setup):
         'channel_id': channel_data['channel_id']
     }
 
-    with pytest.raises(AccessError):
-        requests.post(url + 'channel/leave', params=payload)
+    # AccessError
+    resp = requests.post(url + 'channel/leave', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_leave_success_all_members(url, setup):
@@ -352,10 +367,10 @@ def test_channel_leave_success_all_members(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    result = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
-    assert not user_2['u_id'] in result['owner_members']
-    assert not user_2['u_id'] in result['all_members']
+    assert not user_2['u_id'] in json.loads(resp.text)['owner_members']
+    assert not user_2['u_id'] in json.loads(resp.text)['all_members']
 
 # def test_channel_leave_empty_channel(url, setup):
 #     '''
@@ -411,8 +426,10 @@ def test_channel_join_invalid_channel_id(url, setup):
         'channel_id': 99
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/join', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/join', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_join_invalid_access(url, setup):
@@ -434,8 +451,10 @@ def test_channel_join_invalid_access(url, setup):
         'channel_id': channel_data['channel_id']
     }
 
-    with pytest.raises(AccessError):
-        requests.post(url + 'channel/join', params=payload)
+    # AccessError
+    resp = requests.post(url + 'channel/join', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_join_as_flockr_owner(url, setup):
@@ -462,7 +481,7 @@ def test_channel_join_as_flockr_owner(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    result = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -487,7 +506,7 @@ def test_channel_join_as_flockr_owner(url, setup):
         ],
     }
 
-    assert result == expected_result
+    assert json.loads(resp.text) == expected_result
 
 
 def test_channel_join_success(url, setup):
@@ -519,7 +538,7 @@ def test_channel_join_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    result = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -549,7 +568,7 @@ def test_channel_join_success(url, setup):
         ],
     }
 
-    assert result == expected_result
+    assert json.loads(resp.text) == expected_result
 
 ########################################################
 
@@ -565,7 +584,11 @@ def test_channel_addowner_invalid_channel_id(url, setup):
         'channel_id': 99,
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/addowner', params=payload)
+
+    # InputError
+    resp = requests.post(url + 'channel/addowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_addowner_invalid_uid(url, setup):
@@ -587,8 +610,10 @@ def test_channel_addowner_invalid_uid(url, setup):
         'u_id': 99
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/addowner', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/addowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_addowner_already_existing_owner(url, setup):
@@ -610,8 +635,10 @@ def test_channel_addowner_already_existing_owner(url, setup):
         'u_id': user_1['u_id']
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/addowner', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/addowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_addowner_self_escalation(url, setup):
@@ -640,8 +667,10 @@ def test_channel_addowner_self_escalation(url, setup):
         'u_id': user_2['u_id']
     }
 
-    with pytest.raises(AccessError):
-        requests.post(url + 'channel/addowner', params=payload)
+    # AccessError
+    resp = requests.post(url + 'channel/addowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_addowner_not_owner_of_channel(url, setup):
@@ -676,8 +705,10 @@ def test_channel_addowner_not_owner_of_channel(url, setup):
         'u_id': user_3['u_id']
     }
 
-    with pytest.raises(AccessError):
-        requests.post(url + 'channel/addowner', params=payload)
+    # AccessError
+    resp = requests.post(url + 'channel/addowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_addowner_success(url, setup):
@@ -724,7 +755,7 @@ def test_channel_addowner_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    result = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -764,7 +795,7 @@ def test_channel_addowner_success(url, setup):
         ],
     }
 
-    assert result == expected_result
+    assert json.loads(resp.text) == expected_result
 
 ########################################################
 
@@ -782,8 +813,10 @@ def test_channel_removeowner_invalid_channel_id(url, setup):
         'u_id': user_2['u_id']
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/removeowner', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/removeowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_removeowner_not_valid_uid(url, setup):
@@ -812,8 +845,10 @@ def test_channel_removeowner_not_valid_uid(url, setup):
         'u_id': 99
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/removeowner', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/removeowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_removeowner_not_owner_of_channel(url, setup):
@@ -842,8 +877,10 @@ def test_channel_removeowner_not_owner_of_channel(url, setup):
         'u_id': user_2['u_id']
     }
 
-    with pytest.raises(InputError):
-        requests.post(url + 'channel/removeowner', params=payload)
+    # InputError
+    resp = requests.post(url + 'channel/removeowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_removeowner_invalid_perm(url, setup):
@@ -872,8 +909,10 @@ def test_channel_removeowner_invalid_perm(url, setup):
         'u_id': user_1['u_id']
     }
 
-    with pytest.raises(AccessError):
-        requests.post(url + 'channel/removeowner', params=payload)
+    # AccessError
+    resp = requests.post(url + 'channel/removeowner', params=payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400
 
 
 def test_channel_removeowner_success(url, setup):
@@ -941,7 +980,7 @@ def test_channel_removeowner_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    result = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -967,7 +1006,7 @@ def test_channel_removeowner_success(url, setup):
         ],
     }
 
-    assert result == expected_result
+    assert json.loads(resp.text) == expected_result
 
 
 def test_channel_removeowner_as_flockr_owner(url, setup):
@@ -1021,7 +1060,7 @@ def test_channel_removeowner_as_flockr_owner(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    result = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -1047,6 +1086,6 @@ def test_channel_removeowner_as_flockr_owner(url, setup):
         ],
     }
 
-    assert result == expected_result
+    assert json.loads(resp.text) == expected_result
 
 ########################################################
