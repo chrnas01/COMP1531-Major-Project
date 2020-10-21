@@ -104,6 +104,7 @@ def auth_register(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
+        'permission_id': 1 if u_id == 1 else 0 # flockr owner for first person registered 
     }
 
     other.data['users'].append(new_register)
