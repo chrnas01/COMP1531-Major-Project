@@ -54,3 +54,13 @@ def decrypt_token(encrypted_token):
     SECRET = 'IOAE@*#)_IEI@#U()IOJF}_@w30p}"ASDAP9*&@*_!$^_$983y17ae1)(#&@!)wed2891ydhaq;sd'
     decrypted_token = jwt.decode(encrypted_token, SECRET, "HS256")
     return decrypted_token
+
+def is_empty():
+    if data['users']:
+        return False
+    if data['channels']:
+        return False
+    if data['messages']:
+        return False
+    return True
+    
