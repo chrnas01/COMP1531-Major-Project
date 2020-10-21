@@ -26,11 +26,11 @@ def auth_login(email, password):
         raise InputError('Password is incorrect - Cannot login')
 
     # calculate token
-    token = email
+    token = other.encrypt_token(u_id).decode("utf-8")
 
     return {
         'u_id': u_id,
-        'token': token,
+        'token': token
     }
 
 # provided a token, determines if logout is_success
@@ -42,8 +42,8 @@ def auth_logout(token):
     '''
     for user in other.data['users']:
         if user['token'] == token:
-            return {'is_success ': True}
-    return {'is_success ': False}
+            return {'is_success': True}
+    return {'is_success': False}
 
 def auth_register(email, password, name_first, name_last):
     '''
@@ -75,10 +75,10 @@ def auth_register(email, password, name_first, name_last):
     # check if already registered email
     if is_email_registered(email):
         raise InputError('Email is already registered - Cannot register')
-
+    
     # register
     u_id = len(other.data['users']) + 1 # first person u_id 1, second 2,...
-    token = email # iteration 1, token is email
+    token = other.encrypt_token(u_id).decode("utf-8")
 
     # concatenate
     handle_str = name_first.lower() + name_last.lower()
@@ -94,6 +94,7 @@ def auth_register(email, password, name_first, name_last):
                 handle_exists = True
 
     if handle_exists:
+        handle_str = handle_str[:20 - len(str(u_id))]
         handle_str = handle_str + str(u_id)
 
     new_register = {
@@ -111,7 +112,7 @@ def auth_register(email, password, name_first, name_last):
 
     return {
         'u_id': u_id,
-        'token': token,
+        'token': token
     }
 
 def is_email_registered(email):
