@@ -46,7 +46,7 @@ def setup():
         'name_first': 'Jayden',
         'name_last': 'Leung'
     }
-    user1 = requests.post(url + 'register', params=payload)
+    user1 = requests.post(url + 'register', json=payload)
 
     payload = {
         'email': 'steven@gmail.com',
@@ -54,7 +54,7 @@ def setup():
         'name_first': 'Steven',
         'name_last': 'Luong'
     }
-    user2 = requests.post(url + 'register', params=payload)
+    user2 = requests.post(url + 'register', json=payload)
 
     payload = {
         'email': 'sam@gmail.com',
@@ -62,7 +62,7 @@ def setup():
         'name_first': 'Sam',
         'name_last': 'He'
     }
-    user3 = requests.post(url + 'register', params=payload)
+    user3 = requests.post(url + 'register', json=payload)
 
     return user_1, user_2, user_3
 
@@ -83,7 +83,7 @@ def test_channel_invite_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/invite', params=payload)
+    resp = requests.post(url + 'channel/invite', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -100,7 +100,7 @@ def test_channel_invite_invalid_uid(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
@@ -109,7 +109,7 @@ def test_channel_invite_invalid_uid(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/invite', params=payload)
+    resp = requests.post(url + 'channel/invite', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -125,7 +125,7 @@ def test_channel_invite_invalid_access(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -134,7 +134,7 @@ def test_channel_invite_invalid_access(url, setup):
     }
 
     # AccessError
-    resp = requests.post(url + 'channel/invite', params=payload)
+    resp = requests.post(url + 'channel/invite', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -151,20 +151,20 @@ def test_channel_invite_success(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/invite', params=payload)
+    requests.post(url + 'channel/invite', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -206,7 +206,7 @@ def test_channel_details_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -223,7 +223,7 @@ def test_channel_details_invalid_access(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -231,7 +231,7 @@ def test_channel_details_invalid_access(url, setup):
     }
 
     # AccessError
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -247,20 +247,20 @@ def test_channel_details_success(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/invite', params=payload)
+    requests.post(url + 'channel/invite', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -307,7 +307,7 @@ def test_channel_leave_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/leave', params=payload)
+    resp = requests.post(url + 'channel/leave', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -323,7 +323,7 @@ def test_channel_leave_not_already_in_channel(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -331,7 +331,7 @@ def test_channel_leave_not_already_in_channel(url, setup):
     }
 
     # AccessError
-    resp = requests.post(url + 'channel/leave', params=payload)
+    resp = requests.post(url + 'channel/leave', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -348,26 +348,26 @@ def test_channel_leave_success_all_members(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/invite', params=payload)
+    requests.post(url + 'channel/invite', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/leave', params=payload)
+    requests.post(url + 'channel/leave', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     assert not user_2['u_id'] in json.loads(resp.text)['owner_members']
     assert not user_2['u_id'] in json.loads(resp.text)['all_members']
@@ -383,28 +383,28 @@ def test_channel_leave_success_all_members(url, setup):
 #         'name': 'test channel',
 #         'is_public': False
 #     }
-#     channel_data = requests.post(url + 'channels/create', params=payload)
+#     channel_data = requests.post(url + 'channels/create', json=payload)
 
 #     payload = {
 #         'token': user_1['token'],
 #         'channel_id': channel_data['channel_id'],
 #         'u_id': user_2['u_id']
 #     }
-#     requests.post(url + 'channel/invite', params=payload)
+#     requests.post(url + 'channel/invite', json=payload)
 
 
 #     payload = {
 #         'token': user_2['token'],
 #         'channel_id': channel_data['channel_id']
 #     }
-#     requests.post(url + 'channel/leave', params=payload)
+#     requests.post(url + 'channel/leave', json=payload)
 
 
 #     payload = {
 #         'token': user_1['token'],
 #         'channel_id': channel_data['channel_id']
 #     }
-#     requests.post(url + 'channel/leave', params=payload)
+#     requests.post(url + 'channel/leave', json=payload)
 
 
 #     assert not user_1['u_id'] in other.data['channels'][channel_data['channel_id'] - 1][
@@ -427,7 +427,7 @@ def test_channel_join_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/join', params=payload)
+    resp = requests.post(url + 'channel/join', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -444,7 +444,7 @@ def test_channel_join_invalid_access(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -452,7 +452,7 @@ def test_channel_join_invalid_access(url, setup):
     }
 
     # AccessError
-    resp = requests.post(url + 'channel/join', params=payload)
+    resp = requests.post(url + 'channel/join', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -469,19 +469,19 @@ def test_channel_join_as_flockr_owner(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -520,25 +520,25 @@ def test_channel_join_success(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_3['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -586,7 +586,7 @@ def test_channel_addowner_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/addowner', params=payload)
+    resp = requests.post(url + 'channel/addowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -602,7 +602,7 @@ def test_channel_addowner_invalid_uid(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
@@ -611,7 +611,7 @@ def test_channel_addowner_invalid_uid(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/addowner', params=payload)
+    resp = requests.post(url + 'channel/addowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -627,7 +627,7 @@ def test_channel_addowner_already_existing_owner(url, setup):
         'name': 'test channel',
         'is_public': False
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
@@ -636,7 +636,7 @@ def test_channel_addowner_already_existing_owner(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/addowner', params=payload)
+    resp = requests.post(url + 'channel/addowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -653,13 +653,13 @@ def test_channel_addowner_self_escalation(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -668,7 +668,7 @@ def test_channel_addowner_self_escalation(url, setup):
     }
 
     # AccessError
-    resp = requests.post(url + 'channel/addowner', params=payload)
+    resp = requests.post(url + 'channel/addowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -685,19 +685,19 @@ def test_channel_addowner_not_owner_of_channel(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_3['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -706,7 +706,7 @@ def test_channel_addowner_not_owner_of_channel(url, setup):
     }
 
     # AccessError
-    resp = requests.post(url + 'channel/addowner', params=payload)
+    resp = requests.post(url + 'channel/addowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -723,39 +723,39 @@ def test_channel_addowner_success(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_3['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/addowner', params=payload)
+    requests.post(url + 'channel/addowner', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_3['u_id']
     }
-    requests.post(url + 'channel/addowner', params=payload)
+    requests.post(url + 'channel/addowner', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -814,7 +814,7 @@ def test_channel_removeowner_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/removeowner', params=payload)
+    resp = requests.post(url + 'channel/removeowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -831,13 +831,13 @@ def test_channel_removeowner_not_valid_uid(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_1['token'],
@@ -846,7 +846,7 @@ def test_channel_removeowner_not_valid_uid(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/removeowner', params=payload)
+    resp = requests.post(url + 'channel/removeowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -863,13 +863,13 @@ def test_channel_removeowner_not_owner_of_channel(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_1['token'],
@@ -878,7 +878,7 @@ def test_channel_removeowner_not_owner_of_channel(url, setup):
     }
 
     # InputError
-    resp = requests.post(url + 'channel/removeowner', params=payload)
+    resp = requests.post(url + 'channel/removeowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -895,13 +895,13 @@ def test_channel_removeowner_invalid_perm(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -910,7 +910,7 @@ def test_channel_removeowner_invalid_perm(url, setup):
     }
 
     # AccessError
-    resp = requests.post(url + 'channel/removeowner', params=payload)
+    resp = requests.post(url + 'channel/removeowner', json=payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400
 
@@ -927,60 +927,60 @@ def test_channel_removeowner_success(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_3['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/addowner', params=payload)
+    requests.post(url + 'channel/addowner', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_3['u_id']
     }
-    requests.post(url + 'channel/addowner', params=payload)
+    requests.post(url + 'channel/addowner', json=payload)
 
     payload = {
         'token': user_3['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/removeowner', params=payload)
+    requests.post(url + 'channel/removeowner', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_3['u_id']
     }
-    requests.post(url + 'channel/removeowner', params=payload)
+    requests.post(url + 'channel/removeowner', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_1['u_id']
     }
-    requests.post(url + 'channel/removeowner', params=payload)
+    requests.post(url + 'channel/removeowner', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -1021,46 +1021,46 @@ def test_channel_removeowner_as_flockr_owner(url, setup):
         'name': 'test channel',
         'is_public': True
     }
-    channel_data = requests.post(url + 'channels/create', params=payload)
+    channel_data = requests.post(url + 'channels/create', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_3['token'],
         'channel_id': channel_data['channel_id']
     }
-    requests.post(url + 'channel/join', params=payload)
+    requests.post(url + 'channel/join', json=payload)
 
     payload = {
         'token': user_2['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_3['u_id']
     }
-    requests.post(url + 'channel/addowner', params=payload)
+    requests.post(url + 'channel/addowner', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_2['u_id']
     }
-    requests.post(url + 'channel/removeowner', params=payload)
+    requests.post(url + 'channel/removeowner', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'u_id': user_3['u_id']
     }
-    requests.post(url + 'channel/removeowner', params=payload)
+    requests.post(url + 'channel/removeowner', json=payload)
 
     payload = {
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = request.get(url + 'channel/details', params=payload)
+    resp = request.get(url + 'channel/details', json=payload)
 
     expected_result = {
         'name': 'test channel',
