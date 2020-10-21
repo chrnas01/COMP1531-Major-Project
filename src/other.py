@@ -127,3 +127,12 @@ def valid_user(u_id):
         if user['u_id'] == u_id:
             return True
     return False
+
+def get_user_handle_strs():
+    '''
+    Get all handle strs
+    '''
+    ret = []
+    for user in data['users']:
+        ret.append(user['handle_str'])
+    return ret
