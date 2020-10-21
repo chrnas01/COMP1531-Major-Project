@@ -69,13 +69,19 @@ def test_valid_message(setup):
 
     assert message.message_send(
             user_1['token'], channel_data['channel_id'], msg) == {'message_id': 1}
-    assert other.data['messages'] == [{
-        'message_id': 1,
-        'channel_id': channel_data['channel_id'],
-        'u_id': user_1['u_id'],
-        'message': msg,
-        'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-    }]
+    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
 
 def test_valid_message_multi(setup):
     '''
@@ -91,32 +97,42 @@ def test_valid_message_multi(setup):
 
     assert message.message_send(
             user_1['token'], channel_data['channel_id'], msg) == {'message_id': 1}
-    assert other.data['messages'] == [{
-        'message_id': 1,
-        'channel_id': channel_data['channel_id'],
-        'u_id': user_1['u_id'],
-        'message': msg,
-        'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-    }]
+    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
 
     assert message.message_send(
             user_2['token'], channel_data['channel_id'], msg2) == {'message_id': 2}
-    assert other.data['messages'] == [
-        {
-            'message_id': 1,
-            'channel_id': channel_data['channel_id'],
-            'u_id': user_1['u_id'],
-            'message': msg,
-            'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-        },
-        {
-            'message_id': 2,
-            'channel_id': channel_data['channel_id'],
-            'u_id': user_2['u_id'],
-            'message': msg2,
-            'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-        }
-    ]
+    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            },
+            {
+                'message_id': 2,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_2['u_id'],
+                'message': msg2,
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
 
 def test_message_remove_nonexistent(setup):
     '''
@@ -180,15 +196,19 @@ def test_message_remove_valid(setup):
 
     message.message_remove(user_1['token'], 1)
 
-    assert other.data['messages'] == [
-        {
-            'message_id': 2,
-            'channel_id': channel_data['channel_id'],
-            'u_id': user_1['u_id'],
-            'message': msg,
-            'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-        }
-    ]
+    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+        'messages': [
+            {
+                'message_id': 2,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
 
 def test_message_edit_other_user(setup):
     '''
@@ -240,22 +260,26 @@ def test_message_edit_valid(setup):
 
     message.message_edit(user_1['token'], 1, 'tset')
 
-    assert other.data['messages'] == [
-        {
-            'message_id': 1,
-            'channel_id': channel_data['channel_id'],
-            'u_id': user_1['u_id'],
-            'message': 'tset',
-            'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-        },
-        {
-            'message_id': 2,
-            'channel_id': channel_data['channel_id'],
-            'u_id': user_1['u_id'],
-            'message': msg,
-            'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-        }
-    ]
+    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'tset',
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            },
+            {
+                'message_id': 2,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
 
 def test_message_edit_valid_remove(setup):
     '''
@@ -273,12 +297,16 @@ def test_message_edit_valid_remove(setup):
 
     message.message_edit(user_1['token'], 1, '')
 
-    assert other.data['messages'] == [
-        {
-            'message_id': 2,
-            'channel_id': channel_data['channel_id'],
-            'u_id': user_1['u_id'],
-            'message': msg,
-            'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
-        }
-    ]
+    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+        'messages': [
+            {
+                'message_id': 2,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }

@@ -110,7 +110,7 @@ def channel_messages(token, channel_id, start):
             messages.append(msg)
 
     if (start + 50) >= len(messages):
-        end_index = len(messages) - 1
+        end_index = len(messages)
         end = -1
 
     return {
