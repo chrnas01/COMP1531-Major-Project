@@ -16,7 +16,7 @@ def test_auth_login_invalid_email(url):
         'email': 'nicholas@gmai.l.com',
         'password': 'password'
     }
-    resp = requests.post(url + 'auth/login', params=payload)
+    resp = requests.post(url + 'auth/login', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -29,7 +29,7 @@ def test_auth_login_not_registered(url):
         'email': 'nicholas@gmail.com',
         'password': 'password'
     }
-    resp = requests.post(url + 'auth/login', params=payload)
+    resp = requests.post(url + 'auth/login', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -45,13 +45,13 @@ def test_auth_login_incorrect_password(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    requests.post(url + 'auth/register', params=payload)
+    requests.post(url + 'auth/register', json=payload)
 
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'notthepassword'
     }
-    resp = requests.post(url + 'auth/login', params=payload)
+    resp = requests.post(url + 'auth/login', json=payload)
 
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
@@ -69,19 +69,18 @@ def test_logout_success(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    requests.post(url + 'auth/register', params=payload)
+    requests.post(url + 'auth/register', json=payload)
 
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password'
     }
-    requests.post(url + 'auth/login', params=payload)
-
+    resp = requests.post(url + 'auth/login', json=payload)
+    
     payload = {
-        'email': 'nicholas@gmail.com',
-        'password': 'password'
+        'token': resp.json()['token']
     }
-    resp = requests.post(url + 'auth/logout', params=payload)
+    resp = requests.post(url + 'auth/logout', json=payload)
     assert json.loads(resp.text) == {'is_success': True}
 
 def test_auth_unsuccessful_logout(url):
@@ -89,10 +88,9 @@ def test_auth_unsuccessful_logout(url):
     Check logout was unsuccessful
     '''
     payload = {
-        'email': 'nicholas@gmail.com',
-        'password': 'password'
+        'token': 'this_token_does_not_exist',
     }
-    resp = requests.post(url + 'auth/logout', params=payload)
+    resp = requests.post(url + 'auth/logout', json=payload)
     assert json.loads(resp.text) == {'is_success': False}
 
 ################################################################################
@@ -108,7 +106,7 @@ def test_auth_register_invalid_email(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
+    resp = requests.post(url + 'auth/register', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -123,7 +121,7 @@ def test_auth_register_used(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    requests.post(url + 'auth/register', params=payload)
+    requests.post(url + 'auth/register', json=payload)
 
     payload = {
         'email': 'nicholas@gmail.com',
@@ -131,7 +129,7 @@ def test_auth_register_used(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
+    resp = requests.post(url + 'auth/register', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -146,7 +144,7 @@ def test_auth_register_password_too_long(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload) # 5 characters password (too short)
+    resp = requests.post(url + 'auth/register', json=payload) # 5 characters password (too short)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -161,8 +159,8 @@ def test_auth_register_password_valid(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload) # 6 characters password (valid)
-    assert json.loads(resp.text) == {'u_id': 1, 'token': 1}
+    resp = requests.post(url + 'auth/register', json=payload) # 6 characters password (valid)
+    assert json.loads(resp.text) == {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
 
 ################################################################################
 
@@ -178,7 +176,7 @@ def test_auth_register_firstname_short(url):
         'name_first': '',
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
+    resp = requests.post(url + 'auth/register', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -193,7 +191,7 @@ def test_auth_register_firstname_long(url):
         'name_first': 'A'*51,
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
+    resp = requests.post(url + 'auth/register', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -209,8 +207,8 @@ def test_auth_register_firstname_valid1(url):
         'name_first': 'A',
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
-    assert json.loads(resp.text) == {'u_id': 1, 'token': 1}
+    resp = requests.post(url + 'auth/register', json=payload)
+    assert json.loads(resp.text) == {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
 
 def test_auth_register_firstname_valid2(url):
     '''
@@ -224,8 +222,8 @@ def test_auth_register_firstname_valid2(url):
         'name_first': 'A'*50,
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
-    assert json.loads(resp.text) == {'u_id': 1, 'token': 1}
+    resp = requests.post(url + 'auth/register', json=payload)
+    assert json.loads(resp.text) == {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
 
 ################################################################################
 # Tests on name_last
@@ -240,7 +238,7 @@ def test_auth_register_lastname_short(url):
         'name_first': 'nicholas',
         'name_last': ''
     }
-    resp = requests.post(url + 'auth/register', params=payload)
+    resp = requests.post(url + 'auth/register', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -255,7 +253,7 @@ def test_auth_register_lastname_long(url):
         'name_first': 'nicholas',
         'name_last': 'A'*51
     }
-    resp = requests.post(url + 'auth/register', params=payload)
+    resp = requests.post(url + 'auth/register', json=payload)
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
@@ -271,8 +269,8 @@ def test_auth_register_lastname_valid1(url):
         'name_first': 'nicholas',
         'name_last': 'A'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
-    assert json.loads(resp.text) == {'u_id': 1, 'token': 1}
+    resp = requests.post(url + 'auth/register', json=payload)
+    assert json.loads(resp.text) == {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
 
 def test_auth_register_lastname_valid2(url):
     '''
@@ -286,5 +284,52 @@ def test_auth_register_lastname_valid2(url):
         'name_first': 'nicholas',
         'name_last': 'A'*50
     }
-    resp = requests.post(url + 'auth/register', params=payload)
-    assert json.loads(resp.text) == {'u_id': 1, 'token': 1}
+    resp = requests.post(url + 'auth/register', json=payload)
+    assert json.loads(resp.text) == {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
+
+################################################################################
+# Tests for handle_str
+def test_http_handle_str1(url):
+    '''
+    testing that the handle string randomisation is working
+    '''
+    other.clear()
+    payload = {
+        'email': 'EMAIL@gmail.com',
+        'password': 'WORDSS',
+        'name_first': 'FIRSTNAME',
+        'name_last': 'LASTNAME'
+    }
+    requests.post(url + 'auth/register', json=payload)
+
+    payload = {
+        'email': 'EMAIL2@gmail.com',
+        'password': 'WORDSS',
+        'name_first': 'FIRSTNAME',
+        'name_last': 'LASTNAME'
+    }
+    requests.post(url + 'auth/register', json=payload)
+    assert other.get_user_handle_strs() == ['firstnamelastname', 'firstnamelastname2']
+
+def test_http_handle_str20char(url):
+    '''
+    testing that the handle string randomisation is working for names longer
+    than 20 characters
+    '''
+    other.clear()
+    payload = {
+        'email': 'EMAIL2@gmail.com',
+        'password': 'WORDSS',
+        'name_first': 'twentycharacters',
+        'name_last': 'isthisname'
+    }
+    requests.post(url + 'auth/register', json=payload)
+
+    payload = {
+        'email': 'EMAIL@gmail.com',
+        'password': 'WORDSS',
+        'name_first': 'twentycharacters',
+        'name_last': 'isthisname'
+    }
+    requests.post(url + 'auth/register', json=payload)
+    assert other.get_user_handle_strs() == ['twentycharactersisth', 'twentycharactersist2']
