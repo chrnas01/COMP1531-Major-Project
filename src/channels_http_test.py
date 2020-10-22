@@ -143,3 +143,78 @@ def test_channels_listall_successful():
     '''
     Successfully provides a list of all channels and their associated details
     '''
+     
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user 
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload)
+
+    # Creating Private and Public Channel 
+    channel_payload1 = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': False
+    }
+    channel1 = requests.post(url + 'channels/create', json = channel_payloa1)
+
+    channel_payload2 = {
+        'token': user1['token'],
+        'name': 'Channel2',
+        'is_public': True
+    }
+    channel2 = requests.post(url + 'channels/create', json = channel_payload2)
+
+    # Generating a list of channels the user is apart of 
+    resp = request.get(url + 'channels/listall', json = {'token': user1['token']})
+
+    assert json.loads(resp.txt) ==  {'channels': [
+        {
+            'channel_name': 'Channel1',
+            'channel_id': channel1['channel_id'],
+            'is_public': False,
+            'owner_members': [user1['u_id'],],
+            'all_members': [user1['u_id'],],
+        },
+        {
+            'channel_name': 'Channel_2',
+            'channel_id': channel2['channel_id'],
+            'is_public': True,
+            'owner_members': [user1['u_id'],],
+            'all_members': [user1['u_id'],],
+        },
+    ]}
+
+def test_channels_listall_no_existing_channels():
+    '''
+    If there are no existing channels channels_listall() should return an empty list
+    '''
+     # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering users 
+    user_payload1 = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload1)
+
+     # Generating a list of channels that exist 
+    resp = request.get(url + 'channels/listall', json = {'token': user1['token']})
+    assert json.loads(resp.txt) == {'channels': []}
+
+# Tests for channels_create() function.
+###################################################################################
+
+def test_channels_create_invalid_channel_name1():
+    '''
+    Public channel name is greater than 20 characters long
+    '''
