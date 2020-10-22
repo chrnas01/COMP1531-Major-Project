@@ -1,17 +1,14 @@
 '''
 Tests functions in other.py
 '''
-import pytest
+import json
+import requests
 import other
-import auth
-import message
-import channels
-import channel
-from datetime import datetime, timezone
-from error import InputError, AccessError
+import pytest
+from echo_http_test import url
 
 @pytest.fixture
-def setup():
+def setup(url):
     '''
     Resets user data for each test
     '''
@@ -49,7 +46,7 @@ def setup():
 ################################################################################
 
 
-def test_admin_userpermission_change_invalid_uid(setup):
+def test_admin_userpermission_change_invalid_uid(url, setup):
     '''
     Changing user permission of u_id that does not exist
     '''
@@ -59,7 +56,7 @@ def test_admin_userpermission_change_invalid_uid(setup):
     user_1, _, _ = setup
 
     payload = {
-        'token': user_1['token'],
+        'token': user_1.json()['token'],
         'u_id': 99,
         'permission_id': 1
     }
@@ -68,7 +65,7 @@ def test_admin_userpermission_change_invalid_uid(setup):
     assert resp.json()['code'] == 400
 
 
-def test_admin_userpermission_change_invalid_permission_id(setup):
+def test_admin_userpermission_change_invalid_permission_id(url, setup):
     '''
     Changing user permission with wrong permission_id
     '''
@@ -76,8 +73,8 @@ def test_admin_userpermission_change_invalid_permission_id(setup):
     user_1, user_2, _ = setup
 
     payload = {
-        'token': user_1['token'],
-        'u_id': user_2['u_id'],
+        'token': user_1.json()['token'],
+        'u_id': user_2.json()['u_id'],
         'permission_id': 2
     }
     resp = requests.post(url + 'admin/userpermission/change', json=payload)
@@ -85,7 +82,7 @@ def test_admin_userpermission_change_invalid_permission_id(setup):
     assert resp.json()['code'] == 400
 
 
-def test_admin_userpermission_change_unauthorised_user(setup):
+def test_admin_userpermission_change_unauthorised_user(url, setup):
     '''
     Changing user permission with wrong unauthorised user
     '''
@@ -93,8 +90,8 @@ def test_admin_userpermission_change_unauthorised_user(setup):
     _, user_2, user_3 = setup
 
     payload = {
-        'token': user_2['token'],
-        'u_id': user_3['u_id'],
+        'token': user_2.json()['token'],
+        'u_id': user_3.json()['u_id'],
         'permission_id': 1
     }
     resp = requests.post(url + 'admin/userpermission/change', json=payload)
@@ -102,21 +99,28 @@ def test_admin_userpermission_change_unauthorised_user(setup):
     assert resp.json()['code'] == 400
 
 
-def test_admin_userpermission_change_success(setup):
+def test_admin_userpermission_change_success(url, setup):
     '''
     Successful admin user permission change
     '''
     # Setup pytest
     user_1, user_2, _ = setup
 
+    # Test that {} was returned (Not an error)
     payload = {
-        'token': user_1['token'],
-        'u_id': user_2['u_id'],
+        'token': user_1.json()['token'],
+        'u_id': user_2.json()['u_id'],
         'permission_id': 1
     }
     resp = requests.post(url + 'admin/userpermission/change', json=payload)
-
-    assert is_successful_in_change_permissions(user_1, user_2)
     assert json.loads(resp.text) == {}
 
-################################################################################
+    # Test that user permission was changed
+    payload = {
+        'user_1': user_1.json(),
+        'user_2': user_2.json()
+    }
+    resp = requests.post(url + 'other/successful/permissions', json=payload)
+    assert json.loads(resp.text) == {'successful': True}
+
+###############################################################################
