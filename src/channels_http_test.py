@@ -198,7 +198,7 @@ def test_channels_listall_no_existing_channels():
      # Clearing Database 
     requests.delete(url + 'clear')
 
-    # Registering users 
+    # Registering user 
     user_payload1 = {
         'email': 'chrisnassif@gmail.com',
         'password': 'password',
@@ -218,3 +218,241 @@ def test_channels_create_invalid_channel_name1():
     '''
     Public channel name is greater than 20 characters long
     '''
+
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload1 = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload1)
+
+    # Creatinng Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': True
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400 
+
+
+def test_channels_create_invalid_channel_name2():
+    '''
+    Private channel name is greater than 20 characters long
+    '''
+    
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload1 = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload1)
+
+    # Creatinng Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': False
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400 
+
+def test_channels_create_20char_channel_name():
+    '''
+    Boundary Test: Channel name is exactly 20 characters long
+    '''
+
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload)
+
+    # Creatinng Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 20*'a',
+        'is_public': False
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload)
+    assert json.loads(resp.txt) == {'channel_id': 1}
+
+def test_channels_create_successful_public():
+    '''
+    Public channel is successfully created
+    '''
+    
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload)
+
+    # Creatinng Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': True
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload)
+    assert json.loads(resp.txt) == {'channel_id': 1}
+
+def test_channels_create_successful_private():
+    '''
+    Private channel is successfully created
+    '''
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload)
+
+    # Creatinng Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': False
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload)
+    assert json.loads(resp.txt) == {'channel_id': 1}
+
+def test_channels_create_name_exists():
+    '''
+    Channel name already exists
+    '''
+
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering users 
+    user_payload1 = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload1)
+
+    user_payload2 = {
+        'email': 'johnsmith@gmail.com',
+        'password': 'password',
+        'name_first': 'John',
+        'name_last': 'Smith'
+    }
+    user2 = requests.post(url + 'auth/register', json = user_payload2)
+    
+    # Creating Channel 
+    channel_payload1 = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': True
+    }
+    channel1 = requests.post(url + 'channels/create', json = channel_payload1)
+    
+    channel_payload2 = {
+        'token': user2['token'],
+        'name': 'Channel1',
+        'is_public': True
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload2)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400 
+
+def test_channels_create_nameless_channel():
+    '''
+    Channel name is not input i.e. trying to make a channel without a name
+    '''
+    
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload)
+
+    # Creatinng Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': '',
+        'is_public': False
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload)
+    assert 'code' in resp.json()
+    assert resp.json()['code'] == 400 
+
+def test_channels_create_successful_private_multi():
+    '''
+    Creating multiple channels (Testing the channel_id progression system)
+    '''
+    
+    # Clearing Database 
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json = user_payload)
+
+    # Creatinng Channels
+    channel_payload1 = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': True
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload1)
+    assert json.loads(resp.txt) == {'channel_id': 1}
+
+    channel_payload2 = {
+        'token': user1['token'],
+        'name': 'Channel2',
+        'is_public': False
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload2)
+    assert json.loads(resp.txt) == {'channel_id': 2}
+
+    channel_payload3 = {
+        'token': user1['token'],
+        'name': 'Channel3',
+        'is_public': True
+    }
+    resp = requests.post(url + 'channels/create', json = channel_payload3)
+    assert json.loads(resp.txt) == {'channel_id': 3}
