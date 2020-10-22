@@ -72,7 +72,28 @@ def other_clear():
     '''
     Clear database
     '''
-    other.clear()
+    return dumps(other.clear())
+
+@APP.route('/other/show', methods=['GET'])
+def show():
+    '''
+    shows
+    '''
+    return dumps(other.data)
+
+@APP.route('/other/is_empty', methods=['GET'])
+def show_is_empty():
+    '''
+    shows if empty
+    '''
+    return dumps(other.is_empty())
+
+@APP.route('/other/show/handle_str', methods=['GET'])
+def show_handle_strs():
+    '''
+    shows handle strings
+    '''
+    return dumps(other.get_user_handle_strs())
 
 
 if __name__ == "__main__":
