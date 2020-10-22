@@ -18,16 +18,20 @@ def test_http_user_clear_1(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    requests.post(url + 'auth/register', params=payload)
+    requests.post(url + 'auth/register', json=payload)
     requests.delete(url + 'clear')
-    assert other.is_empty()
+
+    resp = requests.get(url + 'other/is_empty', json=payload)
+    assert json.loads(resp.text)
 
 def test_http_user_clear_0(url):
     '''
     test clearing zero users
     '''
     requests.delete(url + 'clear')
-    assert other.is_empty()
+
+    resp = requests.get(url + 'other/is_empty')
+    assert json.loads(resp.text)
 
 def test_http_channel_clear_1(url):
     '''
@@ -39,14 +43,15 @@ def test_http_channel_clear_1(url):
         'name_first': 'nicholas',
         'name_last': 'tan'
     }
-    resp = requests.post(url + 'auth/register', params=payload)
+    resp = requests.post(url + 'auth/register', json=payload)
 
     payload = {
         'token': resp.json()['token'],
         'name': 'my_channel',
         'is_public': True
     }
-    requests.post(url + 'channels/create', params=payload) 
+    requests.post(url + 'channels/create', json=payload) 
     
     requests.delete(url + 'clear')
-    assert other.is_empty()
+    resp = requests.get(url + 'other/is_empty', json=payload)
+    assert json.loads(resp.text)
