@@ -103,12 +103,18 @@ def channel_messages(token, channel_id, start):
     end = start + 50
     end_index = end
 
-    if (start + 50) >= len(other.data['messages']):
-        end_index = len(other.data['messages']) - 1
+    messages = []
+
+    for msg in other.data['messages']:
+        if msg['channel_id'] == channel_id:
+            messages.append(msg)
+
+    if end >= len(messages):
+        end_index = len(messages)
         end = -1
 
     return {
-        'messages': other.data['messages'][start:end_index],
+        'messages': messages[start:end_index],
         'start': start,
         'end': end
     }

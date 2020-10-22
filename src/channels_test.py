@@ -201,4 +201,3 @@ def test_channels_create_successful_private_multi():
     assert channels.channels_create(user1['token'], 'ChannelName', False) == {'channel_id': 1}
     assert channels.channels_create(user1['token'], 'ChannelName2', False) == {'channel_id': 2}
     assert channels.channels_create(user1['token'], 'ChannelName3', False) == {'channel_id': 3}
-

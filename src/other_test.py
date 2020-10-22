@@ -4,6 +4,10 @@ Tests functions in other.py
 import pytest
 import other
 import auth
+import message
+import channels
+import channel
+from datetime import datetime, timezone
 from error import InputError, AccessError
 
 
@@ -79,3 +83,69 @@ def test_admin_userpermission_change_success(setup):
     assert successful
 
 ################################################################################
+
+def test_search(setup):
+    '''
+    searching in a channel
+    '''
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+
+    message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
+    message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_send(user_1['token'], channel_data['channel_id'], 'Hello')
+    message.message_send(user_2['token'], channel_data['channel_id'], 'test2')
+
+    assert other.search(user_1['token'], 'est') == {
+        'messages': [
+            {
+                'message_id': 2,
+                'channel_id': channel_data['channel_id'],
+                'u_id': other.token_to_uid(user_1['token']),
+                'message': 'test',
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            },
+            {
+                'message_id': 4,
+                'channel_id': channel_data['channel_id'],
+                'u_id': other.token_to_uid(user_2['token']),
+                'message': 'test2',
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ]
+    }
+
+def test_search_other_channel(setup):
+    '''
+    searching in a separate channel
+    '''
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel_data2 = channels.channels_create(user_2['token'], 'test channel2', False)
+
+    message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
+    message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_send(user_1['token'], channel_data['channel_id'], 'Hello')
+    message.message_send(user_2['token'], channel_data2['channel_id'], 'test2')
+
+    assert other.search(user_1['token'], 'e') == {
+        'messages': [
+            {
+                'message_id': 2,
+                'channel_id': channel_data['channel_id'],
+                'u_id': other.token_to_uid(user_1['token']),
+                'message': 'test',
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            },
+            {
+                'message_id': 3,
+                'channel_id': channel_data['channel_id'],
+                'u_id': other.token_to_uid(user_1['token']),
+                'message': 'Hello',
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ]
+    }
