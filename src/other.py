@@ -93,11 +93,6 @@ def encrypt_token(u_id):
     encrypted_token = jwt.encode({'token': u_id}, SECRET, "HS256")
     return encrypted_token
 
-def decrypt_token(encrypted_token):
-    SECRET = 'IOAE@*#)_IEI@#U()IOJF}_@w30p}"ASDAP9*&@*_!$^_$983y17ae1)(#&@!)wed2891ydhaq;sd'
-    decrypted_token = jwt.decode(encrypted_token, SECRET, "HS256")
-    return decrypted_token
-
 def is_empty():
     if data['users']:
         return False
@@ -117,7 +112,6 @@ def check_if_flockr_owner(u_id):
                 return True
 
     return False
-
 
 def valid_user(u_id):
     '''
