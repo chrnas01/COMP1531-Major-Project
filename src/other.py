@@ -1,8 +1,13 @@
 '''
 Contains miscellaneous functions
 '''
+import auth
+import channels
+import jwt
+import hashlib
 from error import InputError, AccessError
 import channels
+
 
 data = {
     'users': [],
@@ -80,9 +85,26 @@ def token_to_uid(token):
     for user in data['users']:
         if user['token'] == token:
             return user['u_id']
+    else:
+        return -1 
 
-    return -1
+def password_encrypt(password):
+    encrypted_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    return encrypted_password
 
+def encrypt_token(u_id):
+    SECRET = 'IOAE@*#)_IEI@#U()IOJF}_@w30p}"ASDAP9*&@*_!$^_$983y17ae1)(#&@!)wed2891ydhaq;sd'
+    encrypted_token = jwt.encode({'token': u_id}, SECRET, "HS256")
+    return encrypted_token
+
+def is_empty():
+    if data['users']:
+        return False
+    if data['channels']:
+        return False
+    if data['messages']:
+        return False
+    return True
 
 def check_if_flockr_owner(u_id):
     '''
@@ -95,7 +117,6 @@ def check_if_flockr_owner(u_id):
 
     return False
 
-
 def valid_user(u_id):
     '''
     Checks if the given u_id is a valid user
@@ -104,3 +125,12 @@ def valid_user(u_id):
         if user['u_id'] == u_id:
             return True
     return False
+
+def get_user_handle_strs():
+    '''
+    Get all handle strs
+    '''
+    ret = []
+    for user in data['users']:
+        ret.append(user['handle_str'])
+    return ret

@@ -29,9 +29,9 @@ def url():
         server.kill()
         raise Exception("Couldn't get URL from local server")
 
-# def test_echo(url):
-#     '''
-#     A simple test to check echo
-#     '''
-#     resp = requests.get(url + 'echo', params={'data': 'hello'})
-#     assert json.loads(resp.text) == {'data': 'hello'}
+def test_echo(url):
+    '''
+    A simple test to check echo
+    '''
+    resp = requests.get(url + 'echo', params={'data': 'hello'})
+    assert json.loads(resp.text) == {'data': 'hello'}
