@@ -11,7 +11,7 @@ def test_auth_login_invalid_email(url):
     '''
     Test to check auth login invalid email
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmai.l.com',
         'password': 'password'
@@ -24,7 +24,7 @@ def test_auth_login_not_registered(url):
     '''
     Test to check auth login invalid email
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password'
@@ -37,7 +37,7 @@ def test_auth_login_incorrect_password(url):
     '''
     Password is not correct
     '''
-    other.clear()
+    requests.delete(url + 'clear')
 
     payload = {
         'email': 'nicholas@gmail.com',
@@ -56,13 +56,33 @@ def test_auth_login_incorrect_password(url):
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
+def test_auth_valid_login(url):
+    '''
+    Check valid
+    '''
+    requests.delete(url + 'clear')
+    payload = {
+        'email': 'nicholas@gmail.com',
+        'password': 'password',
+        'name_first': 'nicholas',
+        'name_last': 'tan'
+    }
+    requests.post(url + 'auth/register', json=payload)
+
+    payload = {
+        'email': 'nicholas@gmail.com',
+        'password': 'password'
+    }
+    resp = requests.post(url + 'auth/login', json=payload)
+    assert json.loads(resp.text) == {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
+
 ################################################################################
 
 def test_logout_success(url):
     '''
     Check valid
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password',
@@ -99,7 +119,7 @@ def test_auth_register_invalid_email(url):
     '''
     Test to check auth register invalid email
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmai.l.com',
         'password': 'password',
@@ -114,7 +134,7 @@ def test_auth_register_used(url):
     '''
     Test to check auth register already used email
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password',
@@ -137,7 +157,7 @@ def test_auth_register_password_too_long(url):
     '''
     Test to check auth register invalid password (length 5)
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'ABCDE',
@@ -152,7 +172,7 @@ def test_auth_register_password_valid(url):
     '''
     Test to check auth register valid password (length 6)
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'ABCDEF',
@@ -169,7 +189,7 @@ def test_auth_register_firstname_short(url):
     '''
     name_first is too short
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password',
@@ -184,7 +204,7 @@ def test_auth_register_firstname_long(url):
     '''
     name_first is too long
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password',
@@ -199,7 +219,7 @@ def test_auth_register_firstname_valid1(url):
     '''
     name_first is of valid length
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     # name_first is length 1
     payload = {
         'email': 'nicholas@gmail.com',
@@ -214,7 +234,7 @@ def test_auth_register_firstname_valid2(url):
     '''
     name_first is exactly the character limit
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     # name_first is length 50
     payload = {
         'email': 'nicholas@gmail.com',
@@ -231,7 +251,7 @@ def test_auth_register_lastname_short(url):
     '''
     name_last is too short
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password',
@@ -246,7 +266,7 @@ def test_auth_register_lastname_long(url):
     '''
     name_last is too long
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'nicholas@gmail.com',
         'password': 'password',
@@ -261,7 +281,7 @@ def test_auth_register_lastname_valid1(url):
     '''
     name_last is of valid length
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     # name_last is length 1
     payload = {
         'email': 'nicholas@gmail.com',
@@ -276,7 +296,7 @@ def test_auth_register_lastname_valid2(url):
     '''
     name_last is of valid length
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     # name_last is length 50
     payload = {
         'email': 'nicholas@gmail.com',
@@ -293,7 +313,7 @@ def test_http_handle_str1(url):
     '''
     testing that the handle string randomisation is working
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'EMAIL@gmail.com',
         'password': 'WORDSS',
@@ -309,14 +329,16 @@ def test_http_handle_str1(url):
         'name_last': 'LASTNAME'
     }
     requests.post(url + 'auth/register', json=payload)
-    assert other.get_user_handle_strs() == ['firstnamelastname', 'firstnamelastname2']
+
+    resp = requests.get(url + 'other/show/handle_str')
+    assert json.loads(resp.text) == ['firstnamelastname', 'firstnamelastname2']
 
 def test_http_handle_str20char(url):
     '''
     testing that the handle string randomisation is working for names longer
     than 20 characters
     '''
-    other.clear()
+    requests.delete(url + 'clear')
     payload = {
         'email': 'EMAIL2@gmail.com',
         'password': 'WORDSS',
@@ -332,4 +354,6 @@ def test_http_handle_str20char(url):
         'name_last': 'isthisname'
     }
     requests.post(url + 'auth/register', json=payload)
-    assert other.get_user_handle_strs() == ['twentycharactersisth', 'twentycharactersist2']
+
+    resp = requests.get(url + 'other/show/handle_str')
+    assert json.loads(resp.text) == ['twentycharactersisth', 'twentycharactersist2']
