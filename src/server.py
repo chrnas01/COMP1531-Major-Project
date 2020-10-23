@@ -56,7 +56,6 @@ def other_clear():
     '''
     return dumps(other.clear())
 
-
 # channels_list 
 @APP.route("/channels/list", methods = ['GET'])
 def channels_list():
