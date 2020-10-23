@@ -30,7 +30,7 @@ def test_auth_login_incorrect_password():
     '''
     other.clear()
     test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'LASTNAME')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
     with pytest.raises(InputError):
         assert auth.auth_login('EMAIL@gmail.com', 'NOTTHEPASSWORD')
@@ -41,10 +41,10 @@ def test_auth_login_correct_password():
     '''
     other.clear()
     test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'LASTNAME')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
     test_in = auth.auth_login('EMAIL@gmail.com', 'PASSWORD')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
 
@@ -87,7 +87,7 @@ def test_auth_register_password_correct():
     other.clear()
     # Password is length 6
     test_in = auth.auth_register('EMAIL@gmail.com', 'WORDSS', 'FIRSTNAME', 'LASTNAME')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
 
@@ -118,7 +118,7 @@ def test_auth_register_firstname_valid1():
     other.clear()
     # name_first is length 1
     test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'A', 'LASTNAME')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
 def test_auth_register_firstname_valid2():
@@ -128,7 +128,7 @@ def test_auth_register_firstname_valid2():
     other.clear()
     # name_first is length 50
     test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'A'*50, 'LASTNAME')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
 
@@ -159,7 +159,7 @@ def test_auth_register_lastname_valid1():
     other.clear()
     # name_last is length 1
     test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'A')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
 def test_auth_register_lastname_valid2():
@@ -169,7 +169,7 @@ def test_auth_register_lastname_valid2():
     other.clear()
     # name_last is length 50
     test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'A'*50)
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
 
@@ -181,25 +181,24 @@ def test_auth_successful_logout():
     '''
     other.clear()
     test_in = auth.auth_register('EMAIL@gmail.com', 'PASSWORD', 'FIRSTNAME', 'LASTNAME')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
     test_in = auth.auth_login('EMAIL@gmail.com', 'PASSWORD')
-    expected = {'u_id': 1, 'token': 'EMAIL@gmail.com',}
+    expected = {'u_id': 1, 'token': other.encrypt_token(1).decode("utf-8")}
     assert test_in == expected
 
-    assert auth.auth_logout('EMAIL@gmail.com') == {'is_success ': True}
+    assert auth.auth_logout(other.encrypt_token(1).decode("utf-8")) == {'is_success': True}
 
 def test_auth_unsuccessful_logout():
     '''
     logout was unsuccessful
     '''
     other.clear()
-    assert auth.auth_logout('EMAIL@gmail.com') == {'is_success ': False}
+    assert auth.auth_logout(other.encrypt_token(1).decode("utf-8")) == {'is_success': False}
 
 ################################################################################
 # Tests for handle_str
-
 def test_handle_str1():
     '''
     testing that the handle string randomisation is working
@@ -207,7 +206,7 @@ def test_handle_str1():
     other.clear()
     auth.auth_register('EMAIL@gmail.com', 'WORDSS', 'FIRSTNAME', 'LASTNAME')
     auth.auth_register('EMAIL2@gmail.com', 'WORDSS', 'FIRSTNAME', 'LASTNAME')
-    assert other.data['users'][1]['handle_str'] == 'firstnamelastname2'
+    assert other.get_user_handle_strs() == ['firstnamelastname', 'firstnamelastname2']
 
 def test_handle_str20char():
     '''
@@ -217,5 +216,4 @@ def test_handle_str20char():
     other.clear()
     auth.auth_register('EMAIL@gmail.com', 'WORDSS', 'twentycharacters', 'isthisname')
     auth.auth_register('EMAIL2@gmail.com', 'WORDSS', 'twentycharacters', 'isthisname')
-    assert other.data['users'][0]['handle_str'] == 'twentycharactersisth'
-    assert other.data['users'][1]['handle_str'] == 'twentycharactersisth2'
+    assert other.get_user_handle_strs() == ['twentycharactersisth', 'twentycharactersist2']

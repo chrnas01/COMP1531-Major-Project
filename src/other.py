@@ -1,12 +1,18 @@
 '''
 Contains miscellaneous functions
 '''
+import auth
+import channels
+import jwt
+import hashlib
 from error import InputError, AccessError
+import channels
+
 
 data = {
     'users': [],
     'channels': [],
-    'messages': [],
+    'messages': []
 }
 
 
@@ -55,17 +61,20 @@ def admin_userpermission_change(token, u_id, permission_id):
 
 def search(token, query_str):
     '''
-    Given a token and query_str searches for a message
+    Given a query string, return a collection of messages in all of
+    the channels that the user has joined that match the query
     '''
+
+    messages = []
+    user_channels = channels.channels_list(token)
+
+    for msg in data['messages']:
+        if any(channel['channel_id'] == msg['channel_id'] for channel in user_channels['channels']):
+            if query_str in msg['message']:
+                messages.append(msg)
+
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
+        'messages': messages
     }
 
 # Coverts the users token to a valid user_id
@@ -76,9 +85,26 @@ def token_to_uid(token):
     for user in data['users']:
         if user['token'] == token:
             return user['u_id']
+    else:
+        return -1 
 
-    return -1
+def password_encrypt(password):
+    encrypted_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+    return encrypted_password
 
+def encrypt_token(u_id):
+    SECRET = 'IOAE@*#)_IEI@#U()IOJF}_@w30p}"ASDAP9*&@*_!$^_$983y17ae1)(#&@!)wed2891ydhaq;sd'
+    encrypted_token = jwt.encode({'token': u_id}, SECRET, "HS256")
+    return encrypted_token
+
+def is_empty():
+    if data['users']:
+        return False
+    if data['channels']:
+        return False
+    if data['messages']:
+        return False
+    return True
 
 def check_if_flockr_owner(u_id):
     '''
@@ -91,7 +117,6 @@ def check_if_flockr_owner(u_id):
 
     return False
 
-
 def valid_user(u_id):
     '''
     Checks if the given u_id is a valid user
@@ -100,3 +125,12 @@ def valid_user(u_id):
         if user['u_id'] == u_id:
             return True
     return False
+
+def get_user_handle_strs():
+    '''
+    Get all handle strs
+    '''
+    ret = []
+    for user in data['users']:
+        ret.append(user['handle_str'])
+    return ret

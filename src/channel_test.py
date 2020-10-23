@@ -298,9 +298,9 @@ def test_channel_leave_empty_channel(setup):
     channel.channel_leave(user_1['token'], channel_data['channel_id'])
 
     assert not user_1['u_id'] in other.data['channels'][channel_data['channel_id'] - 1][
-        'all_members']
+            'all_members']
     assert not user_2['u_id'] in other.data['channels'][channel_data['channel_id'] - 1][
-        'all_members']
+            'all_members']
 
 ########################################################
 
@@ -653,7 +653,7 @@ def test_channel_removeowner_not_owner_of_channel(setup):
 
     with pytest.raises(InputError):
         assert channel.channel_removeowner(user_1['token'], channel_data[
-            'channel_id'], user_2['u_id'])
+                'channel_id'], user_2['u_id'])
 
 def test_channel_removeowner_invalid_perm(setup):
     '''
@@ -670,7 +670,7 @@ def test_channel_removeowner_invalid_perm(setup):
 
     with pytest.raises(AccessError):
         assert channel.channel_removeowner(user_2['token'], channel_data[
-            'channel_id'], user_1['u_id'])
+                'channel_id'], user_1['u_id'])
 
 def test_channel_removeowner_success(setup):
     '''

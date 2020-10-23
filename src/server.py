@@ -2,8 +2,12 @@ import sys
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from error import InputError
 import channel
+from error import InputError, AccessError
+import channels
+import auth 
+import re
+import other
 
 def defaultHandler(err):
     response = err.get_response()
@@ -56,15 +60,93 @@ def http_channel_join():
     data = request.get_json()
     return dumps(channel.channel_join(data['token'], data['channel_id']))
 
-@APP.route("/channel_addowner", methods=['POST'])
+@APP.route("/channel/addowner", methods=['POST'])
 def httpchannel_addowner():
     data = request.get_json()
     return dumps(channel.channel_addowner(data['token'], data['channel_id'], data['u_id']))
 
-@APP.route("/channel_removeowner", methods=['POST'])
+@APP.route("/channel/removeowner", methods=['POST'])
 def http_channel_removeowner():
     data = request.get_json()
     return dumps(channel.channel_removeowner(data['token'], data['channel_id'], data['u_id']))
+# auth login
+@APP.route("/auth/login", methods=['POST'])
+def auth_login():
+
+    data = request.get_json()
+    return dumps(auth.auth_login(data['email'], data['password']))
+
+# auth logout
+@APP.route("/auth/logout", methods=['POST'])
+def auth_logout():
+    '''
+    Given an active token, invalidates the token to log the user out.
+    If a valid token is given, and the user is successfully logged out,
+    it returns true, otherwise false.
+    '''
+    data = request.get_json()
+    return dumps(auth.auth_logout(data['token']))
+
+# auth register
+@APP.route("/auth/register", methods=['POST'])
+def auth_register():
+    '''
+    Given a user's first and last name, email address, and password,
+    create a new account for them and return a new token for
+    authentication in their session. A handle is generated that is the
+    concatentation of a lowercase-only first name and last name. If the
+    concatenation is longer than 20 characters, it is cutoff at 20 characters.
+    If the handle is already taken, you may modify the handle in any way you
+    see fit to make it unique.
+    '''
+    data = request.get_json()
+    return dumps(auth.auth_register(data['email'], data['password'], data['name_first'], data['name_last']))
+
+@APP.route("/clear", methods=['DELETE'])
+def other_clear():
+    '''
+    Clear database
+    '''
+    return dumps(other.clear())
+
+# channels_list 
+@APP.route("/channels/list", methods = ['GET'])
+def channels_list():
+    data = request.get_json()
+    return dumps(channels.channels_list(data['token']))
+
+# channels_listall 
+@APP.route("/channels/listall", methods = ['GET'])
+def channels_listall(): 
+    data = request.get_json()
+    return dumps(channels.channels_listall(data['token']))
+
+# channels_create 
+@APP.route("/channels/create", methods = ['POST'])
+def channels_create(): 
+    data = request.get_json()
+    return dumps(channels.channels_create(data['token'], data['name'], data['is_public']))
+@APP.route('/other/show', methods=['GET'])
+def show():
+    '''
+    shows
+    '''
+    return dumps(other.data)
+
+@APP.route('/other/is_empty', methods=['GET'])
+def show_is_empty():
+    '''
+    shows if empty
+    '''
+    return dumps(other.is_empty())
+
+@APP.route('/other/show/handle_str', methods=['GET'])
+def show_handle_strs():
+    '''
+    shows handle strings
+    '''
+    return dumps(other.get_user_handle_strs())
+
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
