@@ -131,7 +131,7 @@ def test_channels_list_no_channels(url):
         'name': 'Channel1',
         'is_public': False
     }
-    channel1 = requests.post(url + 'channels/create', json=channel_payload)
+    requests.post(url + 'channels/create', json=channel_payload)
 
     # Generating a list of channels user 2 is apart of 
     resp = requests.get(url + 'channels/list', json={'token': user2.json()['token']})
@@ -378,7 +378,7 @@ def test_channels_create_name_exists(url):
         'name': 'Channel1',
         'is_public': True
     }
-    channel1 = requests.post(url + 'channels/create', json=channel_payload1)
+    requests.post(url + 'channels/create', json=channel_payload1)
     
     channel_payload2 = {
         'token': user2.json()['token'],
