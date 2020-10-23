@@ -10,29 +10,6 @@ import auth
 import other
 
 
-# Use this fixture to get the URL of the server. It starts the server for you,
-# so you don't need to.
-@pytest.fixture
-def url():
-    url_re = re.compile(r' \* Running on ([^ ]*)')
-    server = Popen(["python3", "src/server.py"], stderr=PIPE, stdout=PIPE)
-    line = server.stderr.readline()
-    local_url = url_re.match(line.decode())
-    if local_url:
-        yield local_url.group(1)
-        # Terminate the server
-        server.send_signal(signal.SIGINT)
-        waited = 0
-        while server.poll() is None and waited < 5:
-            sleep(0.1)
-            waited += 0.1
-        if server.poll() is None:
-            server.kill()
-    else:
-        server.kill()
-        raise Exception("Couldn't get URL from local server")
-
-
 @pytest.fixture
 def setup(url):
     '''
@@ -142,7 +119,7 @@ def test_channel_invite_success(url, setup):
     channel invite success
     '''
 
-    user_1, user_2, user_3 = setup
+    user_1, user_2, _ = setup
 
     payload = {
         'token': user_1['token'],
@@ -286,7 +263,96 @@ def test_channel_details_success(url, setup):
 
 ########################################################
 
-# channel messages
+def test_channel_messages_invalid_channel_id(url, setup):
+    '''
+    channel does not exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': 99,
+        'start': 0
+    }
+
+    # InputError
+    resp = requests.get(url + 'channel/messages', json=payload)
+    resp.status_code == 400
+
+def test_channel_messages_invalid_start(url, setup):
+    '''
+    start does not exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 100
+    }
+
+    # InputError
+    resp = requests.get(url + 'channel/messages', json=payload)
+    resp.status_code == 400
+
+def test_channel_messages_invalid_user(url, setup):
+    '''
+    user does not have perms
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
+    # AccessError
+    resp = requests.get(url + 'channel/messages', json=payload)
+    resp.status_code == 400
+
+def test_channel_messages_success(url, setup):
+    '''
+    successful call
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': True
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
+    expected_result = {
+        'messages': [],
+        'start': 0,
+        'end': -1
+    }
+
+    # AccessError
+    resp = requests.get(url + 'channel/messages', json=payload)
+    assert resp.json() == expected_result
 
 ########################################################
 
