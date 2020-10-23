@@ -3,8 +3,9 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from error import InputError, AccessError
+import channels
+import auth 
 import re
-import auth
 import other
 
 def defaultHandler(err):
@@ -74,6 +75,23 @@ def other_clear():
     '''
     return dumps(other.clear())
 
+# channels_list 
+@APP.route("/channels/list", methods = ['GET'])
+def channels_list():
+    data = request.get_json()
+    return dumps(channels.channels_list(data['token']))
+
+# channels_listall 
+@APP.route("/channels/listall", methods = ['GET'])
+def channels_listall(): 
+    data = request.get_json()
+    return dumps(channels.channels_listall(data['token']))
+
+# channels_create 
+@APP.route("/channels/create", methods = ['POST'])
+def channels_create(): 
+    data = request.get_json()
+    return dumps(channels.channels_create(data['token'], data['name'], data['is_public']))
 @APP.route('/other/show', methods=['GET'])
 def show():
     '''
