@@ -115,7 +115,7 @@ def test_channels_list_no_channels(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload1)
+    user1 = requests.post(url + 'auth/register', json=user_payload1)
 
     user_payload2 = {
         'email': 'johnsmith@gmail.com',
@@ -123,19 +123,19 @@ def test_channels_list_no_channels(url):
         'name_first': 'John',
         'name_last': 'Smith'
     }
-    user2 = requests.post(url + 'auth/register', json = user_payload2)
+    user2 = requests.post(url + 'auth/register', json=user_payload2)
 
     # User 1 creates private channel 
     channel_payload = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': False
     }
-    channel1 = requests.post(url + 'channels/create', json = channel_payload)
+    channel1 = requests.post(url + 'channels/create', json=channel_payload)
 
     # Generating a list of channels user 2 is apart of 
-    resp = request.get(url + 'channels/list', json = {'token': user2['token']})
-    assert json.loads(resp.txt) == {'channels': []}
+    resp = requests.get(url + 'channels/list', json={'token': user2.json()['token']})
+    assert json.loads(resp.text) == {'channels': []}
 
     # Tests for channels_listall() function.
 ###################################################################################
@@ -155,41 +155,41 @@ def test_channels_listall_successful(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creating Private and Public Channel 
     channel_payload1 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': False
     }
-    channel1 = requests.post(url + 'channels/create', json = channel_payloa1)
+    channel1 = requests.post(url + 'channels/create', json=channel_payload1)
 
     channel_payload2 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel2',
         'is_public': True
     }
-    channel2 = requests.post(url + 'channels/create', json = channel_payload2)
+    channel2 = requests.post(url + 'channels/create', json=channel_payload2)
 
     # Generating a list of channels the user is apart of 
-    resp = request.get(url + 'channels/listall', json = {'token': user1['token']})
+    resp = requests.get(url + 'channels/listall', json={'token': user1.json()['token']})
 
-    assert json.loads(resp.txt) ==  {'channels': [
+    assert json.loads(resp.text) ==  {'channels': [
         {
             'channel_name': 'Channel1',
-            'channel_id': channel1['channel_id'],
+            'channel_id': channel1.json()['channel_id'],
             'is_public': False,
-            'owner_members': [user1['u_id'],],
-            'all_members': [user1['u_id'],],
+            'owner_members': [user1.json()['u_id']],
+            'all_members': [user1.json()['u_id']]
         },
         {
-            'channel_name': 'Channel_2',
-            'channel_id': channel2['channel_id'],
+            'channel_name': 'Channel2',
+            'channel_id': channel2.json()['channel_id'],
             'is_public': True,
-            'owner_members': [user1['u_id'],],
-            'all_members': [user1['u_id'],],
-        },
+            'owner_members': [user1.json()['u_id']],
+            'all_members': [user1.json()['u_id']]
+        }
     ]}
 
 def test_channels_listall_no_existing_channels(url):
@@ -206,11 +206,11 @@ def test_channels_listall_no_existing_channels(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload1)
+    user1 = requests.post(url + 'auth/register', json=user_payload1)
 
      # Generating a list of channels that exist 
-    resp = request.get(url + 'channels/listall', json = {'token': user1['token']})
-    assert json.loads(resp.txt) == {'channels': []}
+    resp = requests.get(url + 'channels/listall', json={'token': user1.json()['token']})
+    assert json.loads(resp.text) == {'channels': []}
 
 # Tests for channels_create() function.
 ###################################################################################
@@ -230,17 +230,17 @@ def test_channels_create_invalid_channel_name1(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload1)
+    user1 = requests.post(url + 'auth/register', json=user_payload1)
 
     # Creatinng Channel
     channel_payload = {
-        'token': user1['token'],
-        'name': 'Channel1',
+        'token': user1.json()['token'],
+        'name': 'ChannelNameGreaterthan20characters',
         'is_public': True
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload)
+    resp = requests.post(url + 'channels/create', json=channel_payload)
     assert 'code' in resp.json()
-    assert resp.json()['code'] == 400 
+    assert resp.json()['code'] == 400
 
 
 def test_channels_create_invalid_channel_name2(url):
@@ -258,15 +258,15 @@ def test_channels_create_invalid_channel_name2(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload1)
+    user1 = requests.post(url + 'auth/register', json=user_payload1)
 
     # Creatinng Channel
     channel_payload = {
-        'token': user1['token'],
-        'name': 'Channel1',
+        'token': user1.json()['token'],
+        'name': 'ChannelNameGreaterthan20characters',
         'is_public': False
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload)
+    resp = requests.post(url + 'channels/create', json=channel_payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400 
 
@@ -285,16 +285,16 @@ def test_channels_create_20char_channel_name(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creatinng Channel
     channel_payload = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 20*'a',
         'is_public': False
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload)
-    assert json.loads(resp.txt) == {'channel_id': 1}
+    resp = requests.post(url + 'channels/create', json=channel_payload)
+    assert json.loads(resp.text) == {'channel_id': 1}
 
 def test_channels_create_successful_public(url):
     '''
@@ -311,16 +311,16 @@ def test_channels_create_successful_public(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creatinng Channel
     channel_payload = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': True
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload)
-    assert json.loads(resp.txt) == {'channel_id': 1}
+    resp = requests.post(url + 'channels/create', json=channel_payload)
+    assert json.loads(resp.text) == {'channel_id': 1}
 
 def test_channels_create_successful_private(url):
     '''
@@ -336,16 +336,16 @@ def test_channels_create_successful_private(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creatinng Channel
     channel_payload = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': False
     }
     resp = requests.post(url + 'channels/create', json = channel_payload)
-    assert json.loads(resp.txt) == {'channel_id': 1}
+    assert json.loads(resp.text) == {'channel_id': 1}
 
 def test_channels_create_name_exists(url):
     '''
@@ -362,7 +362,7 @@ def test_channels_create_name_exists(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload1)
+    user1 = requests.post(url + 'auth/register', json=user_payload1)
 
     user_payload2 = {
         'email': 'johnsmith@gmail.com',
@@ -370,18 +370,18 @@ def test_channels_create_name_exists(url):
         'name_first': 'John',
         'name_last': 'Smith'
     }
-    user2 = requests.post(url + 'auth/register', json = user_payload2)
+    user2 = requests.post(url + 'auth/register', json=user_payload2)
     
     # Creating Channel 
     channel_payload1 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': True
     }
-    channel1 = requests.post(url + 'channels/create', json = channel_payload1)
+    channel1 = requests.post(url + 'channels/create', json=channel_payload1)
     
     channel_payload2 = {
-        'token': user2['token'],
+        'token': user2.json()['token'],
         'name': 'Channel1',
         'is_public': True
     }
@@ -404,15 +404,15 @@ def test_channels_create_nameless_channel(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creatinng Channel
     channel_payload = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': '',
         'is_public': False
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload)
+    resp = requests.post(url + 'channels/create', json=channel_payload)
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400 
 
@@ -431,29 +431,29 @@ def test_channels_create_successful_private_multi(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creatinng Channels
     channel_payload1 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': True
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload1)
-    assert json.loads(resp.txt) == {'channel_id': 1}
+    resp = requests.post(url + 'channels/create', json=channel_payload1)
+    assert json.loads(resp.text) == {'channel_id': 1}
 
     channel_payload2 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel2',
         'is_public': False
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload2)
-    assert json.loads(resp.txt) == {'channel_id': 2}
+    resp = requests.post(url + 'channels/create', json=channel_payload2)
+    assert json.loads(resp.text) == {'channel_id': 2}
 
     channel_payload3 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel3',
         'is_public': True
     }
-    resp = requests.post(url + 'channels/create', json = channel_payload3)
-    assert json.loads(resp.txt) == {'channel_id': 3}
+    resp = requests.post(url + 'channels/create', json=channel_payload3)
+    assert json.loads(resp.text) == {'channel_id': 3}
