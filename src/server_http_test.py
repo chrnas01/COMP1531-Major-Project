@@ -266,4 +266,114 @@ def test_message_remove_success(url, setup):
 
 # http_message_edit
 
+def test_message_edit_invalid_sender(url, setup):
+    '''
+    editing a message that was sent by a different user
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/invite', json=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'message': 'edit'
+    }
+
+    # AccessError
+    resp = requests.put(url + 'message/edit', json=payload)
+    resp.status_code == 400
+
+def test_message_edit_invalid_perms(url, setup):
+    '''
+    editing a message without permissions
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/invite', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'message_id': resp['message_id'],
+        'message': 'edit'
+    }
+
+    # AccessError
+    resp = requests.put(url + 'message/edit', json=payload)
+    resp.status_code == 400
+
+def test_message_edit_success(url, setup):
+    '''
+    successful call
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'message': 'edit'
+    }
+    requests.put(url + 'message/edit', json=payload)
+
+    expected_result = {
+        'messages': ['edit'],
+        'start': 0,
+        'end': -1
+    }
+
+    resp = requests.get(url + 'channel/messages', params=payload)
+    assert resp.json() == expected_result
+
 ########################################################
