@@ -134,3 +134,14 @@ def get_user_handle_strs():
     for user in data['users']:
         ret.append(user['handle_str'])
     return ret
+
+def is_successful_in_change_permissions(user_1, user_2):
+    '''
+    Check that permissions were changed
+    '''
+    successful = False
+    for user in data['users']:
+        if user['u_id'] == user_2['u_id']:
+            if user['permission_id'] == 1:
+                successful = True
+    return {'successful': successful}
