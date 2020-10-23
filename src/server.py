@@ -47,7 +47,12 @@ def http_channel_details():
     return dumps(channel.channel_details(data['token'], data['channel_id']))
 
 ####################
-# CHANNEL MESSAGES
+
+@APP.route("/channel/messages", methods=['GET'])
+def http_channel_messages():
+    data = request.get_json()
+    return dumps(channel.channel_messages(data['token'], data['channel_id'], data['start']))
+
 ####################
 
 @APP.route("/channel/leave", methods=['POST'])
@@ -61,7 +66,7 @@ def http_channel_join():
     return dumps(channel.channel_join(data['token'], data['channel_id']))
 
 @APP.route("/channel/addowner", methods=['POST'])
-def httpchannel_addowner():
+def http_channel_addowner():
     data = request.get_json()
     return dumps(channel.channel_addowner(data['token'], data['channel_id'], data['u_id']))
 
@@ -69,6 +74,7 @@ def httpchannel_addowner():
 def http_channel_removeowner():
     data = request.get_json()
     return dumps(channel.channel_removeowner(data['token'], data['channel_id'], data['u_id']))
+
 # auth login
 @APP.route("/auth/login", methods=['POST'])
 def auth_login():
@@ -102,22 +108,6 @@ def auth_register():
     data = request.get_json()
     return dumps(auth.auth_register(data['email'], data['password'], data['name_first'], data['name_last']))
 
-@APP.route("/admin/userpermission/change", methods=['POST'])
-def admin_userpermission_change():
-    '''
-    Change permissions
-    '''
-    data = request.get_json()
-    return other.admin_userpermission_change(data['token'], data['u_id'], data['permission_id'])
-
-@APP.route("/other/successful/permissions", methods=['POST'])
-def other_if_successful_permission():
-    '''
-    Check if permission change was successful
-    '''
-    data = request.get_json()
-    return dumps(other.is_successful_in_change_permissions(data['user_1'], data['user_2']))
-
 @APP.route("/clear", methods=['DELETE'])
 def other_clear():
     '''
@@ -142,6 +132,7 @@ def channels_listall():
 def channels_create(): 
     data = request.get_json()
     return dumps(channels.channels_create(data['token'], data['name'], data['is_public']))
+
 @APP.route('/other/show', methods=['GET'])
 def show():
     '''
