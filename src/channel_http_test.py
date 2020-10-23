@@ -350,7 +350,6 @@ def test_channel_messages_success(url, setup):
         'end': -1
     }
 
-    # AccessError
     resp = requests.get(url + 'channel/messages', params=payload)
     assert resp.json() == expected_result
 
