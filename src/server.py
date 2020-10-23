@@ -2,9 +2,10 @@ import sys
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from error import InputError
+from error import InputError, AccessError
 import channels
 import auth 
+import re
 import other
 
 def defaultHandler(err):
@@ -33,6 +34,24 @@ def echo():
     return dumps({
         'data': data
     })
+
+# auth login
+@APP.route("/auth/login", methods=['POST'])
+def auth_login():
+
+    data = request.get_json()
+    return dumps(auth.auth_login(data['email'], data['password']))
+
+# auth logout
+@APP.route("/auth/logout", methods=['POST'])
+def auth_logout():
+    '''
+    Given an active token, invalidates the token to log the user out.
+    If a valid token is given, and the user is successfully logged out,
+    it returns true, otherwise false.
+    '''
+    data = request.get_json()
+    return dumps(auth.auth_logout(data['token']))
 
 # auth register
 @APP.route("/auth/register", methods=['POST'])
@@ -73,6 +92,27 @@ def channels_listall():
 def channels_create(): 
     data = request.get_json()
     return dumps(channels.channels_create(data['token'], data['name'], data['is_public']))
+@APP.route('/other/show', methods=['GET'])
+def show():
+    '''
+    shows
+    '''
+    return dumps(other.data)
+
+@APP.route('/other/is_empty', methods=['GET'])
+def show_is_empty():
+    '''
+    shows if empty
+    '''
+    return dumps(other.is_empty())
+
+@APP.route('/other/show/handle_str', methods=['GET'])
+def show_handle_strs():
+    '''
+    shows handle strings
+    '''
+    return dumps(other.get_user_handle_strs())
+
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
