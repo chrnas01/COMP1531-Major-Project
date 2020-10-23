@@ -139,7 +139,7 @@ def test_channel_invite_success(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -181,7 +181,7 @@ def test_channel_details_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
     resp.status_code == 400
 
 
@@ -205,7 +205,7 @@ def test_channel_details_invalid_access(url, setup):
     }
 
     # AccessError
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
     resp.status_code == 400
 
 
@@ -233,7 +233,7 @@ def test_channel_details_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -427,7 +427,7 @@ def test_channel_leave_success_all_members(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     assert not user_2['u_id'] in resp.json()['owner_members']
     assert not user_2['u_id'] in resp.json()['all_members']
@@ -497,7 +497,7 @@ def test_channel_join_as_flockr_owner(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -554,7 +554,7 @@ def test_channel_join_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -766,7 +766,7 @@ def test_channel_addowner_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -987,7 +987,7 @@ def test_channel_removeowner_success(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
@@ -1067,7 +1067,7 @@ def test_channel_removeowner_as_flockr_owner(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id']
     }
-    resp = requests.get(url + 'channel/details', json=payload)
+    resp = requests.get(url + 'channel/details', params=payload)
 
     expected_result = {
         'name': 'test channel',
