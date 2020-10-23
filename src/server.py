@@ -108,6 +108,22 @@ def auth_register():
     data = request.get_json()
     return dumps(auth.auth_register(data['email'], data['password'], data['name_first'], data['name_last']))
 
+@APP.route("/admin/userpermission/change", methods=['POST'])
+def admin_userpermission_change():
+    '''
+    Change permissions
+    '''
+    data = request.get_json()
+    return other.admin_userpermission_change(data['token'], data['u_id'], data['permission_id'])
+
+@APP.route("/other/successful/permissions", methods=['POST'])
+def other_if_successful_permission():
+    '''
+    Check if permission change was successful
+    '''
+    data = request.get_json()
+    return dumps(other.is_successful_in_change_permissions(data['user_1'], data['user_2']))
+
 @APP.route("/clear", methods=['DELETE'])
 def other_clear():
     '''
