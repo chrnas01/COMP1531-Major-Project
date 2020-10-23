@@ -1,6 +1,7 @@
 import pytest
 import re
 from subprocess import Popen, PIPE
+from datetime import datetime, timezone
 import signal
 import requests
 import json
@@ -121,7 +122,15 @@ def test_message_send_success(url, setup):
     }
 
     expected_result = {
-        'messages': ['test'],
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
         'start': 0,
         'end': -1
     }
@@ -181,7 +190,7 @@ def test_message_remove_invalid_sender(url, setup):
         'channel_id': channel_data['channel_id'],
         'message': 'test'
     }
-    resp = requests.post(url + 'message/send', json=payload)
+    resp = requests.post(url + 'message/send', json=payload).json()
 
     payload = {
         'token': user_1['token'],
@@ -217,7 +226,7 @@ def test_message_remove_invalid_perms(url, setup):
         'channel_id': channel_data['channel_id'],
         'message': 'test'
     }
-    resp = requests.post(url + 'message/send', json=payload)
+    resp = requests.post(url + 'message/send', json=payload).json()
 
     payload = {
         'token': user_2['token'],
@@ -246,11 +255,18 @@ def test_message_remove_success(url, setup):
         'channel_id': channel_data['channel_id'],
         'message': 'test'
     }
-    resp = requests.post(url + 'message/send', json=payload)
+    resp = requests.post(url + 'message/send', json=payload).json()
 
     payload = {
         'token': user_1['token'],
         'message_id': resp['message_id']
+    }
+    requests.delete(url + 'message/remove', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
     }
 
     expected_result = {
@@ -291,7 +307,7 @@ def test_message_edit_invalid_sender(url, setup):
         'channel_id': channel_data['channel_id'],
         'message': 'test'
     }
-    resp = requests.post(url + 'message/send', json=payload)
+    resp = requests.post(url + 'message/send', json=payload).json()
 
     payload = {
         'token': user_1['token'],
@@ -328,7 +344,7 @@ def test_message_edit_invalid_perms(url, setup):
         'channel_id': channel_data['channel_id'],
         'message': 'test'
     }
-    resp = requests.post(url + 'message/send', json=payload)
+    resp = requests.post(url + 'message/send', json=payload).json()
 
     payload = {
         'token': user_2['token'],
@@ -358,7 +374,7 @@ def test_message_edit_success(url, setup):
         'channel_id': channel_data['channel_id'],
         'message': 'test'
     }
-    resp = requests.post(url + 'message/send', json=payload)
+    resp = requests.post(url + 'message/send', json=payload).json()
 
     payload = {
         'token': user_1['token'],
@@ -367,8 +383,22 @@ def test_message_edit_success(url, setup):
     }
     requests.put(url + 'message/edit', json=payload)
 
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
     expected_result = {
-        'messages': ['edit'],
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'edit',
+                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+            }
+        ],
         'start': 0,
         'end': -1
     }
