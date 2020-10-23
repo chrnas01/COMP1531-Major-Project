@@ -5,7 +5,7 @@ tests for http_channels.py
 import json
 import requests
 import other 
-from echo_http_test import url 
+from echo_http_test import url
 
 # Tests for channels_list() function.
 ###################################################################################
@@ -24,30 +24,31 @@ def test_channels_list_successful(url):
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creating Private Channel 
     channel_payload = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': False
     }
-    channel1 = requests.post(url + 'channels/create', json = channel_payload)
+    channel1 = requests.post(url + 'channels/create', json=channel_payload)
 
     # Generating a list of channels the user is apart of 
-    resp = request.get(url + 'channels/list', json = {'token': user1['token']})
+    resp = requests.get(url + 'channels/list', json={'token': user1.json()['token']})
 
-    assert json.loads(resp.txt) ==  {'channels': [
+    assert json.loads(resp.text) ==  {'channels': [
         {
             'channel_name': 'Channel1',
-            'channel_id': channel1['channel_id'],
+            'channel_id': channel1.json()['channel_id'],
             'is_public': False,
-            'owner_members': [user1['u_id'],],
-            'all_members': [user1['u_id'],],
-        },
+            'owner_members': [user1.json()['u_id'],],
+            'all_members': [user1.json()['u_id'],]
+        }
     ]}
 
-def test_channels_list_successful_two_channels():
+
+def test_channels_list_successful_two_channels(url):
     '''
     Successfuly provides a list of all channels that the authorized user is part of:
     '''
@@ -62,44 +63,44 @@ def test_channels_list_successful_two_channels():
         'name_first': 'Chris',
         'name_last': 'Nassif'
     }
-    user1 = requests.post(url + 'auth/register', json = user_payload)
+    user1 = requests.post(url + 'auth/register', json=user_payload)
 
     # Creating Private and Public Channel 
     channel_payload1 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel1',
         'is_public': False
     }
-    channel1 = requests.post(url + 'channels/create', json = channel_payloa1)
+    channel1 = requests.post(url + 'channels/create', json=channel_payload1)
 
     channel_payload2 = {
-        'token': user1['token'],
+        'token': user1.json()['token'],
         'name': 'Channel2',
         'is_public': True
     }
-    channel2 = requests.post(url + 'channels/create', json = channel_payload2)
+    channel2 = requests.post(url + 'channels/create', json=channel_payload2)
 
     # Generating a list of channels the user is apart of 
-    resp = request.get(url + 'channels/list', json = {'token': user1['token']})
+    resp = requests.get(url + 'channels/list', json={'token': user1.json()['token']})
 
-    assert json.loads(resp.txt) ==  {'channels': [
+    assert json.loads(resp.text) ==  {'channels': [
         {
             'channel_name': 'Channel1',
-            'channel_id': channel1['channel_id'],
+            'channel_id': channel1.json()['channel_id'],
             'is_public': False,
-            'owner_members': [user1['u_id'],],
-            'all_members': [user1['u_id'],],
+            'owner_members': [user1.json()['u_id']],
+            'all_members': [user1.json()['u_id']]
         },
         {
-            'channel_name': 'Channel_2',
-            'channel_id': channel2['channel_id'],
+            'channel_name': 'Channel2',
+            'channel_id': channel2.json()['channel_id'],
             'is_public': True,
-            'owner_members': [user1['u_id'],],
-            'all_members': [user1['u_id'],],
-        },
+            'owner_members': [user1.json()['u_id'],],
+            'all_members': [user1.json()['u_id'],],
+        }
     ]}
 
-def test_channels_list_no_channels():
+def test_channels_list_no_channels(url):
     '''
     User doesnt belong to any channels
     '''
@@ -139,7 +140,7 @@ def test_channels_list_no_channels():
     # Tests for channels_listall() function.
 ###################################################################################
 
-def test_channels_listall_successful():
+def test_channels_listall_successful(url):
     '''
     Successfully provides a list of all channels and their associated details
     '''
@@ -191,7 +192,7 @@ def test_channels_listall_successful():
         },
     ]}
 
-def test_channels_listall_no_existing_channels():
+def test_channels_listall_no_existing_channels(url):
     '''
     If there are no existing channels channels_listall() should return an empty list
     '''
@@ -214,7 +215,7 @@ def test_channels_listall_no_existing_channels():
 # Tests for channels_create() function.
 ###################################################################################
 
-def test_channels_create_invalid_channel_name1():
+def test_channels_create_invalid_channel_name1(url):
     '''
     Public channel name is greater than 20 characters long
     '''
@@ -242,7 +243,7 @@ def test_channels_create_invalid_channel_name1():
     assert resp.json()['code'] == 400 
 
 
-def test_channels_create_invalid_channel_name2():
+def test_channels_create_invalid_channel_name2(url):
     '''
     Private channel name is greater than 20 characters long
     '''
@@ -269,7 +270,7 @@ def test_channels_create_invalid_channel_name2():
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400 
 
-def test_channels_create_20char_channel_name():
+def test_channels_create_20char_channel_name(url):
     '''
     Boundary Test: Channel name is exactly 20 characters long
     '''
@@ -295,7 +296,7 @@ def test_channels_create_20char_channel_name():
     resp = requests.post(url + 'channels/create', json = channel_payload)
     assert json.loads(resp.txt) == {'channel_id': 1}
 
-def test_channels_create_successful_public():
+def test_channels_create_successful_public(url):
     '''
     Public channel is successfully created
     '''
@@ -321,7 +322,7 @@ def test_channels_create_successful_public():
     resp = requests.post(url + 'channels/create', json = channel_payload)
     assert json.loads(resp.txt) == {'channel_id': 1}
 
-def test_channels_create_successful_private():
+def test_channels_create_successful_private(url):
     '''
     Private channel is successfully created
     '''
@@ -346,7 +347,7 @@ def test_channels_create_successful_private():
     resp = requests.post(url + 'channels/create', json = channel_payload)
     assert json.loads(resp.txt) == {'channel_id': 1}
 
-def test_channels_create_name_exists():
+def test_channels_create_name_exists(url):
     '''
     Channel name already exists
     '''
@@ -388,7 +389,7 @@ def test_channels_create_name_exists():
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400 
 
-def test_channels_create_nameless_channel():
+def test_channels_create_nameless_channel(url):
     '''
     Channel name is not input i.e. trying to make a channel without a name
     '''
@@ -415,7 +416,7 @@ def test_channels_create_nameless_channel():
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400 
 
-def test_channels_create_successful_private_multi():
+def test_channels_create_successful_private_multi(url):
     '''
     Creating multiple channels (Testing the channel_id progression system)
     '''
