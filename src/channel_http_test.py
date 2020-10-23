@@ -276,7 +276,7 @@ def test_channel_messages_invalid_channel_id(url, setup):
     }
 
     # InputError
-    resp = requests.get(url + 'channel/messages', json=payload)
+    resp = requests.get(url + 'channel/messages', params=payload)
     resp.status_code == 400
 
 def test_channel_messages_invalid_start(url, setup):
@@ -299,7 +299,7 @@ def test_channel_messages_invalid_start(url, setup):
     }
 
     # InputError
-    resp = requests.get(url + 'channel/messages', json=payload)
+    resp = requests.get(url + 'channel/messages', params=payload)
     resp.status_code == 400
 
 def test_channel_messages_invalid_user(url, setup):
@@ -322,7 +322,7 @@ def test_channel_messages_invalid_user(url, setup):
     }
 
     # AccessError
-    resp = requests.get(url + 'channel/messages', json=payload)
+    resp = requests.get(url + 'channel/messages', params=payload)
     resp.status_code == 400
 
 def test_channel_messages_success(url, setup):
@@ -351,7 +351,7 @@ def test_channel_messages_success(url, setup):
     }
 
     # AccessError
-    resp = requests.get(url + 'channel/messages', json=payload)
+    resp = requests.get(url + 'channel/messages', params=payload)
     assert resp.json() == expected_result
 
 ########################################################
