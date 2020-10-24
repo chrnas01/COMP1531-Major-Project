@@ -30,7 +30,7 @@ def users_all(token):
     '''
     Given token returns a dictionary with of users
     '''
-
+    
     return {'users': data['users']}
 
 
