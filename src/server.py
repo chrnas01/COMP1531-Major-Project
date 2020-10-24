@@ -92,6 +92,7 @@ def channels_listall():
 def channels_create(): 
     data = request.get_json()
     return dumps(channels.channels_create(data['token'], data['name'], data['is_public']))
+
 @APP.route('/other/show', methods=['GET'])
 def show():
     '''
