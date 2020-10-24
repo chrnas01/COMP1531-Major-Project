@@ -1,13 +1,6 @@
-import pytest
-import re
-from subprocess import Popen, PIPE
-import signal
-from time import sleep
 import requests
 import json
 from echo_http_test import url
-import auth
-import other
 
 def test_user_profile_success(url):
     '''
@@ -424,4 +417,31 @@ def test_user_profile_sethandle_long(url):
 
     assert 'code' in resp
     assert resp['code'] == 400
+
+def test_all_users(url):
+    '''
+    Test to show all users
+    '''
+    requests.delete(url + 'clear')
+
+    # Setup users
+    user_payload = {
+        'email': 'Jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung'
+    }
+    user_1 = requests.post(url + 'auth/register', json=user_payload).json()
     
+    resp = requests.get(url + 'users/all', json={'token': user_1['token']}).json()
+    
+    assert resp == {'users': [{
+        'u_id': 1,
+        'token': user_1['token'],
+        'email': 'Jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung',
+        'handle_str': 'jaydenleung',
+        'permission_id': 1}]       
+    }
