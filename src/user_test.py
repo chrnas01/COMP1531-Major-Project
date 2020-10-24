@@ -209,5 +209,5 @@ def test_user_profile_sethandle_long():
     auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong') # Flockr Owner
 
     with pytest.raises(InputError):
-        user.user_profile_sethandle(user_1['token'], 'A'*21)
+        user.user_profile_sethandle(user_1['token'], 'A'*20)
 ########################################################
