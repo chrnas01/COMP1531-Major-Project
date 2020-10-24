@@ -2,11 +2,13 @@ import sys
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
+import channel
 from error import InputError, AccessError
 import channels
 import auth 
 import re
 import other
+import message
 
 def defaultHandler(err):
     response = err.get_response()
@@ -34,6 +36,49 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/channel/invite", methods=['POST'])
+def http_channel_invite():
+    data = request.get_json()
+    return dumps(channel.channel_invite(data['token'], data['channel_id'], data['u_id']))
+
+@APP.route("/channel/details", methods=['GET'])
+def http_channel_details():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+
+    return dumps(channel.channel_details(token, channel_id))
+
+####################
+
+@APP.route("/channel/messages", methods=['GET'])
+def http_channel_messages():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
+    return dumps(channel.channel_messages(token, channel_id, start))
+
+####################
+
+@APP.route("/channel/leave", methods=['POST'])
+def http_channel_leave():
+    data = request.get_json()
+    return dumps(channel.channel_leave(data['token'], data['channel_id']))
+
+@APP.route("/channel/join", methods=['POST'])
+def http_channel_join():
+    data = request.get_json()
+    return dumps(channel.channel_join(data['token'], data['channel_id']))
+
+@APP.route("/channel/addowner", methods=['POST'])
+def http_channel_addowner():
+    data = request.get_json()
+    return dumps(channel.channel_addowner(data['token'], data['channel_id'], data['u_id']))
+
+@APP.route("/channel/removeowner", methods=['POST'])
+def http_channel_removeowner():
+    data = request.get_json()
+    return dumps(channel.channel_removeowner(data['token'], data['channel_id'], data['u_id']))
 
 # auth login
 @APP.route("/auth/login", methods=['POST'])
@@ -68,6 +113,22 @@ def auth_register():
     data = request.get_json()
     return dumps(auth.auth_register(data['email'], data['password'], data['name_first'], data['name_last']))
 
+@APP.route("/admin/userpermission/change", methods=['POST'])
+def admin_userpermission_change():
+    '''
+    Change permissions
+    '''
+    data = request.get_json()
+    return other.admin_userpermission_change(data['token'], data['u_id'], data['permission_id'])
+
+@APP.route("/other/successful/permissions", methods=['POST'])
+def other_if_successful_permission():
+    '''
+    Check if permission change was successful
+    '''
+    data = request.get_json()
+    return dumps(other.is_successful_in_change_permissions(data['user_1'], data['user_2']))
+
 @APP.route("/clear", methods=['DELETE'])
 def other_clear():
     '''
@@ -78,14 +139,14 @@ def other_clear():
 # channels_list 
 @APP.route("/channels/list", methods = ['GET'])
 def channels_list():
-    data = request.get_json()
-    return dumps(channels.channels_list(data['token']))
+    token = request.args.get('token')
+    return dumps(channels.channels_list(token))
 
 # channels_listall 
 @APP.route("/channels/listall", methods = ['GET'])
 def channels_listall(): 
-    data = request.get_json()
-    return dumps(channels.channels_listall(data['token']))
+    token = request.args.get('token')
+    return dumps(channels.channels_listall(token))
 
 # channels_create 
 @APP.route("/channels/create", methods = ['POST'])
@@ -113,6 +174,21 @@ def show_handle_strs():
     shows handle strings
     '''
     return dumps(other.get_user_handle_strs())
+
+@APP.route('/message/send', methods=['POST'])
+def http_message_send():
+    data = request.get_json()
+    return dumps(message.message_send(data['token'], data['channel_id'], data['message']))
+
+@APP.route('/message/remove', methods=['DELETE'])
+def http_message_remove():
+    data = request.get_json()
+    return dumps(message.message_remove(data['token'], data['message_id']))
+
+@APP.route('/message/edit', methods=['PUT'])
+def http_message_edit():
+    data = request.get_json()
+    return dumps(message.message_edit(data['token'], data['message_id'], data['message']))
 
 
 if __name__ == "__main__":
