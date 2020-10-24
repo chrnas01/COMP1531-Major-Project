@@ -2,6 +2,7 @@ import sys
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
+import channel
 from error import InputError, AccessError
 import channels
 import auth 
@@ -35,6 +36,49 @@ def echo():
     return dumps({
         'data': data
     })
+
+@APP.route("/channel/invite", methods=['POST'])
+def http_channel_invite():
+    data = request.get_json()
+    return dumps(channel.channel_invite(data['token'], data['channel_id'], data['u_id']))
+
+@APP.route("/channel/details", methods=['GET'])
+def http_channel_details():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+
+    return dumps(channel.channel_details(token, channel_id))
+
+####################
+
+@APP.route("/channel/messages", methods=['GET'])
+def http_channel_messages():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    start = int(request.args.get('start'))
+    return dumps(channel.channel_messages(token, channel_id, start))
+
+####################
+
+@APP.route("/channel/leave", methods=['POST'])
+def http_channel_leave():
+    data = request.get_json()
+    return dumps(channel.channel_leave(data['token'], data['channel_id']))
+
+@APP.route("/channel/join", methods=['POST'])
+def http_channel_join():
+    data = request.get_json()
+    return dumps(channel.channel_join(data['token'], data['channel_id']))
+
+@APP.route("/channel/addowner", methods=['POST'])
+def http_channel_addowner():
+    data = request.get_json()
+    return dumps(channel.channel_addowner(data['token'], data['channel_id'], data['u_id']))
+
+@APP.route("/channel/removeowner", methods=['POST'])
+def http_channel_removeowner():
+    data = request.get_json()
+    return dumps(channel.channel_removeowner(data['token'], data['channel_id'], data['u_id']))
 
 # auth login
 @APP.route("/auth/login", methods=['POST'])
@@ -109,6 +153,7 @@ def channels_listall():
 def channels_create(): 
     data = request.get_json()
     return dumps(channels.channels_create(data['token'], data['name'], data['is_public']))
+
 @APP.route('/other/show', methods=['GET'])
 def show():
     '''
