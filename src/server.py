@@ -139,14 +139,14 @@ def other_clear():
 # channels_list 
 @APP.route("/channels/list", methods = ['GET'])
 def channels_list():
-    data = request.get_json()
-    return dumps(channels.channels_list(data['token']))
+    token = request.args.get('token')
+    return dumps(channels.channels_list(token))
 
 # channels_listall 
 @APP.route("/channels/listall", methods = ['GET'])
 def channels_listall(): 
-    data = request.get_json()
-    return dumps(channels.channels_listall(data['token']))
+    token = request.args.get('token')
+    return dumps(channels.channels_listall(token))
 
 # channels_create 
 @APP.route("/channels/create", methods = ['POST'])
