@@ -13,7 +13,6 @@ def test_user_profile_success(url):
     '''
     Tests that user_profile returns the correct data
     '''
-    
     requests.delete(url + 'clear')
 
     # Setup users
@@ -44,7 +43,6 @@ def test_user_profile_invalid_uid(url):
     '''
     Tests that user_profile throws an InputError with invalid uid
     '''
-
     requests.delete(url + 'clear')
 
     #Setup users
@@ -71,7 +69,6 @@ def test_user_profile_setname_success(url):
     '''
     Tests that user_profile_setname sets the correct first and last name
     '''
-
     requests.delete(url + 'clear')
 
     # Setup users
@@ -285,7 +282,6 @@ def test_user_profile_setemail_used_email(url):
     '''
     Tests that user_profile_setemail throws InputError when email is already used
     '''
-    
     requests.delete(url + 'clear')
 
     # Setup users   
@@ -359,6 +355,8 @@ def test_user_profile_sethandle_already_exists(url):
     '''
     Tests that user_profile_sethandle sets the correct handle_str when there are duplicates
     '''
+    requests.delete(url + 'clear')
+
     # Setup users
     user_payload = {
         'email': 'Steven@gmail.com',
@@ -382,6 +380,8 @@ def test_user_profile_sethandle_short(url):
     '''
     Tests that user_profile_sethandle throws InputError when handle is too short
     '''
+    requests.delete(url + 'clear')
+
     # Setup users
     user_payload = {
         'email': 'Jayden@gmail.com',
@@ -405,6 +405,7 @@ def test_user_profile_sethandle_long(url):
     '''
     Tests that user_profile_sethandle throws InputError when handle is too long
     '''
+    requests.delete(url + 'clear')
 
     # Setup users
     user_payload = {
