@@ -292,7 +292,7 @@ def test_user_profile_setemail_used_email(url):
         'name_first': 'Steven',
         'name_last': 'Luong',
     }
-    user_2 = requests.post(url + 'auth/register', json=user_payload).json()
+    requests.post(url + 'auth/register', json=user_payload).json()
 
     setemail_payload = {
         'token': user_1['token'],
@@ -411,7 +411,7 @@ def test_user_profile_sethandle_long(url):
 
     sethandle_payload = {
         'token': user_1['token'],
-        'handle_str': 'A'*21,
+        'handle_str': 'A'*20,
     }
     resp = requests.put(url + 'user/profile/sethandle', json=sethandle_payload).json()
 
@@ -436,7 +436,7 @@ def test_all_users(url):
     resp = requests.get(url + 'users/all', json={'token': user_1['token']}).json()
     
     assert resp == {'users': [{
-        'u_id': 1,
+        'u_id': user_1['u_id'],
         'token': user_1['token'],
         'email': 'Jayden@gmail.com',
         'password': 'password',
