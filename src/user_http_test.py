@@ -29,7 +29,7 @@ def test_user_profile_success(url):
         'token': user_1['token'],
         'u_id': user_1['u_id'],
     }
-    resp = requests.get(url + 'user/profile', param=profile_payload).json()
+    resp = requests.get(url + 'user/profile', params=profile_payload).json()
     assert resp == {
         'user': {
             'email': 'jayden@gmail.com',
@@ -60,7 +60,7 @@ def test_user_profile_invalid_uid(url):
         'token': user_1['token'],
         'u_id': 99,
     }
-    resp = requests.get(url + 'user/profile', param=profile_payload).json()    
+    resp = requests.get(url + 'user/profile', params=profile_payload).json()    
     
     assert 'code' in resp
     assert resp['code'] == 400
@@ -88,14 +88,21 @@ def test_user_profile_setname_success(url):
         'name_first': 'changed_first',
         'name_last': 'changed_last',
     }
-    resp = requests.put(url + 'user/profile/setname', json=setname_payload).json()
+    requests.put(url + 'user/profile/setname', json=setname_payload).json()
+
+    profile_payload = {
+        'token': user_1['token'],
+        'u_id': user_1['u_id'],
+    }
+    resp = requests.get(url + 'user/profile', params=profile_payload).json()
+
     assert resp == {
         'user': {
             'email': 'jayden@gmail.com',
-            'u_id': user_1['u_id'],
+            'handle_str': 'jaydenleung',
             'name_first': 'changed_first',
             'name_last': 'changed_last',
-            'handle_str': 'jaydenleung',
+            'u_id': user_1['u_id'],
             }
         }
 
@@ -232,8 +239,14 @@ def test_user_profile_setemail_success(url):
         'token': user_1['token'],
         'email': 'test@gmail.com',
     }
-    resp = requests.put(url + 'user/profile/setemail', json=setemail_payload).json()
- 
+    requests.put(url + 'user/profile/setemail', json=setemail_payload).json()
+    
+    profile_payload = {
+        'token': user_1['token'],
+        'u_id': user_1['u_id'],
+    }
+    resp = requests.get(url + 'user/profile', params=profile_payload).json()
+
     assert resp == {
         'user': {
             'email': 'test@gmail.com',
@@ -276,17 +289,25 @@ def test_user_profile_setemail_used_email(url):
     requests.delete(url + 'clear')
 
     # Setup users   
-    user_payload1 = {
+    user_payload = {
+        'email': 'jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung',
+    }
+    user_1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    user_payload = {
         'email': 'Steven@gmail.com',
         'password': 'password',
         'name_first': 'Steven',
-        'name_last': 'Luong'
+        'name_last': 'Luong',
     }
-    user_1 = requests.post(url + 'auth/register', json=user_payload1).json()
+    user_2 = requests.post(url + 'auth/register', json=user_payload).json()
 
     setemail_payload = {
         'token': user_1['token'],
-        'email': 'Steven@email.com',
+        'email': 'Steven@gmail.com',
     }
 
     resp = requests.put(url + 'user/profile/setemail', json=setemail_payload).json()
@@ -316,8 +337,13 @@ def test_user_profile_sethandle_success(url):
         'token': user_1['token'],
         'handle_str': 'newhandle',
     }
-
-    resp = requests.put(url + 'user/profile/sethandle', json=sethandle_payload).json()
+    requests.put(url + 'user/profile/sethandle', json=sethandle_payload).json()
+    
+    profile_payload = {
+        'token': user_1['token'],
+        'u_id': user_1['u_id'],
+    }
+    resp = requests.get(url + 'user/profile', params=profile_payload).json()
 
     assert resp == {
         'user': {
@@ -334,13 +360,13 @@ def test_user_profile_sethandle_already_exists(url):
     Tests that user_profile_sethandle sets the correct handle_str when there are duplicates
     '''
     # Setup users
-    user_payload2 = {
+    user_payload = {
         'email': 'Steven@gmail.com',
         'password': 'password',
         'name_first': 'Steven',
         'name_last': 'Luong'
     }
-    user_2 = requests.post(url + 'auth/register', json=user_payload2).json()
+    user_1 = requests.post(url + 'auth/register', json=user_payload).json()
 
     sethandle_payload = {
         'token': user_1['token'],
