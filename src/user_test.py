@@ -191,7 +191,7 @@ def test_user_profile_sethandle_already_exists():
 
 def test_user_profile_sethandle_short():
     '''
-    Tests that user_profile_sethandle sets the correct handle_str when there are duplicates
+    Tests that user_profile_sethandle throws InputError when handle is too short
     '''
     other.clear()
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
@@ -202,12 +202,12 @@ def test_user_profile_sethandle_short():
 
 def test_user_profile_sethandle_long():
     '''
-    Tests that user_profile_sethandle sets the correct handle_str when there are duplicates
+    Tests that user_profile_sethandle throws InputError when handele is too long
     '''
     other.clear()
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
     auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong') # Flockr Owner
 
     with pytest.raises(InputError):
-        user.user_profile_sethandle(user_1['token'], 'A'*20)
+        user.user_profile_sethandle(user_1['token'], 'A'*21)
 ########################################################
