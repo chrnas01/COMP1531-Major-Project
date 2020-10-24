@@ -46,4 +46,4 @@ Channels:
     -   The is-public variable stores a boolean: If True the channel is Public, if false the channel is private
 
 User:
-- handle_str must be between 3 and 20 characters not inclusive
+- handle_str must be between 3 and 20 characters (inclusive)
