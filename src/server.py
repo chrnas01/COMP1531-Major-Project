@@ -208,6 +208,14 @@ def user_profile_sethandle():
     data = request.get_json()
     return dumps(user.user_profile_sethandle(data['token'], data['handle_str']))
 
+@APP.route('/users/all', methods=['GET'])
+def users_all():
+    '''
+    show a list of all users and their associated details
+    '''
+    token = request.args.get('token')
+    return dumps(other.users_all(token))
+
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
