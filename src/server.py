@@ -8,6 +8,7 @@ import channels
 import auth 
 import re
 import other
+import message
 
 def defaultHandler(err):
     response = err.get_response()
@@ -173,6 +174,21 @@ def show_handle_strs():
     shows handle strings
     '''
     return dumps(other.get_user_handle_strs())
+
+@APP.route('/message/send', methods=['POST'])
+def http_message_send():
+    data = request.get_json()
+    return dumps(message.message_send(data['token'], data['channel_id'], data['message']))
+
+@APP.route('/message/remove', methods=['DELETE'])
+def http_message_remove():
+    data = request.get_json()
+    return dumps(message.message_remove(data['token'], data['message_id']))
+
+@APP.route('/message/edit', methods=['PUT'])
+def http_message_edit():
+    data = request.get_json()
+    return dumps(message.message_edit(data['token'], data['message_id'], data['message']))
 
 
 if __name__ == "__main__":
