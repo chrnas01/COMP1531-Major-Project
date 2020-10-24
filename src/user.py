@@ -89,7 +89,7 @@ def user_profile_sethandle(token, handle_str):
     current_user = other.token_to_uid(token)
 
     # handle_str must be between 3 and 20 characters not inclusive
-    if len(handle_str) < 3 or len(handle_str) > 20:
+    if len(handle_str) <= 3 or len(handle_str) >= 20:
         raise InputError('length of first name is invalid - Cannot register')
 
 
