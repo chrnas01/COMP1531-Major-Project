@@ -206,7 +206,7 @@ def user_profile_sethandle():
     change user's handlestr
     '''
     data = request.get_json()
-    return dumps(user.user_profile_setname(data['token'], data['handle_str']))
+    return dumps(user.user_profile_sethandle(data['token'], data['handle_str']))
 
 
 if __name__ == "__main__":
