@@ -169,7 +169,7 @@ def show_is_empty():
     '''
     return dumps(other.is_empty())
 
-@APP.route('/other/search', methods=['GET'])
+@APP.route('/search', methods=['GET'])
 def search():
     '''
     search
