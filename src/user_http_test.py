@@ -426,7 +426,7 @@ def test_all_users(url):
 
     # Setup users
     user_payload = {
-        'email': 'Jayden@gmail.com',
+        'email': 'jayden@gmail.com',
         'password': 'password',
         'name_first': 'Jayden',
         'name_last': 'Leung'
@@ -438,7 +438,7 @@ def test_all_users(url):
     assert resp == {'users': [{
         'u_id': user_1['u_id'],
         'token': user_1['token'],
-        'email': 'Jayden@gmail.com',
+        'email': 'jayden@gmail.com',
         'password': 'password',
         'name_first': 'Jayden',
         'name_last': 'Leung',
