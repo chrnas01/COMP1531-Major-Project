@@ -30,6 +30,9 @@ def users_all(token):
     '''
     Given token returns a dictionary with of users
     '''
+    #token is invalid
+    if token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
     
     return {'users': data['users']}
 
@@ -38,6 +41,10 @@ def admin_userpermission_change(token, u_id, permission_id):
     '''
     Given token, u_id and permission_id, changes flockr admin perms
     '''
+    #token is invalid
+    if token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # The authorised user is not an owner
     for user in data['users']:
         if user['u_id'] == token_to_uid(token):
@@ -64,6 +71,9 @@ def search(token, query_str):
     Given a query string, return a collection of messages in all of
     the channels that the user has joined that match the query
     '''
+    #token is invalid
+    if token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     messages = []
     user_channels = channels.channels_list(token)

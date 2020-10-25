@@ -6,6 +6,9 @@ def message_send(token, channel_id, message):
     '''
     Send a message from authorised_user to the channel specified by channel_id
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     # Check that the user is a member of the channel
     if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
@@ -39,6 +42,9 @@ def message_remove(token, message_id):
     '''
     Given a message_id for a message, this message is removed from the channel
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     msg = {}
 
@@ -72,6 +78,9 @@ def message_edit(token, message_id, message):
     Given a message, update it's text with new text.
     If the new message is an empty string, the message is deleted.
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     for i in range(len(other.data['messages'])):
         if other.data['messages'][i]['message_id'] == message_id:

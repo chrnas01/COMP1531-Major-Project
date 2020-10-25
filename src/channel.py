@@ -9,6 +9,10 @@ def channel_invite(token, channel_id, u_id):
     Invites a user (with user id u_id) to join a channel with ID channel_id.
     Once invited the user is added to the channel immediately
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Check for channel_id exists
     if channel_id > len(other.data['channels']):
         raise InputError('channel_id does not refer to a valid')
@@ -33,6 +37,10 @@ def channel_details(token, channel_id):
     Given a Channel with ID channel_id that the authorised user
     is part of, provide basic details about the channel
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Check for channel_id exists
     if channel_id > len(other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
@@ -88,6 +96,10 @@ def channel_messages(token, channel_id, start):
     or, if this function has returned the least recent messages in the channel,
     returns -1 in "end" to indicate there are no more messages to load after this return.
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Check for channel_id exists
     if channel_id > len(other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
@@ -125,6 +137,10 @@ def channel_leave(token, channel_id):
     '''
     Given a channel ID, the user removed as a member of this channel
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Check for channel_id exists
     if channel_id > len(other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
@@ -145,6 +161,10 @@ def channel_join(token, channel_id):
     Given a channel_id of a channel that the authorised user can
     join, adds them to that channel
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Check for channel_id exists
     if channel_id > len(other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
@@ -168,6 +188,10 @@ def channel_addowner(token, channel_id, u_id):
     '''
     Make user with user id u_id an owner of this channel
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Check for channel_id exists
     if channel_id > len(other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
@@ -200,6 +224,10 @@ def channel_removeowner(token, channel_id, u_id):
     '''
     Remove user with user id u_id an owner of this channel
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Check for channel_id exists
     if channel_id > len(other.data['channels']):
         raise InputError('Channel ID is not a valid channel')

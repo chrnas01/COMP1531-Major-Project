@@ -4,7 +4,7 @@
 import re
 import other
 import auth
-from error import InputError
+from error import InputError, AccessError
 
 def user_profile(_, u_id):
     '''
@@ -35,6 +35,9 @@ def user_profile_setname(token, name_first, name_last):
     Given a first and last name,
     changes the first and last name of current user
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     current_user = other.token_to_uid(token)
 
@@ -60,6 +63,9 @@ def user_profile_setemail(token, email):
     '''
     Given email changed the email of the current user
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     current_user = other.token_to_uid(token)
 
@@ -85,6 +91,9 @@ def user_profile_sethandle(token, handle_str):
     '''
     Given handle string changed the handle_str of the current user
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     current_user = other.token_to_uid(token)
 
