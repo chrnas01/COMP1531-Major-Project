@@ -56,9 +56,11 @@ def message_remove(token, message_id):
                  the authorised user making this request''')
 
     #check if they are a channel owner
-    if other.token_to_uid(token) not in other.data['channels'][
+    #check if they are a channel or flockr owner
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
+        if other.token_to_uid(token) not in other.data['channels'][
                 msg['channel_id'] - 1]['owner_members']:
-        raise AccessError('When user with user id u_id is not an owner of the channel')
+            raise AccessError('The authorised user is not an owner of this channel or the flockr')
 
     other.data['messages'].remove(msg)
 
@@ -80,10 +82,11 @@ def message_edit(token, message_id, message):
         raise AccessError('''Message with message_id was not sent
                  by the authorised user making this request''')
 
-    #check if they are a channel owner
-    if other.token_to_uid(token) not in other.data['channels'][
-                other.data['messages'][i]['channel_id'] - 1]['owner_members']:
-        raise AccessError('When user with user id u_id is not an owner of the channel')
+    #check if they are a channel or flockr owner
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
+        if other.token_to_uid(token) not in other.data['channels'][
+                    other.data['messages'][i]['channel_id'] - 1]['owner_members']:
+            raise AccessError('The authorised user is not an owner of this channel or the flockr')
 
     if not message:
         message_remove(token, message_id)
