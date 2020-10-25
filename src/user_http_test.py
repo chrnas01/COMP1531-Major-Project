@@ -360,8 +360,16 @@ def test_user_profile_sethandle_already_exists(url):
     }
     user_1 = requests.post(url + 'auth/register', json=user_payload).json()
 
+    user_payload = {
+        'email': 'jay@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung'
+    }
+    user_2 = requests.post(url + 'auth/register', json=user_payload).json()
+
     sethandle_payload = {
-        'token': user_1['token'],
+        'token': user_2['token'],
         'handle_str': 'stevenluong',
     }
     resp = requests.put(url + 'user/profile/sethandle', json=sethandle_payload).json()
