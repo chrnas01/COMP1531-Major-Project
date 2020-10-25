@@ -35,7 +35,7 @@ def test_channels_list_successful(url):
     channel1 = requests.post(url + 'channels/create', json=channel_payload)
 
     # Generating a list of channels the user is apart of 
-    resp = requests.get(url + 'channels/list', json={'token': user1.json()['token']})
+    resp = requests.get(url + 'channels/list', params={'token': user1.json()['token']})
 
     assert json.loads(resp.text) ==  {'channels': [
         {
@@ -81,7 +81,7 @@ def test_channels_list_successful_two_channels(url):
     channel2 = requests.post(url + 'channels/create', json=channel_payload2)
 
     # Generating a list of channels the user is apart of 
-    resp = requests.get(url + 'channels/list', json={'token': user1.json()['token']})
+    resp = requests.get(url + 'channels/list', params={'token': user1.json()['token']})
 
     assert json.loads(resp.text) ==  {'channels': [
         {
@@ -134,7 +134,7 @@ def test_channels_list_no_channels(url):
     requests.post(url + 'channels/create', json=channel_payload)
 
     # Generating a list of channels user 2 is apart of 
-    resp = requests.get(url + 'channels/list', json={'token': user2.json()['token']})
+    resp = requests.get(url + 'channels/list', params={'token': user2.json()['token']})
     assert json.loads(resp.text) == {'channels': []}
 
     # Tests for channels_listall() function.
@@ -173,7 +173,7 @@ def test_channels_listall_successful(url):
     channel2 = requests.post(url + 'channels/create', json=channel_payload2)
 
     # Generating a list of channels the user is apart of 
-    resp = requests.get(url + 'channels/listall', json={'token': user1.json()['token']})
+    resp = requests.get(url + 'channels/listall', params={'token': user1.json()['token']})
 
     assert json.loads(resp.text) ==  {'channels': [
         {
@@ -209,7 +209,7 @@ def test_channels_listall_no_existing_channels(url):
     user1 = requests.post(url + 'auth/register', json=user_payload1)
 
      # Generating a list of channels that exist 
-    resp = requests.get(url + 'channels/listall', json={'token': user1.json()['token']})
+    resp = requests.get(url + 'channels/listall', params={'token': user1.json()['token']})
     assert json.loads(resp.text) == {'channels': []}
 
 # Tests for channels_create() function.

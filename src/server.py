@@ -9,6 +9,7 @@ import auth
 import re
 import other
 import user
+import message
 
 def defaultHandler(err):
     response = err.get_response()
@@ -139,14 +140,14 @@ def other_clear():
 # channels_list 
 @APP.route("/channels/list", methods = ['GET'])
 def channels_list():
-    data = request.get_json()
-    return dumps(channels.channels_list(data['token']))
+    token = request.args.get('token')
+    return dumps(channels.channels_list(token))
 
 # channels_listall 
 @APP.route("/channels/listall", methods = ['GET'])
 def channels_listall(): 
-    data = request.get_json()
-    return dumps(channels.channels_listall(data['token']))
+    token = request.args.get('token')
+    return dumps(channels.channels_listall(token))
 
 # channels_create 
 @APP.route("/channels/create", methods = ['POST'])
@@ -215,6 +216,20 @@ def users_all():
     '''
     token = request.args.get('token')
     return dumps(other.users_all(token))
+@APP.route('/message/send', methods=['POST'])
+def http_message_send():
+    data = request.get_json()
+    return dumps(message.message_send(data['token'], data['channel_id'], data['message']))
+
+@APP.route('/message/remove', methods=['DELETE'])
+def http_message_remove():
+    data = request.get_json()
+    return dumps(message.message_remove(data['token'], data['message_id']))
+
+@APP.route('/message/edit', methods=['PUT'])
+def http_message_edit():
+    data = request.get_json()
+    return dumps(message.message_edit(data['token'], data['message_id'], data['message']))
 
 
 if __name__ == "__main__":
