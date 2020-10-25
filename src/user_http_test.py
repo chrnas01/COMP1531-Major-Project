@@ -358,7 +358,7 @@ def test_user_profile_sethandle_already_exists(url):
         'name_first': 'Steven',
         'name_last': 'Luong'
     }
-    user_1 = requests.post(url + 'auth/register', json=user_payload).json()
+    requests.post(url + 'auth/register', json=user_payload).json()
 
     user_payload = {
         'email': 'jay@gmail.com',
