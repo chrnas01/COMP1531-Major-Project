@@ -95,8 +95,8 @@ def token_to_uid(token):
     for user in data['users']:
         if user['token'] == token:
             return user['u_id']
-    else:
-        return -1 
+    
+    return -1
 
 def password_encrypt(password):
     encrypted_password = hashlib.sha256(password.encode('utf-8')).hexdigest()

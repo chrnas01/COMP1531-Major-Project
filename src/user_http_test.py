@@ -1,6 +1,7 @@
 import requests
 import json
 from echo_http_test import url
+import other
 
 def test_user_profile_success(url):
     '''
@@ -433,7 +434,7 @@ def test_all_users(url):
     }
     user_1 = requests.post(url + 'auth/register', json=user_payload).json()
     
-    resp = requests.get(url + 'users/all', json={'token': user_1['token']}).json()
+    resp = requests.get(url + 'users/all', params={'token': user_1['token']}).json()
     
     assert resp == {'users': [{
         'u_id': user_1['u_id'],

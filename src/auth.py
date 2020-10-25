@@ -40,9 +40,6 @@ def auth_logout(token):
     If a valid token is given, and the user is successfully logged out,
     it returns true, otherwise false.
     '''
-    #token is invalid
-    if other.token_to_uid(token) == -1:
-        raise AccessError('Invalid Token')
 
     for user in other.data['users']:
         if user['token'] == token:

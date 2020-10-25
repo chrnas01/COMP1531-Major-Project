@@ -225,6 +225,7 @@ def users_all():
     '''
     token = request.args.get('token')
     return dumps(other.users_all(token))
+
 @APP.route('/message/send', methods=['POST'])
 def http_message_send():
     data = request.get_json()
