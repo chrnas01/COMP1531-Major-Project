@@ -47,7 +47,7 @@ def admin_userpermission_change(token, u_id, permission_id):
     for user in data['users']:
         if user['u_id'] == u_id:
             # Not 0 or 1
-            if permission_id not in range(0, 2):
+            if permission_id not in range(1, 3):
                 raise InputError(
                     'permission_id does not refer to a value permission')
 
