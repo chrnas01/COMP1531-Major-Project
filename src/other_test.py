@@ -48,7 +48,7 @@ def test_admin_userpermission_change_invalid_permission_id(setup):
     user_1, user_2, _ = setup
 
     with pytest.raises(InputError):
-        assert other.admin_userpermission_change(user_1['token'], user_2['u_id'], 2)
+        assert other.admin_userpermission_change(user_1['token'], user_2['u_id'], 0)
 
 
 def test_admin_userpermission_change_unauthorised_user(setup):

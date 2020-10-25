@@ -198,7 +198,7 @@ def test_search(url, setup):
         'query_str': 'est',
     }
 
-    resp = requests.get(url + 'other/search', params=payload)
+    resp = requests.get(url + '/search', params=payload)
     assert resp.json() == expected_result
 
 def test_search_other_channel(url, setup):
@@ -280,5 +280,5 @@ def test_search_other_channel(url, setup):
         'query_str': 'e',
     }
 
-    resp = requests.get(url + 'other/search', params=payload)
+    resp = requests.get(url + '/search', params=payload)
     assert resp.json() == expected_result
