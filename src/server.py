@@ -169,6 +169,15 @@ def show_is_empty():
     '''
     return dumps(other.is_empty())
 
+@APP.route('/other/search', methods=['GET'])
+def search():
+    '''
+    search
+    '''
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    return dumps(other.search(token, query_str))
+
 @APP.route('/other/show/handle_str', methods=['GET'])
 def show_handle_strs():
     '''
@@ -224,13 +233,13 @@ def http_message_send():
 @APP.route('/message/remove', methods=['DELETE'])
 def http_message_remove():
     data = request.get_json()
-    return dumps(message.message_remove(data['token'], data['message_id']))
+    return dumps(message.message_remove(data['token'], int(data['message_id'])))
 
 @APP.route('/message/edit', methods=['PUT'])
 def http_message_edit():
     data = request.get_json()
-    return dumps(message.message_edit(data['token'], data['message_id'], data['message']))
+    return dumps(message.message_edit(data['token'], int(data['message_id']), data['message']))
 
 
 if __name__ == "__main__":
-    APP.run(port=50000) # Do not edit this port
+    APP.run(port=0) # Do not edit this port
