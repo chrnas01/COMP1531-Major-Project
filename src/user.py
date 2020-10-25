@@ -99,7 +99,7 @@ def user_profile_sethandle(token, handle_str):
 
     # handle_str must be between 3 and 20 characters not inclusive
     if len(handle_str) <= 3 or len(handle_str) >= 20:
-        raise InputError('length of first name is invalid - Cannot register')
+        raise InputError('handle_str must be between 3 and 20 characters')
 
 
 
@@ -109,7 +109,8 @@ def user_profile_sethandle(token, handle_str):
             handle = user.get('handle_str')
             #check if handle exists
             if handle_str == handle:
-                raise InputError('handle is already used by another user')
+                if current_user != user.get('u_id'):
+                    raise InputError('handle is already used by another user')
   
 
     for user in other.data['users']:

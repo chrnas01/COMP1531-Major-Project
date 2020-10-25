@@ -26,7 +26,7 @@ def channel_invite(token, channel_id, u_id):
         raise AccessError('the authorised user is not already a member of the channel')
 
     if u_id in other.data['channels'][channel_id - 1]['all_members']:
-        raise AccessError('the authorised user is already a member of the channel')
+        raise AccessError('user is already a member of the channel')
 
     # add the user the the channel
     other.data['channels'][channel_id - 1]['all_members'].append(u_id)
@@ -52,7 +52,7 @@ def channel_details(token, channel_id):
     if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
         raise AccessError('Authorised user is not a member of channel with channel_id')
 
-    name = other.data['channels'][channel_id - 1]['channel_name']
+    name = other.data['channels'][channel_id - 1]['name']
     owner_members = other.data['channels'][channel_id - 1]['owner_members']
     all_members = other.data['channels'][channel_id - 1]['all_members']
 

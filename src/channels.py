@@ -62,7 +62,7 @@ def channels_create(token, name, is_public):
     # Name cannot already exist
     total_channels = len(other.data['channels'])
     for i in range(total_channels):
-        if name in other.data['channels'][i]['channel_name']:
+        if name in other.data['channels'][i]['name']:
             raise InputError('Channel name already exists - Cannot create channel')
 
     # Testing if this is the first channel being created.
@@ -72,7 +72,7 @@ def channels_create(token, name, is_public):
         channel_id = len(other.data['channels']) + 1
 
     new_channel = {
-        'channel_name': name,
+        'name': name,
         'channel_id': channel_id,
         'is_public': is_public,
         'owner_members': [other.token_to_uid(token),],
