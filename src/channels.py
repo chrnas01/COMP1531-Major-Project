@@ -60,9 +60,9 @@ def channels_create(token, name, is_public):
     if len(name) == 0:
         raise InputError('Field, "Channel name" left blank - Cannot create channel')
     # Name cannot already exist
-    total_channels = len(other.data['channels'])
-    for i in range(total_channels):
-        if name in other.data['channels'][i]['name']:
+
+    for channel in other.data['channels']:
+        if name == channel['name']:
             raise InputError('Channel name already exists - Cannot create channel')
 
     # Testing if this is the first channel being created.

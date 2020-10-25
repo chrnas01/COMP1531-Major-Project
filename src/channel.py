@@ -45,7 +45,7 @@ def channel_details(token, channel_id):
         raise AccessError('Invalid Token')
 
     # Check for channel_id exists
-    if channel_id > len(other.data['channels']):
+    if channel_id > len(other.data['channels']) or channel_id < 1:
         raise InputError('Channel ID is not a valid channel')
 
     # Check that the user is a member of the channel
