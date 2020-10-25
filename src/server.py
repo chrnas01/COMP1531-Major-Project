@@ -8,6 +8,7 @@ import channels
 import auth 
 import re
 import other
+import user
 import message
 
 def defaultHandler(err):
@@ -175,6 +176,46 @@ def show_handle_strs():
     '''
     return dumps(other.get_user_handle_strs())
 
+@APP.route('/user/profile', methods=['GET'])
+def user_profile():
+    '''
+    show user profile
+    '''
+    token = request.args.get('token')
+    u_id = int(request.args.get('u_id'))
+    return dumps(user.user_profile(token, u_id))
+
+@APP.route('/user/profile/setname', methods=['PUT'])
+def user_profile_setname():
+    '''
+    change user's name
+    '''
+    data = request.get_json()
+    return dumps(user.user_profile_setname(data['token'], data['name_first'], data['name_last']))
+
+@APP.route('/user/profile/setemail', methods=['PUT'])
+def user_profile_setemail():
+    '''
+    change user's email
+    '''
+    data = request.get_json()
+    return dumps(user.user_profile_setemail(data['token'], data['email']))
+
+@APP.route('/user/profile/sethandle', methods=['PUT'])
+def user_profile_sethandle():
+    '''
+    change user's handlestr
+    '''
+    data = request.get_json()
+    return dumps(user.user_profile_sethandle(data['token'], data['handle_str']))
+
+@APP.route('/users/all', methods=['GET'])
+def users_all():
+    '''
+    show a list of all users and their associated details
+    '''
+    token = request.args.get('token')
+    return dumps(other.users_all(token))
 @APP.route('/message/send', methods=['POST'])
 def http_message_send():
     data = request.get_json()
