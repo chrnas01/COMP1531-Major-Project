@@ -211,3 +211,22 @@ def test_user_profile_sethandle_long():
     with pytest.raises(InputError):
         user.user_profile_sethandle(user_1['token'], 'A'*20)
 ########################################################
+
+def test_all_users():
+    '''
+    Test to show all users
+    '''
+    other.clear()
+
+    user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
+    
+    assert other.users_all(user_1['token']) == {'users': [{
+        'u_id': 1,
+        'token': user_1['token'],
+        'email': 'jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung',
+        'handle_str': 'jaydenleung',
+        'permission_id': 1}]       
+    }
