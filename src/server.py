@@ -41,7 +41,7 @@ def echo():
 @APP.route("/channel/invite", methods=['POST'])
 def http_channel_invite():
     data = request.get_json()
-    return dumps(channel.channel_invite(data['token'], data['channel_id'], data['u_id']))
+    return dumps(channel.channel_invite(data['token'], int(data['channel_id']), int(data['u_id'])))
 
 @APP.route("/channel/details", methods=['GET'])
 def http_channel_details():
@@ -64,22 +64,22 @@ def http_channel_messages():
 @APP.route("/channel/leave", methods=['POST'])
 def http_channel_leave():
     data = request.get_json()
-    return dumps(channel.channel_leave(data['token'], data['channel_id']))
+    return dumps(channel.channel_leave(data['token'], int(data['channel_id'])))
 
 @APP.route("/channel/join", methods=['POST'])
 def http_channel_join():
     data = request.get_json()
-    return dumps(channel.channel_join(data['token'], data['channel_id']))
+    return dumps(channel.channel_join(data['token'], int(data['channel_id'])))
 
 @APP.route("/channel/addowner", methods=['POST'])
 def http_channel_addowner():
     data = request.get_json()
-    return dumps(channel.channel_addowner(data['token'], data['channel_id'], data['u_id']))
+    return dumps(channel.channel_addowner(data['token'], int(data['channel_id']), int(data['u_id'])))
 
 @APP.route("/channel/removeowner", methods=['POST'])
 def http_channel_removeowner():
     data = request.get_json()
-    return dumps(channel.channel_removeowner(data['token'], data['channel_id'], data['u_id']))
+    return dumps(channel.channel_removeowner(data['token'], int(data['channel_id']), int(data['u_id'])))
 
 # auth login
 @APP.route("/auth/login", methods=['POST'])
@@ -120,7 +120,7 @@ def admin_userpermission_change():
     Change permissions
     '''
     data = request.get_json()
-    return other.admin_userpermission_change(data['token'], data['u_id'], data['permission_id'])
+    return other.admin_userpermission_change(data['token'], int(data['u_id']), int(data['permission_id']))
 
 @APP.route("/other/successful/permissions", methods=['POST'])
 def other_if_successful_permission():
@@ -169,6 +169,15 @@ def show_is_empty():
     '''
     return dumps(other.is_empty())
 
+@APP.route('/search', methods=['GET'])
+def search():
+    '''
+    search
+    '''
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    return dumps(other.search(token, query_str))
+
 @APP.route('/other/show/handle_str', methods=['GET'])
 def show_handle_strs():
     '''
@@ -216,20 +225,21 @@ def users_all():
     '''
     token = request.args.get('token')
     return dumps(other.users_all(token))
+
 @APP.route('/message/send', methods=['POST'])
 def http_message_send():
     data = request.get_json()
-    return dumps(message.message_send(data['token'], data['channel_id'], data['message']))
+    return dumps(message.message_send(data['token'], int(data['channel_id']), data['message']))
 
 @APP.route('/message/remove', methods=['DELETE'])
 def http_message_remove():
     data = request.get_json()
-    return dumps(message.message_remove(data['token'], data['message_id']))
+    return dumps(message.message_remove(data['token'], int(data['message_id'])))
 
 @APP.route('/message/edit', methods=['PUT'])
 def http_message_edit():
     data = request.get_json()
-    return dumps(message.message_edit(data['token'], data['message_id'], data['message']))
+    return dumps(message.message_edit(data['token'], int(data['message_id']), data['message']))
 
 
 if __name__ == "__main__":

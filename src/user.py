@@ -4,7 +4,7 @@
 import re
 import other
 import auth
-from error import InputError
+from error import InputError, AccessError
 
 def user_profile(_, u_id):
     '''
@@ -35,6 +35,9 @@ def user_profile_setname(token, name_first, name_last):
     Given a first and last name,
     changes the first and last name of current user
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     current_user = other.token_to_uid(token)
 
@@ -60,6 +63,9 @@ def user_profile_setemail(token, email):
     '''
     Given email changed the email of the current user
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     current_user = other.token_to_uid(token)
 
@@ -85,12 +91,15 @@ def user_profile_sethandle(token, handle_str):
     '''
     Given handle string changed the handle_str of the current user
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     current_user = other.token_to_uid(token)
 
     # handle_str must be between 3 and 20 characters not inclusive
     if len(handle_str) <= 3 or len(handle_str) >= 20:
-        raise InputError('length of first name is invalid - Cannot register')
+        raise InputError('handle_str must be between 3 and 20 characters')
 
 
 
@@ -100,7 +109,8 @@ def user_profile_sethandle(token, handle_str):
             handle = user.get('handle_str')
             #check if handle exists
             if handle_str == handle:
-                raise InputError('handle is already used by another user')
+                if current_user != user.get('u_id'):
+                    raise InputError('handle is already used by another user')
   
 
     for user in other.data['users']:

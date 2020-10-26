@@ -5,7 +5,7 @@ import pytest
 import auth
 import channels
 import other
-from error import InputError
+from error import InputError, AccessError
 
 # Tests for channels_list() function.
 ###################################################################################
@@ -23,7 +23,7 @@ def test_channels_list_successful():
     # Shouldn't include channel 2 as user1 is not in this channel
     assert channels.channels_list(user1['token']) == {'channels': [
         {
-            'channel_name': 'Channel_1',
+            'name': 'Channel_1',
             'channel_id': channel1['channel_id'],
             'is_public': True,
             'owner_members': [user1['u_id'],],
@@ -45,14 +45,14 @@ def test_channels_list_successful_two_channels():
 
     assert channels.channels_listall(user1['token']) == {'channels': [
         {
-            'channel_name': 'Channel_1',
+            'name': 'Channel_1',
             'channel_id': channel1['channel_id'],
             'is_public': True,
             'owner_members': [user1['u_id'],],
             'all_members': [user1['u_id'],],
         },
         {
-            'channel_name': 'Channel_2',
+            'name': 'Channel_2',
             'channel_id': channel2['channel_id'],
             'is_public': False,
             'owner_members': [user1['u_id'],],
@@ -89,14 +89,14 @@ def test_channels_listall_successful():
 
     assert channels.channels_listall(user1['token']) == {'channels': [
         {
-            'channel_name': 'Channel_1',
+            'name': 'Channel_1',
             'channel_id': channel1['channel_id'],
             'is_public': True,
             'owner_members': [user1['u_id'],],
             'all_members': [user1['u_id'],],
         },
         {
-            'channel_name': 'Channel_2',
+            'name': 'Channel_2',
             'channel_id': channel2['channel_id'],
             'is_public': False,
             'owner_members': [user2['u_id'],],
@@ -117,7 +117,7 @@ def test_channels_listall_no_existing_channels():
 # Tests for channels_create() function.
 ###################################################################################
 
-def test_channels_create_invalid_channel_name1():
+def test_channels_create_invalid_name1():
     '''
     Public channel name is greater than 20 characters long
     '''
@@ -129,7 +129,7 @@ def test_channels_create_invalid_channel_name1():
         assert channels.channels_create(
             user1['token'], 'ChannelNameGreaterthan20characters', True)
 
-def test_channels_create_invalid_channel_name2():
+def test_channels_create_invalid_name2():
     '''
     Private channel name is greater than 20 characters long
     '''
@@ -141,7 +141,7 @@ def test_channels_create_invalid_channel_name2():
         assert channels.channels_create(
             user1['token'], 'ChannelNameGreaterthan20characters', False)
 
-def test_channels_create_20char_channel_name():
+def test_channels_create_20char_name():
     '''
     Boundary Test: Channel name is exactly 20 characters long
     '''
@@ -201,3 +201,20 @@ def test_channels_create_successful_private_multi():
     assert channels.channels_create(user1['token'], 'ChannelName', False) == {'channel_id': 1}
     assert channels.channels_create(user1['token'], 'ChannelName2', False) == {'channel_id': 2}
     assert channels.channels_create(user1['token'], 'ChannelName3', False) == {'channel_id': 3}
+
+def test_invalid_token():
+    '''
+    Checking that the invalid token checks are working
+    '''
+    other.clear()
+
+    auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
+
+    with pytest.raises(AccessError):
+        assert channels.channels_create('invalid-token', 'a', True)
+
+    with pytest.raises(AccessError):
+        assert channels.channels_list('invalid-token')
+
+    with pytest.raises(AccessError):
+        assert channels.channels_listall('invalid-token')

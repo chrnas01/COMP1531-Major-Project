@@ -39,7 +39,7 @@ def test_channels_list_successful(url):
 
     assert json.loads(resp.text) ==  {'channels': [
         {
-            'channel_name': 'Channel1',
+            'name': 'Channel1',
             'channel_id': channel1.json()['channel_id'],
             'is_public': False,
             'owner_members': [user1.json()['u_id'],],
@@ -85,14 +85,14 @@ def test_channels_list_successful_two_channels(url):
 
     assert json.loads(resp.text) ==  {'channels': [
         {
-            'channel_name': 'Channel1',
+            'name': 'Channel1',
             'channel_id': channel1.json()['channel_id'],
             'is_public': False,
             'owner_members': [user1.json()['u_id']],
             'all_members': [user1.json()['u_id']]
         },
         {
-            'channel_name': 'Channel2',
+            'name': 'Channel2',
             'channel_id': channel2.json()['channel_id'],
             'is_public': True,
             'owner_members': [user1.json()['u_id'],],
@@ -177,14 +177,14 @@ def test_channels_listall_successful(url):
 
     assert json.loads(resp.text) ==  {'channels': [
         {
-            'channel_name': 'Channel1',
+            'name': 'Channel1',
             'channel_id': channel1.json()['channel_id'],
             'is_public': False,
             'owner_members': [user1.json()['u_id']],
             'all_members': [user1.json()['u_id']]
         },
         {
-            'channel_name': 'Channel2',
+            'name': 'Channel2',
             'channel_id': channel2.json()['channel_id'],
             'is_public': True,
             'owner_members': [user1.json()['u_id']],
@@ -215,7 +215,7 @@ def test_channels_listall_no_existing_channels(url):
 # Tests for channels_create() function.
 ###################################################################################
 
-def test_channels_create_invalid_channel_name1(url):
+def test_channels_create_invalid_name1(url):
     '''
     Public channel name is greater than 20 characters long
     '''
@@ -243,7 +243,7 @@ def test_channels_create_invalid_channel_name1(url):
     assert resp.json()['code'] == 400
 
 
-def test_channels_create_invalid_channel_name2(url):
+def test_channels_create_invalid_name2(url):
     '''
     Private channel name is greater than 20 characters long
     '''
@@ -270,7 +270,7 @@ def test_channels_create_invalid_channel_name2(url):
     assert 'code' in resp.json()
     assert resp.json()['code'] == 400 
 
-def test_channels_create_20char_channel_name(url):
+def test_channels_create_20char_name(url):
     '''
     Boundary Test: Channel name is exactly 20 characters long
     '''
