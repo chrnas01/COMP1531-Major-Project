@@ -163,5 +163,9 @@ def test_invalid_token(setup):
 
     with pytest.raises(AccessError):
         assert other.users_all('invalid-token')
+    
+    with pytest.raises(AccessError):
         assert other.admin_userpermission_change('invalid-token', user_2['u_id'], 1)
+    
+    with pytest.raises(AccessError):
         assert other.search('invalid-token', 'a')

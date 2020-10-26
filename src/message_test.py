@@ -328,5 +328,9 @@ def test_invalid_token(setup):
 
     with pytest.raises(AccessError):
         assert message.message_send('invalid-token', channel_data['channel_id'], 'test')
+    
+    with pytest.raises(AccessError):
         assert message.message_remove('invalid-token', 1)
+    
+    with pytest.raises(AccessError):
         assert message.message_edit('invalid-token', 1, 'test')

@@ -64,6 +64,21 @@ def test_channel_invite_invalid_access(setup):
     with pytest.raises(AccessError):
         assert channel.channel_invite(user_2['token'], channel_data['channel_id'], user_3['u_id'])
 
+def test_channel_invite_already_member(setup):
+    '''
+    user is already a member
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    # Create a private channel as jayden
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False) # channel_id 1
+    # Successful channel invite
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+
+    with pytest.raises(AccessError):
+        assert channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+
 def test_channel_invite_success(setup):
     '''
     channel invite success
@@ -786,9 +801,21 @@ def test_invalid_token(setup):
 
     with pytest.raises(AccessError):
         assert channel.channel_details('invalid-token', channel_data['channel_id'])
+
+    with pytest.raises(AccessError):
         assert channel.channel_addowner('invalid-token', channel_data['channel_id'], user_2['u_id'])
+
+    with pytest.raises(AccessError):
         assert channel.channel_invite('invalid-token', channel_data['channel_id'], user_2['u_id'])
+
+    with pytest.raises(AccessError):
         assert channel.channel_join('invalid-token', channel_data['channel_id'])
+
+    with pytest.raises(AccessError):
         assert channel.channel_leave('invalid-token', channel_data['channel_id'])
+
+    with pytest.raises(AccessError):
         assert channel.channel_messages('invalid-token', channel_data['channel_id'], 0)
+
+    with pytest.raises(AccessError):
         assert channel.channel_removeowner('invalid-token', channel_data['channel_id'], user_1['u_id'])

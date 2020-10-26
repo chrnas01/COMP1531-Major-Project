@@ -242,5 +242,9 @@ def test_invalid_token():
 
     with pytest.raises(AccessError):
         assert user.user_profile_setname('invalid-token', 'sam', 'he')
+    
+    with pytest.raises(AccessError):
         assert user.user_profile_setemail('invalid-token', 'Steven@gmail.com')
+    
+    with pytest.raises(AccessError):
         assert user.user_profile_sethandle('invalid-token', 'Steven123')

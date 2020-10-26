@@ -212,5 +212,9 @@ def test_invalid_token():
 
     with pytest.raises(AccessError):
         assert channels.channels_create('invalid-token', 'a', True)
+
+    with pytest.raises(AccessError):
         assert channels.channels_list('invalid-token')
+
+    with pytest.raises(AccessError):
         assert channels.channels_listall('invalid-token')
