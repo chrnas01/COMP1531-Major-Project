@@ -158,7 +158,7 @@ def channels_create():
 @APP.route('/other/show', methods=['GET'])
 def show():
     '''
-    shows
+    shows databse
     '''
     return dumps(other.data)
 
