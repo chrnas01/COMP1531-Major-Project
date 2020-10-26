@@ -174,6 +174,13 @@ def test_search(url, setup):
     }
     requests.post(url + 'message/send', json=payload)
 
+    payload = {
+        'token': user_1.json()['token'],
+        'query_str': 'est',
+    }
+
+    resp = requests.get(url + '/search', params=payload).json()
+
     expected_result = {
         'messages': [
             {
@@ -181,25 +188,19 @@ def test_search(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1.json()['u_id'],
                 'message': 'test',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': resp['messages'][0]['time_created']
             },
             {
                 'message_id': 4,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_2.json()['u_id'],
                 'message': 'test2',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': resp['messages'][1]['time_created']
             }
         ]
     }
 
-    payload = {
-        'token': user_1.json()['token'],
-        'query_str': 'est',
-    }
-
-    resp = requests.get(url + '/search', params=payload)
-    assert resp.json() == expected_result
+    assert resp == expected_result
 
 def test_search_other_channel(url, setup):
     '''
@@ -256,6 +257,13 @@ def test_search_other_channel(url, setup):
     }
     requests.post(url + 'message/send', json=payload)
 
+    payload = {
+        'token': user_1.json()['token'],
+        'query_str': 'e',
+    }
+
+    resp = requests.get(url + '/search', params=payload).json()
+
     expected_result = {
         'messages': [
             {
@@ -263,22 +271,17 @@ def test_search_other_channel(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1.json()['u_id'],
                 'message': 'test',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': resp['messages'][0]['time_created']
             },
             {
                 'message_id': 3,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1.json()['u_id'],
                 'message': 'Hello',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': resp['messages'][1]['time_created']
             }
         ]
     }
 
-    payload = {
-        'token': user_1.json()['token'],
-        'query_str': 'e',
-    }
-
-    resp = requests.get(url + '/search', params=payload)
-    assert resp.json() == expected_result
+    assert resp == expected_result
+    
