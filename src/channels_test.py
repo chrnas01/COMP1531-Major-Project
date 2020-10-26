@@ -5,7 +5,7 @@ import pytest
 import auth
 import channels
 import other
-from error import InputError
+from error import InputError, AccessError
 
 # Tests for channels_list() function.
 ###################################################################################
@@ -201,3 +201,16 @@ def test_channels_create_successful_private_multi():
     assert channels.channels_create(user1['token'], 'ChannelName', False) == {'channel_id': 1}
     assert channels.channels_create(user1['token'], 'ChannelName2', False) == {'channel_id': 2}
     assert channels.channels_create(user1['token'], 'ChannelName3', False) == {'channel_id': 3}
+
+def test_invalid_token():
+    '''
+    Checking that the invalid token checks are working
+    '''
+    other.clear()
+
+    auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
+
+    with pytest.raises(AccessError):
+        assert channels.channels_create('invalid-token', 'a', True)
+        assert channels.channels_list('invalid-token')
+        assert channels.channels_listall('invalid-token')

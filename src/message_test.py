@@ -210,6 +210,8 @@ def test_message_remove_valid(setup):
         'end': -1
     }
 
+########################################################
+
 def test_message_edit_other_user(setup):
     '''
     editing a message sent by another user
@@ -310,3 +312,21 @@ def test_message_edit_valid_remove(setup):
         'start': 0,
         'end': -1
     }
+
+########################################################
+
+def test_invalid_token(setup):
+    '''
+    Checking that the invalid token checks are working
+    '''
+
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', True)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
+
+    with pytest.raises(AccessError):
+        assert message.message_send('invalid-token', channel_data['channel_id'], 'test')
+        assert message.message_remove('invalid-token', 1)
+        assert message.message_edit('invalid-token', 1, 'test')

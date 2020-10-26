@@ -147,3 +147,21 @@ def test_search_other_channel(setup):
             }
         ]
     }
+
+################################################################################
+
+def test_invalid_token(setup):
+    '''
+    Checking that the invalid token checks are working
+    '''
+
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', True)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
+
+    with pytest.raises(AccessError):
+        assert other.users_all('invalid-token')
+        assert other.admin_userpermission_change('invalid-token', user_2['u_id'], 1)
+        assert other.search('invalid-token', 'a')

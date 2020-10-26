@@ -4,7 +4,7 @@
 import pytest
 import auth
 import user
-from error import InputError
+from error import InputError, AccessError
 import other
 
 ########################################################
@@ -230,3 +230,17 @@ def test_all_users():
         'handle_str': 'jaydenleung',
         'permission_id': 1}]       
     }
+
+########################################################
+
+def test_invalid_token():
+    '''
+    Checking that the invalid token checks are working
+    '''
+    other.clear()
+    auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung')
+
+    with pytest.raises(AccessError):
+        assert user.user_profile_setname('invalid-token', 'sam', 'he')
+        assert user.user_profile_setemail('invalid-token', 'Steven@gmail.com')
+        assert user.user_profile_sethandle('invalid-token', 'Steven123')
