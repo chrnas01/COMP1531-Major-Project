@@ -189,19 +189,20 @@ def test_message_remove_valid(setup):
 
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
     channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    channel.channel_addowner(user_1['token'], channel_data['channel_id'], user_2['u_id'])
     msg = 'test'
 
-    message.message_send(user_1['token'], channel_data['channel_id'], msg)
-    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
 
-    message.message_remove(user_1['token'], 1)
+    message.message_remove(user_2['token'], 1)
 
-    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+    assert channel.channel_messages(user_2['token'], channel_data['channel_id'], 0) == {
         'messages': [
             {
                 'message_id': 2,
                 'channel_id': channel_data['channel_id'],
-                'u_id': user_1['u_id'],
+                'u_id': user_2['u_id'],
                 'message': msg,
                 'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
             }
@@ -209,6 +210,8 @@ def test_message_remove_valid(setup):
         'start': 0,
         'end': -1
     }
+
+########################################################
 
 def test_message_edit_other_user(setup):
     '''
@@ -253,26 +256,27 @@ def test_message_edit_valid(setup):
 
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
     channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    channel.channel_addowner(user_1['token'], channel_data['channel_id'], user_2['u_id'])
     msg = 'test'
 
-    message.message_send(user_1['token'], channel_data['channel_id'], msg)
-    message.message_send(user_1['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
+    message.message_send(user_2['token'], channel_data['channel_id'], msg)
 
-    message.message_edit(user_1['token'], 1, 'tset')
+    message.message_edit(user_2['token'], 1, 'tset')
 
-    assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
+    assert channel.channel_messages(user_2['token'], channel_data['channel_id'], 0) == {
         'messages': [
             {
                 'message_id': 1,
                 'channel_id': channel_data['channel_id'],
-                'u_id': user_1['u_id'],
+                'u_id': user_2['u_id'],
                 'message': 'tset',
                 'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
             },
             {
                 'message_id': 2,
                 'channel_id': channel_data['channel_id'],
-                'u_id': user_1['u_id'],
+                'u_id': user_2['u_id'],
                 'message': msg,
                 'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
             }
@@ -310,3 +314,25 @@ def test_message_edit_valid_remove(setup):
         'start': 0,
         'end': -1
     }
+
+########################################################
+
+def test_invalid_token(setup):
+    '''
+    Checking that the invalid token checks are working
+    '''
+
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', True)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
+
+    with pytest.raises(AccessError):
+        assert message.message_send('invalid-token', channel_data['channel_id'], 'test')
+    
+    with pytest.raises(AccessError):
+        assert message.message_remove('invalid-token', 1)
+    
+    with pytest.raises(AccessError):
+        assert message.message_edit('invalid-token', 1, 'test')

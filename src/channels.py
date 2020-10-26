@@ -1,7 +1,7 @@
 '''
 functions to manage channels
 '''
-from error import InputError
+from error import InputError, AccessError
 import other
 
 # Provide a list of all channels (and their associated details)
@@ -11,6 +11,10 @@ def channels_list(token):
     Provide a list of all channels (and their associated details)
     that the authorised user is part of
     '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # User of interest
     user_uid = other.token_to_uid(token)
     # Total number of channels
@@ -30,7 +34,10 @@ def channels_listall(token):
     '''
     Provide a list of all channels (and their associated details)
     '''
-    other.token_to_uid(token)
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # Simply returns data structure which stores all channels information.
     return {'channels': other.data['channels']}
 
@@ -40,6 +47,11 @@ def channels_create(token, name, is_public):
     '''
     Creates a new channel with that name that is either a public or private channel
     '''
+
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
     # First check to see if inputted name is valid:
     # Cannot be greater than 20 characters long
     if len(name) > 20:
@@ -48,9 +60,9 @@ def channels_create(token, name, is_public):
     if len(name) == 0:
         raise InputError('Field, "Channel name" left blank - Cannot create channel')
     # Name cannot already exist
-    total_channels = len(other.data['channels'])
-    for i in range(total_channels):
-        if name in other.data['channels'][i]['channel_name']:
+
+    for channel in other.data['channels']:
+        if name == channel['name']:
             raise InputError('Channel name already exists - Cannot create channel')
 
     # Testing if this is the first channel being created.
@@ -60,7 +72,7 @@ def channels_create(token, name, is_public):
         channel_id = len(other.data['channels']) + 1
 
     new_channel = {
-        'channel_name': name,
+        'name': name,
         'channel_id': channel_id,
         'is_public': is_public,
         'owner_members': [other.token_to_uid(token),],
