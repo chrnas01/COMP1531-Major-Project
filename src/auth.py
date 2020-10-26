@@ -11,6 +11,7 @@ def auth_login(email, password):
     Given a registered users' email and password and generates a valid
     token for the user to remain authenticated
     '''
+    password = other.password_encrypt(password)
     # is email format valid
     regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
     if not re.search(regex, email):
@@ -55,6 +56,7 @@ def auth_register(email, password, name_first, name_last):
     If the handle is already taken, you may modify the handle in any way you
     see fit to make it unique.
     '''
+    
     # is email format valid
     regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
     if not re.search(regex, email):
@@ -75,6 +77,8 @@ def auth_register(email, password, name_first, name_last):
     # check if already registered email
     if is_email_registered(email):
         raise InputError('Email is already registered - Cannot register')
+    
+    password = other.password_encrypt(password)
     
     # register
     u_id = len(other.data['users']) + 1 # first person u_id 1, second 2,...
