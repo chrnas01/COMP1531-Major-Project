@@ -121,6 +121,8 @@ def test_message_send_success(url, setup):
         'start': 0
     }
 
+    resp = requests.get(url + 'channel/messages', params=payload).json()
+
     expected_result = {
         'messages': [
             {
@@ -128,15 +130,14 @@ def test_message_send_success(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': 'test',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': resp['messages'][0]['time_created']
             }
         ],
         'start': 0,
         'end': -1
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload)
-    assert resp.json() == expected_result
+    assert resp == expected_result
 
 
 ########################################################
@@ -389,6 +390,8 @@ def test_message_edit_success(url, setup):
         'start': 0
     }
 
+    resp = requests.get(url + 'channel/messages', params=payload).json()
+
     expected_result = {
         'messages': [
             {
@@ -396,14 +399,13 @@ def test_message_edit_success(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': 'edit',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': resp['messages'][0]['time_created']
             }
         ],
         'start': 0,
         'end': -1
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload)
-    assert resp.json() == expected_result
+    assert resp == expected_result
 
 ########################################################

@@ -299,7 +299,6 @@ def test_message_edit_valid_remove(setup):
 
     message.message_send(user_1['token'], channel_data['channel_id'], msg)
     message.message_send(user_1['token'], channel_data['channel_id'], msg)
-
     message.message_edit(user_1['token'], 1, '')
 
     assert channel.channel_messages(user_1['token'], channel_data['channel_id'], 0) == {
