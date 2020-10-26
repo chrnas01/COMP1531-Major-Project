@@ -88,22 +88,22 @@ def test_search(setup):
     message.message_send(user_1['token'], channel_data['channel_id'], 'test')
     message.message_send(user_1['token'], channel_data['channel_id'], 'Hello')
     message.message_send(user_2['token'], channel_data['channel_id'], 'test2')
- 
-    assert other.search(user_1['token'], 'est') == {
+    result = other.search(user_1['token'], 'est')
+    assert result == {
         'messages': [
             {
                 'message_id': 2,
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': result['messages'][0]['time_created']
             },
             {
                 'message_id': 4,
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_2['token']),
                 'message': 'test2',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': result['messages'][1]['time_created']
             }
         ]
     }
@@ -121,22 +121,22 @@ def test_search_other_channel(setup):
     message.message_send(user_1['token'], channel_data['channel_id'], 'test')
     message.message_send(user_1['token'], channel_data['channel_id'], 'Hello')
     message.message_send(user_2['token'], channel_data2['channel_id'], 'test2')
- 
-    assert other.search(user_1['token'], 'e') == {
+    result = other.search(user_1['token'], 'e')
+    assert result == {
         'messages': [
             {
                 'message_id': 2,
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': result['messages'][0]['time_created']
             },
             {
                 'message_id': 3,
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'Hello',
-                'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+                'time_created': result['messages'][1]['time_created']
             }
         ]
     }
