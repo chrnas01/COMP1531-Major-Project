@@ -47,13 +47,15 @@ def message_remove(token, message_id):
         raise AccessError('Invalid Token')
 
     msg = {}
+    msg_exist = False
 
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
+            msg_exist = True
             break
 
     #check if the message exists
-    if not msg:
+    if not msg_exist:
         raise InputError('Message (based on ID) no longer exists')
 
     #check they are deleting their own message

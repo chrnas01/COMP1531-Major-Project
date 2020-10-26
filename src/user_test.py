@@ -4,7 +4,7 @@
 import pytest
 import auth
 import user
-from error import InputError
+from error import InputError, AccessError
 import other
  
 ########################################################
@@ -163,18 +163,18 @@ def test_user_profile_sethandle_success():
     Tests that user_profile_sethandle sets the correct handle_str
     '''
     other.clear()
- 
+
     # Setup users
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
-    user.user_profile_sethandle(user_1['token'], 'newhandle')
- 
+    user.user_profile_sethandle(user_1['token'], 'jaydenleung')
+
     assert user.user_profile(user_1['token'], user_1['u_id']) == {
         'user': {
             'email': 'jayden@gmail.com',
             'u_id': 1,
             'name_first': 'Jayden',
             'name_last': 'Leung',
-            'handle_str': 'newhandle',
+            'handle_str': 'jaydenleung',
             }
         }
  
@@ -229,3 +229,21 @@ def test_all_users():
             'handle_str': 'jaydenleung',
         },
     ]}
+
+########################################################
+
+def test_invalid_token():
+    '''
+    Checking that the invalid token checks are working
+    '''
+    other.clear()
+    auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung')
+
+    with pytest.raises(AccessError):
+        assert user.user_profile_setname('invalid-token', 'sam', 'he')
+    
+    with pytest.raises(AccessError):
+        assert user.user_profile_setemail('invalid-token', 'Steven@gmail.com')
+    
+    with pytest.raises(AccessError):
+        assert user.user_profile_sethandle('invalid-token', 'Steven123')

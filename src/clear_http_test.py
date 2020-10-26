@@ -21,7 +21,7 @@ def test_http_user_clear_1(url):
     requests.post(url + 'auth/register', json=payload)
     requests.delete(url + 'clear')
 
-    resp = requests.get(url + 'other/is_empty', json=payload)
+    resp = requests.get(url + 'other/is_empty')
     assert json.loads(resp.text)
 
 def test_http_user_clear_0(url):
@@ -53,5 +53,5 @@ def test_http_channel_clear_1(url):
     requests.post(url + 'channels/create', json=payload) 
     
     requests.delete(url + 'clear')
-    resp = requests.get(url + 'other/is_empty', json=payload)
+    resp = requests.get(url + 'other/is_empty')
     assert json.loads(resp.text)

@@ -141,10 +141,11 @@ def test_message_remove_nonexistent(setup):
     # Setup pytest
     user_1, _, _ = setup
 
-    channels.channels_create(user_1['token'], 'test channel', False)
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
 
     with pytest.raises(InputError):
-        assert message.message_remove(user_1['token'], 1)
+        assert message.message_remove(user_1['token'], 2)
 
 def test_message_remove_other_user(setup):
     '''
