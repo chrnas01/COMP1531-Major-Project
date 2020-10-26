@@ -166,7 +166,7 @@ def test_user_profile_sethandle_success():
 
     # Setup users
     user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung') # Flockr Owner
-    user.user_profile_sethandle(user_1['token'], 'newhandle')
+    user.user_profile_sethandle(user_1['token'], 'jaydenleung')
 
     assert user.user_profile(user_1['token'], user_1['u_id']) == {
         'user': {
@@ -174,7 +174,7 @@ def test_user_profile_sethandle_success():
             'u_id': 1,
             'name_first': 'Jayden',
             'name_last': 'Leung',
-            'handle_str': 'newhandle',
+            'handle_str': 'jaydenleung',
             }
         }
 
