@@ -2,9 +2,11 @@
 
 ## Changelog
 
-* 28-10: Adding password reset as routes not automatically auth checking
-* 29-10: 6.1 section updated with corrected types
-
+ * 08/10: Added section 6.8
+ * 08/10: Removed any reference to "admin", clarity about implementing entire interface
+ * 12/10: Clarified that even if you modify the handle it must remain less than 20 characters
+ * 28-10: Adding password reset as routes not automatically auth checking
+ * 29-10: 6.1 section updated with corrected types
 ## Contents
 
   1. Aims
@@ -345,12 +347,12 @@ For example, if we imagine a user with token "12345" is trying to read messages 
  * Flockr users have two global permissions
    1) Owners (permission id 1), who can also modify other owners' permissions.
    2) Members (permission id 2), who do not have any special permissions
-* All flockr users are members by default, except for the very first user who signs up, who is an owner
+* All slackr users are members by default, except for the very first user who signs up, who is an owner
 
 A user's primary permissions are their global permissions. Then the channel permissions are layered on top. For example:
-* An owner of flockr has owner permissions in every channel they've joined
-* A member of flockr is a member in channels they are not owners of
-* A member of flockr is an owner in channels they are owners of
+* An owner of slackr has owner permissions in every channel they've joined
+* A member of slackr is a member in channels they are not owners of
+* A member of slackr is an owner in channels they are owners of
 
 ### 6.7. Working with the frontend
 
