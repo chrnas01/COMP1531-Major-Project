@@ -183,7 +183,7 @@ def auth_password_reset(reset_code, new_password):
 
     for user in other.data['users']:
         if user['email'] == user_email:
-            user['password']  = password = other.password_encrypt(new_password)
+            user['password'] = other.password_encrypt(new_password)
 
     return {}
 
