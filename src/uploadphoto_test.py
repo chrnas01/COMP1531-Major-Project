@@ -24,3 +24,31 @@ def getsizes(uri):
 
     return(None)
 
+
+def test_user_profile_uploadphoto_bad_url(url):
+    '''
+    Tests a bad url for upload photo
+    '''
+    requests.delete(url + 'clear')
+
+    # Setup user
+    payload = {
+        'email': 'jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung'
+    }
+    user_1 = requests.post(url + 'auth/register', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'img_url': 'https://jdfklajklfjkkjfl.com.au',
+        'x_start': '0',
+        'y_start': '0',
+        'x_end': '20',
+        'y_end': '20',
+    }
+    resp = requests.post(url + '/user/profile/uploadphoto', json=payload)
+
+    assert resp.status_code == 400
+
