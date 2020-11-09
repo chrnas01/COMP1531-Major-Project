@@ -327,6 +327,95 @@ def test_message_edit_valid_remove(setup):
 
 ########################################################
 
+def test_send_later_invalid_channel(setup):
+    '''
+    sending a message later to an invalid channel
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channels.channels_create(user_1['token'], 'test channel', False)
+    msg = 'test'
+
+    with pytest.raises(InputError):
+        assert message.message_send_later(user_1['token'], 99, msg,
+                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5))
+
+def test_send_later_invalid_message(setup):
+    '''
+    sending message later that is too long
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = ''
+    for i in range(1001):
+        msg += str(i)
+
+    with pytest.raises(InputError):
+        assert message.message_send_later(user_1['token'], channel_data['channel_id'], msg,
+                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5))
+
+def test_send_later_invalid_time(setup):
+    '''
+    sending message later at time in the past
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = 'test'
+
+    with pytest.raises(InputError):
+        assert message.message_send_later(user_1['token'], channel_data['channel_id'], msg,
+                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) - 5))
+
+def test_send_later_invalid_access(setup):
+    '''
+    sending message later when user has not joined the channel
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = 'test'
+
+    with pytest.raises(AccessError):
+        assert message.message_send_later(user_2['token'], channel_data['channel_id'], msg,
+                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5))
+
+def test_send_later_valid(setup):
+    '''
+    sending message later
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = 'test'
+    time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+
+    message.message_send_later(user_1['token'], channel_data['channel_id'], msg, time)
+
+    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+
+    assert result == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': time
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+########################################################
+
 def test_invalid_token(setup):
     '''
     Checking that the invalid token checks are working
@@ -346,3 +435,7 @@ def test_invalid_token(setup):
     
     with pytest.raises(AccessError):
         assert message.message_edit('invalid-token', 1, 'test')
+    
+    with pytest.raises(AccessError):
+        assert message.message_send_later('invalid-token', 1, 'test',
+                int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5)
