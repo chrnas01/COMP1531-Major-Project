@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import time
 from error import InputError, AccessError
 import other
 
@@ -106,3 +107,33 @@ def message_edit(token, message_id, message):
 
     return {
     }
+
+def message_send_later(token, channel_id, message, time_sent):
+    '''
+    Send a message from authorised_user to the channel specified by channel_id
+    at a specific time
+    '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
+    # Check for channel_id exists
+    if channel_id > len(other.data['channels']):
+        raise InputError('channel_id does not refer to a valid channel')
+
+    # Check that the message is within the character limit
+    if len(message) > 1000:
+        raise InputError('Message is more than 1000 characters')
+
+    # Check that the time sent is not in the past
+    curr_time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+    if time_sent < curr_time:
+        raise InputError('Time sent is a time in the past')
+
+    # Check that the user is a member of the channel
+    if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
+        raise AccessError('Authorised user is not a member of channel with channel_id')
+
+    time.sleep(time_sent - curr_time)
+
+    return message_send(token, channel_id, message)
