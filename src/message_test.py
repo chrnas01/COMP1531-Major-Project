@@ -79,7 +79,11 @@ def test_valid_message(setup):
                 'u_id': user_1['u_id'],
                 'message': msg,
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             }
         ],
@@ -111,7 +115,11 @@ def test_valid_message_multi(setup):
                 'u_id': user_1['u_id'],
                 'message': msg,
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             }
         ],
@@ -131,7 +139,11 @@ def test_valid_message_multi(setup):
                 'u_id': user_1['u_id'],
                 'message': msg,
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             },
             {
@@ -140,7 +152,11 @@ def test_valid_message_multi(setup):
                 'u_id': user_2['u_id'],
                 'message': msg2,
                 'time_created': result['messages'][1]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             }
         ],
@@ -222,7 +238,11 @@ def test_message_remove_valid(setup):
                 'u_id': user_2['u_id'],
                 'message': msg,
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             }
         ],
@@ -292,7 +312,11 @@ def test_message_edit_valid(setup):
                 'u_id': user_2['u_id'],
                 'message': 'tset',
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             },
             {
@@ -301,7 +325,11 @@ def test_message_edit_valid(setup):
                 'u_id': user_2['u_id'],
                 'message': msg,
                 'time_created': result['messages'][1]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             }
         ],
@@ -333,7 +361,11 @@ def test_message_edit_valid_remove(setup):
                 'u_id': user_1['u_id'],
                 'message': msg,
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             }
         ],
@@ -424,7 +456,11 @@ def test_send_later_valid(setup):
                 'u_id': user_1['u_id'],
                 'message': msg,
                 'time_created': time,
-                'reacts': [],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
                 'is_pinned': False
             }
         ],
@@ -436,16 +472,17 @@ def test_send_later_valid(setup):
 
 def test_react_invalid_message(setup):
     '''
-    reacting to a message that doesn't exist
+    reacting to a message that is in a channel the user is not a part of
     '''
     # Setup pytest
-    user_1, _, _ = setup
+    user_1, user_2, _ = setup
 
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channels.channels_create(user_2['token'], 'test channel 2', False)
     message.message_send(user_1['token'], channel_data['channel_id'], 'test')
 
     with pytest.raises(InputError):
-        assert message.message_react(user_1['token'], 99, 1)
+        assert message.message_react(user_2['token'], channel_data['channel_id'], 1)
 
 def test_react_invalid_react(setup):
     '''
@@ -493,7 +530,7 @@ def test_react_valid(setup):
                 'message_id': 1,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
-                'message': msg,
+                'message': 'test',
                 'time_created': result['messages'][0]['time_created'],
                 'reacts': [{
                     'react_id': 1,
@@ -511,16 +548,17 @@ def test_react_valid(setup):
 
 def test_unreact_invalid_message(setup):
     '''
-    unreacting to a message that doesn't exist
+    reacting to a message that is in a channel the user is not a part of
     '''
     # Setup pytest
-    user_1, _, _ = setup
+    user_1, user_2, _ = setup
 
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channels.channels_create(user_2['token'], 'test channel 2', False)
     message.message_send(user_1['token'], channel_data['channel_id'], 'test')
 
     with pytest.raises(InputError):
-        assert message.message_unreact(user_1['token'], 99, 1)
+        assert message.message_unreact(user_2['token'], channel_data['channel_id'], 1)
 
 def test_unreact_invalid_react(setup):
     '''
@@ -568,7 +606,7 @@ def test_unreact_valid(setup):
                 'message_id': 1,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
-                'message': msg,
+                'message': 'test',
                 'time_created': result['messages'][0]['time_created'],
                 'reacts': [{
                     'react_id': 1,
@@ -607,3 +645,9 @@ def test_invalid_token(setup):
     with pytest.raises(AccessError):
         assert message.message_send_later('invalid-token', 1, 'test',
                 int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5)
+    
+    with pytest.raises(AccessError):
+        assert message.message_react('invalid-token', 1, 1)
+
+    with pytest.raises(AccessError):
+        assert message.message_unreact('invalid-token', 1, 1)

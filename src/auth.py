@@ -29,6 +29,8 @@ def auth_login(email, password):
     # calculate token
     token = other.encrypt_token(u_id).decode("utf-8")
 
+    other.update_user_reacts(u_id)
+
     return {
         'u_id': u_id,
         'token': token

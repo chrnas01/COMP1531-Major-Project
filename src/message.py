@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 import time
 from error import InputError, AccessError
 import other
+import channels
+import auth
 
 def message_send(token, channel_id, message):
     '''
@@ -30,7 +32,9 @@ def message_send(token, channel_id, message):
         'channel_id': channel_id,
         'u_id': other.token_to_uid(token),
         'message': message,
-        'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+        'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()),
+        'reacts': other.valid_reacts,
+        'is_pinned': False
     }
 
     other.data['messages'].append(message_struct)
@@ -137,3 +141,76 @@ def message_send_later(token, channel_id, message, time_sent):
     time.sleep(time_sent - curr_time)
 
     return message_send(token, channel_id, message)
+
+def message_react(token, message_id, react_id):
+    '''
+    Given a message within a channel the authorised user is part of,
+    add a "react" to that particular message
+    '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
+    for i in range(len(other.data['messages'])):
+        if other.data['messages'][i]['message_id'] == message_id:
+            break
+    
+    # Check that the user is a member of the channel in which the message was sent
+    if other.token_to_uid(token) not in other.data['channels'][other.data['messages'][i]['channel_id'] - 1]['all_members']:
+        raise InputError('message_id is not a valid message within a channel that the authorised user has joined')
+
+    # Check that the react is valid
+    if all(react_id != react['react_id'] for react in other.valid_reacts):
+        raise InputError('react_id is not a valid React ID')
+
+    print(other.data['messages'][i]['reacts'][0]['is_this_user_reacted'])
+    
+    if other.data['messages'][i]['reacts'][0]['is_this_user_reacted']:
+        print('test')
+        raise InputError('''Message with ID message_id already contains an active 
+                React with ID react_id from the authorised user''')
+
+    for react in other.data['messages'][i]['reacts']:
+        if react['react_id'] == react_id:
+            react['u_ids'].append(other.token_to_uid(token))
+            react['is_this_user_reacted'] = True
+            break
+
+    return {}
+
+def message_unreact(token, message_id, react_id):
+    '''
+    Given a message within a channel the authorised user is part of,
+    remove a "react" to that particular message
+    '''
+    '''
+    Given a message within a channel the authorised user is part of,
+    add a "react" to that particular message
+    '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
+    for i in range(len(other.data['messages'])):
+        if other.data['messages'][i]['message_id'] == message_id:
+            break
+
+    # Check that the user is a member of the channel in which the message was sent
+    if other.token_to_uid(token) not in other.data['channels'][other.data['messages'][i]['channel_id'] - 1]['all_members']:
+        raise InputError('message_id is not a valid message within a channel that the authorised user has joined')
+
+    # Check that the react is valid
+    if all(react_id != react['react_id'] for react in other.valid_reacts):
+        raise InputError('react_id is not a valid React ID')
+
+    if not other.data['messages'][i]['reacts'][0]['is_this_user_reacted']:
+        raise InputError('''Message with ID message_id does not 
+                contain an active React with ID react_id''')
+
+    for react in other.data['messages'][i]['reacts']:
+        if react['react_id'] == react_id:
+            react['u_ids'].remove(other.token_to_uid(token))
+            react['is_this_user_reacted'] = False
+            break
+
+    return {}
