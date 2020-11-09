@@ -78,7 +78,9 @@ def test_valid_message(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': msg,
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -108,7 +110,9 @@ def test_valid_message_multi(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': msg,
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -126,14 +130,18 @@ def test_valid_message_multi(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': msg,
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': 2,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_2['u_id'],
                 'message': msg2,
-                'time_created': result['messages'][1]['time_created']
+                'time_created': result['messages'][1]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -213,7 +221,9 @@ def test_message_remove_valid(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_2['u_id'],
                 'message': msg,
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -281,14 +291,18 @@ def test_message_edit_valid(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_2['u_id'],
                 'message': 'tset',
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             },
             {
                 'message_id': 2,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_2['u_id'],
                 'message': msg,
-                'time_created': result['messages'][1]['time_created']
+                'time_created': result['messages'][1]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -318,7 +332,9 @@ def test_message_edit_valid_remove(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': msg,
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -407,7 +423,159 @@ def test_send_later_valid(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': msg,
-                'time_created': time
+                'time_created': time,
+                'reacts': [],
+                'is_pinned': False
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+########################################################
+
+def test_react_invalid_message(setup):
+    '''
+    reacting to a message that doesn't exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_react(user_1['token'], 99, 1)
+
+def test_react_invalid_react(setup):
+    '''
+    reacting to a message with a react that doesn't exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_react(user_1['token'], msg['message_id'], 99)
+
+def test_react_already_reacted(setup):
+    '''
+    reacting to a message that you have already reacted to
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_react(user_1['token'], msg['message_id'], 1)
+
+    with pytest.raises(InputError):
+        assert message.message_react(user_1['token'], msg['message_id'], 1)
+
+def test_react_valid(setup):
+    '''
+    reacting to a message
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_react(user_1['token'], msg['message_id'], 1)
+
+    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+
+    assert result == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [user_1['u_id']],
+                    'is_this_user_reacted': True
+                }],
+                'is_pinned': False
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+########################################################
+
+def test_unreact_invalid_message(setup):
+    '''
+    unreacting to a message that doesn't exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_unreact(user_1['token'], 99, 1)
+
+def test_unreact_invalid_react(setup):
+    '''
+    unreacting to a message with a react that doesn't exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_unreact(user_1['token'], msg['message_id'], 99)
+
+def test_unreact_already_unreacted(setup):
+    '''
+    unreacting to a message that you have not reacted to
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_unreact(user_1['token'], msg['message_id'], 1)
+
+def test_unreact_valid(setup):
+    '''
+    unreacting to a message
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_react(user_1['token'], msg['message_id'], 1)
+    message.message_unreact(user_1['token'], msg['message_id'], 1)
+
+    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+
+    assert result == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': msg,
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             }
         ],
         'start': 0,
