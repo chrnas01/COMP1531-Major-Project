@@ -1,6 +1,6 @@
 import sys
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 import channel
 from error import InputError, AccessError
@@ -10,6 +10,12 @@ import re
 import other
 import user
 import message
+import urllib.request
+import os
+import random
+import requests
+import string
+from PIL import Image
 
 def defaultHandler(err):
     response = err.get_response()
@@ -240,6 +246,66 @@ def http_message_remove():
 def http_message_edit():
     data = request.get_json()
     return dumps(message.message_edit(data['token'], int(data['message_id']), data['message']))
+
+@APP.route('/user/profile/uploadphoto', methods=['POST'])
+def uploadphoto():
+    data = request.get_json()
+    url = str(data['img_url'])
+    x_start = int(data['x_start'])
+    y_start = int(data['y_start'])
+    x_end = int(data['x_end'])
+    y_end  = int(data['y_end'])
+
+
+    # Check that the image is .jpg
+    filename, file_extension = os.path.splitext(url)
+    if file_extension not in ['.jpg', '.jpeg']:
+        raise InputError('Image uploaded is not a JPG')
+
+    # # Check that the url exists
+    # try:
+    #     resp = requests.head(url)
+    # except:
+    #     raise InputError('img_url returns an HTTP status other than 200') 
+
+    # if resp.status_code != 200:
+    #     raise InputError('img_url returns an HTTP status other than 200') 
+
+    # Download the image
+    file_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+    full_file_location = os.path.join(os.path.dirname(__file__) + '/imgurl/', file_name + file_extension)
+    
+    try:
+        urllib.request.urlretrieve(url, full_file_location)
+    except:
+        raise InputError('img_url returns an HTTP status other than 200') 
+
+                
+    # Crop the image
+    image_object = Image.open(full_file_location)
+    width, height = image_object.size
+
+    if x_start < 0 or y_start < 0 or x_end < 0 or y_end < 0 or x_start > width or y_start > height or x_end > width or y_end > height: 
+        # os.remove(full_file_location)
+        raise InputError('any of x_start, y_start, x_end, y_end are not within the dimensions of the image at the URL.')
+
+    try:
+        cropped = image_object.crop((x_start, y_start, x_end, y_end))
+        cropped.save(full_file_location)
+    except:
+        # os.remove(full_file_location)
+        raise InputError('any of x_start, y_start, x_end, y_end are not within the dimensions of the image at the URL.')
+
+    # Save the link
+    for user in other.data['users']:
+        if user['u_id'] == other.token_to_uid(data['token']):
+            user['profile_img_url'] = str(request.host_url + 'imgurl/' + file_name + file_extension)
+
+    return dumps({})
+
+@APP.route('/imgurl/<path:path>')
+def send_img(path):
+    return send_from_directory(str('/' + os.path.dirname(__file__) + '/imgurl/'), path)
 
 
 if __name__ == "__main__":
