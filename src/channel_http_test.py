@@ -148,6 +148,7 @@ def test_channel_invite_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             }
         ],
         'all_members': [
@@ -155,11 +156,13 @@ def test_channel_invite_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
         ],
     }
@@ -242,6 +245,7 @@ def test_channel_details_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             }
         ],
         'all_members': [
@@ -249,11 +253,13 @@ def test_channel_details_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
         ],
     }
@@ -505,6 +511,7 @@ def test_channel_join_as_flockr_owner(url, setup):
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
         ],
         'all_members': [
@@ -512,11 +519,13 @@ def test_channel_join_as_flockr_owner(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
         ],
     }
@@ -562,6 +571,7 @@ def test_channel_join_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
         ],
         'all_members': [
@@ -569,16 +579,19 @@ def test_channel_join_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_3['u_id'],
                 'name_first': 'Sam',
                 'name_last': 'He',
+                'profile_img_url': '',
             },
         ],
     }
@@ -774,16 +787,19 @@ def test_channel_addowner_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_3['u_id'],
                 'name_first': 'Sam',
                 'name_last': 'He',
+                'profile_img_url': '',
             },
         ],
         'all_members': [
@@ -791,16 +807,19 @@ def test_channel_addowner_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_3['u_id'],
                 'name_first': 'Sam',
                 'name_last': 'He',
+                'profile_img_url': '',
             },
         ],
     }
@@ -998,16 +1017,19 @@ def test_channel_removeowner_success(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_3['u_id'],
                 'name_first': 'Sam',
                 'name_last': 'He',
+                'profile_img_url': '',
             },
         ],
     }
@@ -1078,16 +1100,19 @@ def test_channel_removeowner_as_flockr_owner(url, setup):
                 'u_id': user_1['u_id'],
                 'name_first': 'Jayden',
                 'name_last': 'Leung',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_2['u_id'],
                 'name_first': 'Steven',
                 'name_last': 'Luong',
+                'profile_img_url': '',
             },
             {
                 'u_id': user_3['u_id'],
                 'name_first': 'Sam',
                 'name_last': 'He',
+                'profile_img_url': '',
             },
         ],
     }
