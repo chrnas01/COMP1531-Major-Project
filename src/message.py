@@ -51,7 +51,6 @@ def message_remove(token, message_id):
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    msg = {}
     msg_exist = False
 
     for msg in other.data['messages']:
@@ -89,25 +88,24 @@ def message_edit(token, message_id, message):
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    for i in range(len(other.data['messages'])):
-        if other.data['messages'][i]['message_id'] == message_id:
+    for msg in other.data['messages']:
+        if msg['message_id'] == message_id:
             break
 
     #check they are deleting their own message
-    if other.data['messages'][i]['u_id'] != other.token_to_uid(token):
+    if msg['u_id'] != other.token_to_uid(token):
         raise AccessError('''Message with message_id was not sent
                  by the authorised user making this request''')
 
     #check if they are a channel or flockr owner
     if not other.check_if_flockr_owner(other.token_to_uid(token)):
-        if other.token_to_uid(token) not in other.data['channels'][
-                    other.data['messages'][i]['channel_id'] - 1]['owner_members']:
+        if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['owner_members']:
             raise AccessError('The authorised user is not an owner of this channel or the flockr')
 
     if not message:
         message_remove(token, message_id)
     else:
-        other.data['messages'][i]['message'] = message
+        msg['message'] = message
 
     return {
     }
@@ -151,26 +149,24 @@ def message_react(token, message_id, react_id):
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    for i in range(len(other.data['messages'])):
-        if other.data['messages'][i]['message_id'] == message_id:
+    for msg in other.data['messages']:
+        if msg['message_id'] == message_id:
             break
     
     # Check that the user is a member of the channel in which the message was sent
-    if other.token_to_uid(token) not in other.data['channels'][other.data['messages'][i]['channel_id'] - 1]['all_members']:
+    if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['all_members']:
         raise InputError('message_id is not a valid message within a channel that the authorised user has joined')
 
     # Check that the react is valid
     if all(react_id != react['react_id'] for react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
-
-    print(other.data['messages'][i]['reacts'][0]['is_this_user_reacted'])
     
-    if other.data['messages'][i]['reacts'][0]['is_this_user_reacted']:
+    if msg['reacts'][0]['is_this_user_reacted']:
         print('test')
         raise InputError('''Message with ID message_id already contains an active 
                 React with ID react_id from the authorised user''')
 
-    for react in other.data['messages'][i]['reacts']:
+    for react in msg['reacts']:
         if react['react_id'] == react_id:
             react['u_ids'].append(other.token_to_uid(token))
             react['is_this_user_reacted'] = True
@@ -183,31 +179,27 @@ def message_unreact(token, message_id, react_id):
     Given a message within a channel the authorised user is part of,
     remove a "react" to that particular message
     '''
-    '''
-    Given a message within a channel the authorised user is part of,
-    add a "react" to that particular message
-    '''
     #token is invalid
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    for i in range(len(other.data['messages'])):
-        if other.data['messages'][i]['message_id'] == message_id:
+    for msg in other.data['messages']:
+        if msg['message_id'] == message_id:
             break
 
     # Check that the user is a member of the channel in which the message was sent
-    if other.token_to_uid(token) not in other.data['channels'][other.data['messages'][i]['channel_id'] - 1]['all_members']:
+    if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['all_members']:
         raise InputError('message_id is not a valid message within a channel that the authorised user has joined')
 
     # Check that the react is valid
     if all(react_id != react['react_id'] for react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
 
-    if not other.data['messages'][i]['reacts'][0]['is_this_user_reacted']:
+    if not msg['reacts'][0]['is_this_user_reacted']:
         raise InputError('''Message with ID message_id does not 
                 contain an active React with ID react_id''')
 
-    for react in other.data['messages'][i]['reacts']:
+    for react in msg['reacts']:
         if react['react_id'] == react_id:
             react['u_ids'].remove(other.token_to_uid(token))
             react['is_this_user_reacted'] = False
