@@ -256,6 +256,9 @@ def uploadphoto():
     x_end = int(data['x_end'])
     y_end  = int(data['y_end'])
 
+    for user in other.data['users']:
+        if user['u_id'] == other.token_to_uid(data['token']):
+            u_id = user['u_id']
 
     # Check that the image is .jpg
     filename, file_extension = os.path.splitext(url)
@@ -272,7 +275,7 @@ def uploadphoto():
     #     raise InputError('img_url returns an HTTP status other than 200') 
 
     # Download the image
-    file_name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+    file_name = 'pp_' + str(u_id)
     full_file_location = os.path.join(os.path.dirname(__file__) + '/imgurl/', file_name + file_extension)
     
     try:
@@ -310,3 +313,4 @@ def send_img(path):
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
+    # APP.run(port=5100, debug=True) # Do not edit this port
