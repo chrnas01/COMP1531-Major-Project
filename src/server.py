@@ -269,6 +269,10 @@ def uploadphoto():
     if file_extension not in ['.jpg', '.jpeg']:
         raise InputError('Image uploaded is not a JPG')
 
+    # Check that we have a folder to save in
+    if not os.path.exists(os.path.dirname(__file__) + '/imgurl/'):
+        os.makedirs(os.path.dirname(__file__) + '/imgurl/')
+
     # Download the image
     file_name = 'pp_' + str(u_id)
     full_file_location = os.path.join(os.path.dirname(__file__) + '/imgurl/', file_name + file_extension)
@@ -304,5 +308,6 @@ def send_img(path):
     return send_from_directory(str('/' + os.path.dirname(__file__) + '/imgurl/'), path)
 
 if __name__ == "__main__":
+
     APP.run(port=0) # Do not edit this port
     # APP.run(port=5100, debug=True) # Do not edit this port

@@ -4,6 +4,8 @@ from echo_http_test import url
 import other
 from PIL import ImageFile, Image
 import os
+
+
 def test_user_profile_uploadphoto_bad_url(url):
     '''
     Tests a bad url for upload photo
@@ -65,7 +67,7 @@ def test_user_profile_uploadphoto_invalid_x_start_small(url):
     resp = requests.post(url + '/user/profile/uploadphoto', json=payload)
 
     assert resp.status_code == 400
-    
+
     payload = {
         'token': user_1['token'],
         'u_id': user_1['u_id'],
@@ -107,6 +109,7 @@ def test_user_profile_uploadphoto_invalid_x_start_big(url):
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] == ''
 
+
 def test_user_profile_uploadphoto_invalid_y_start_small(url):
     '''
     Tests a bad url for upload photo
@@ -139,6 +142,7 @@ def test_user_profile_uploadphoto_invalid_y_start_small(url):
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] == ''
+
 
 def test_user_profile_uploadphoto_invalid_y_start_big(url):
     '''
@@ -173,6 +177,7 @@ def test_user_profile_uploadphoto_invalid_y_start_big(url):
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] == ''
 
+
 def test_user_profile_uploadphoto_invalid_x_end_small(url):
     '''
     Tests a bad url for upload photo
@@ -206,6 +211,7 @@ def test_user_profile_uploadphoto_invalid_x_end_small(url):
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] == ''
 
+
 def test_user_profile_uploadphoto_invalid_x_end_big(url):
     '''
     Tests a bad url for upload photo
@@ -230,8 +236,8 @@ def test_user_profile_uploadphoto_invalid_x_end_big(url):
         'y_end': '20',
     }
     resp = requests.post(url + '/user/profile/uploadphoto', json=payload)
-
     assert resp.status_code == 400
+    
     payload = {
         'token': user_1['token'],
         'u_id': user_1['u_id'],
@@ -239,7 +245,8 @@ def test_user_profile_uploadphoto_invalid_x_end_big(url):
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] == ''
 
-def test_user_profile_uploadphoto_invalid_y_start_small(url):
+
+def test_user_profile_uploadphoto_invalid_y_end_small(url):
     '''
     Tests a bad url for upload photo
     '''
@@ -271,6 +278,7 @@ def test_user_profile_uploadphoto_invalid_y_start_small(url):
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] == ''
+
 
 def test_user_profile_uploadphoto_not_JPG(url):
     '''
@@ -305,6 +313,7 @@ def test_user_profile_uploadphoto_not_JPG(url):
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] == ''
 
+
 def test_user_profile_uploadphoto_success(url):
     '''
     Tests a bad url for upload photo
@@ -338,7 +347,8 @@ def test_user_profile_uploadphoto_success(url):
     profile_img_url = str(resp['user']['profile_img_url'])
 
     assert profile_img_url != ''
-    image_object = Image.open(os.path.join(os.path.dirname(__file__) + '/imgurl/', 'pp_1.jpg'))
+    image_object = Image.open(os.path.join(
+        os.path.dirname(__file__) + '/imgurl/', 'pp_1.jpg'))
     assert image_object.size == (40, 40)
 
 
@@ -391,19 +401,22 @@ def test_user_profile_uploadphoto_success_two_users(url):
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] != ''
-    
+
     payload = {
         'token': user_2['token'],
         'u_id': user_2['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
     assert resp['user']['profile_img_url'] != ''
-    
-    image_object = Image.open(os.path.join(os.path.dirname(__file__) + '/imgurl/', 'pp_1.jpg'))
+
+    image_object = Image.open(os.path.join(
+        os.path.dirname(__file__) + '/imgurl/', 'pp_1.jpg'))
     assert image_object.size == (40, 40)
 
-    image_object = Image.open(os.path.join(os.path.dirname(__file__) + '/imgurl/', 'pp_2.jpg'))
+    image_object = Image.open(os.path.join(
+        os.path.dirname(__file__) + '/imgurl/', 'pp_2.jpg'))
     assert image_object.size == (20, 20)
+
 
 def test_user_profile_uploadphoto_success_jpeg(url):
     '''
@@ -438,5 +451,6 @@ def test_user_profile_uploadphoto_success_jpeg(url):
     profile_img_url = str(resp['user']['profile_img_url'])
 
     assert profile_img_url != ''
-    image_object = Image.open(os.path.join(os.path.dirname(__file__) + '/imgurl/', 'pp_1.jpg'))
+    image_object = Image.open(os.path.join(
+        os.path.dirname(__file__) + '/imgurl/', 'pp_1.jpg'))
     assert image_object.size == (40, 40)
