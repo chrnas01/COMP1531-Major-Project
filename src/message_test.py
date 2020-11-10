@@ -674,7 +674,7 @@ def test_pin_invalid_perms(setup):
     channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
     msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
 
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         assert message.message_pin(user_2['token'], msg['message_id'])
 
 def test_pin_valid(setup):
@@ -735,6 +735,7 @@ def test_unpin_invalid_channel(setup):
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
     channels.channels_create(user_2['token'], 'test channel 2', False)
     msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_pin(user_1['token'], msg['message_id'])
 
     with pytest.raises(AccessError):
         assert message.message_unpin(user_2['token'], msg['message_id'])
@@ -762,6 +763,7 @@ def test_unpin_invalid_perms(setup):
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
     channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
     msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_pin(user_1['token'], msg['message_id'])
 
     with pytest.raises(AccessError):
         assert message.message_unpin(user_2['token'], msg['message_id'])

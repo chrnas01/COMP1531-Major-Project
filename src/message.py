@@ -206,3 +206,74 @@ def message_unreact(token, message_id, react_id):
             break
 
     return {}
+
+def message_pin(token, message_id):
+    '''
+    Given a message within a channel, mark it as "pinned" to be given special
+    display treatment by the frontend
+    '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
+    msg_exist = False
+
+    for msg in other.data['messages']:
+        if msg['message_id'] == message_id:
+            msg_exist = True
+            break
+
+    #check if the message exists
+    if not msg_exist:
+        raise InputError('message_id is not a valid message')
+
+    if msg['is_pinned']:
+        raise InputError('Message with ID message_id is already pinned')
+
+    # Check that the user is a member of the channel in which the message was sent
+    if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['all_members']:
+        raise AccessError('message_id is not a valid message within a channel that the authorised user has joined')
+
+    #check if they are a channel or flockr owner
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
+        if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['owner_members']:
+            raise AccessError('The authorised user is not an owner of this channel or the flockr')
+    
+    msg['is_pinned'] = True
+
+    return {}
+
+def message_unpin(token, message_id):
+    '''
+    Given a message within a channel, remove it's mark as unpinned
+    '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+
+    msg_exist = False
+
+    for msg in other.data['messages']:
+        if msg['message_id'] == message_id:
+            msg_exist = True
+            break
+
+    #check if the message exists
+    if not msg_exist:
+        raise InputError('message_id is not a valid message')
+
+    if not msg['is_pinned']:
+        raise InputError('Message with ID message_id is already unpinned')
+
+    # Check that the user is a member of the channel in which the message was sent
+    if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['all_members']:
+        raise AccessError('message_id is not a valid message within a channel that the authorised user has joined')
+
+    #check if they are a channel or flockr owner
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
+        if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['owner_members']:
+            raise AccessError('The authorised user is not an owner of this channel or the flockr')
+    
+    msg['is_pinned'] = False
+
+    return {}
