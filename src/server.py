@@ -265,7 +265,7 @@ def uploadphoto():
             u_id = user['u_id']
 
     # Check that the image has correct file extension
-    filename, file_extension = os.path.splitext(url)
+    _, file_extension = os.path.splitext(url)
     if file_extension not in ['.jpg', '.jpeg']:
         raise InputError('Image uploaded is not a JPG')
 
@@ -303,11 +303,11 @@ def uploadphoto():
 
     return dumps({})
 
-@APP.route('/imgurl/<path:path>')
-def send_img(path):
-    return send_from_directory(str('/' + os.path.dirname(__file__) + '/imgurl/'), path)
+@APP.route('/imgurl/<path:filename>', methods=['GET'])
+def send_img(filename):
+    return send_from_directory(str('/' + os.path.dirname(__file__) + '/imgurl/'), filename)
 
 if __name__ == "__main__":
 
     APP.run(port=0) # Do not edit this port
-    # APP.run(port=5100, debug=True) # Do not edit this port
+    # APP.run(port=5100, debug=True) 
