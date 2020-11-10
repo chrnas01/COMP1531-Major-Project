@@ -256,42 +256,35 @@ def uploadphoto():
     x_end = int(data['x_end'])
     y_end  = int(data['y_end'])
 
+    #token is invalid
+    if other.token_to_uid(data['token']) == -1:
+        raise AccessError('Invalid Token')
+
     for user in other.data['users']:
         if user['u_id'] == other.token_to_uid(data['token']):
             u_id = user['u_id']
 
-    # Check that the image is .jpg
+    # Check that the image has correct file extension
     filename, file_extension = os.path.splitext(url)
     if file_extension not in ['.jpg', '.jpeg']:
         raise InputError('Image uploaded is not a JPG')
 
-    # # Check that the url exists
-    # try:
-    #     resp = requests.head(url)
-    # except:
-    #     raise InputError('img_url returns an HTTP status other than 200') 
-
-    # if resp.status_code != 200:
-    #     raise InputError('img_url returns an HTTP status other than 200') 
-
     # Download the image
     file_name = 'pp_' + str(u_id)
     full_file_location = os.path.join(os.path.dirname(__file__) + '/imgurl/', file_name + file_extension)
-    
+
     try:
         urllib.request.urlretrieve(url, full_file_location)
     except:
-        raise InputError('img_url returns an HTTP status other than 200') 
-
+        raise InputError('img_url returns an HTTP status other than 200')
                 
     # Crop the image
     image_object = Image.open(full_file_location)
     width, height = image_object.size
 
-    if x_start < 0 or y_start < 0 or x_end < 0 or y_end < 0 or x_start > width or y_start > height or x_end > width or y_end > height: 
+    if x_start < 0 or y_start < 0 or x_end < 0 or y_end < 0 or x_start > width or y_start > height or x_end > width or y_end > height:
         # os.remove(full_file_location)
         raise InputError('any of x_start, y_start, x_end, y_end are not within the dimensions of the image at the URL.')
-
     try:
         cropped = image_object.crop((x_start, y_start, x_end, y_end))
         cropped.save(full_file_location)
@@ -309,7 +302,6 @@ def uploadphoto():
 @APP.route('/imgurl/<path:path>')
 def send_img(path):
     return send_from_directory(str('/' + os.path.dirname(__file__) + '/imgurl/'), path)
-
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
