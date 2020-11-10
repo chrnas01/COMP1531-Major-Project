@@ -622,6 +622,186 @@ def test_unreact_valid(setup):
 
 ########################################################
 
+def test_pin_invalid_message(setup):
+    '''
+    pinning a message that does not exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_pin(user_1['token'], 99)
+
+def test_pin_invalid_channel(setup):
+    '''
+    pinning a message that is in a channel the user is not a part of
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channels.channels_create(user_2['token'], 'test channel 2', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(AccessError):
+        assert message.message_pin(user_2['token'], msg['message_id'])
+
+def test_pin_already_pinned(setup):
+    '''
+    pinning a message that is already pinned
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_pin(user_1['token'], msg['message_id'])
+
+    with pytest.raises(InputError):
+        assert message.message_pin(user_1['token'], msg['message_id'])
+
+def test_pin_invalid_perms(setup):
+    '''
+    pinning a message when you are not an owner
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_pin(user_2['token'], msg['message_id'])
+
+def test_pin_valid(setup):
+    '''
+    pinning to a message
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_pin(user_1['token'], msg['message_id'])
+
+    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+
+    assert result == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': True
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+########################################################
+
+def test_unpin_invalid_message(setup):
+    '''
+    unpinning a message that does not exist
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_unpin(user_1['token'], 99)
+
+def test_unpin_invalid_channel(setup):
+    '''
+    unpinning a message that is in a channel the user is not a part of
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channels.channels_create(user_2['token'], 'test channel 2', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(AccessError):
+        assert message.message_unpin(user_2['token'], msg['message_id'])
+
+def test_unpin_already_unpinned(setup):
+    '''
+    unpinning a message that is not pinned
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(InputError):
+        assert message.message_unpin(user_1['token'], msg['message_id'])
+
+def test_unpin_invalid_perms(setup):
+    '''
+    unpinning a message when you are not an owner
+    '''
+    # Setup pytest
+    user_1, user_2, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+
+    with pytest.raises(AccessError):
+        assert message.message_unpin(user_2['token'], msg['message_id'])
+
+def test_unpin_valid(setup):
+    '''
+    pinning to a message
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
+    msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
+    message.message_pin(user_1['token'], msg['message_id'])
+    message.message_unpin(user_1['token'], msg['message_id'])
+
+    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+
+    assert result == {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+########################################################
+
 def test_invalid_token(setup):
     '''
     Checking that the invalid token checks are working
@@ -651,3 +831,9 @@ def test_invalid_token(setup):
 
     with pytest.raises(AccessError):
         assert message.message_unreact('invalid-token', 1, 1)
+    
+    with pytest.raises(AccessError):
+        assert message.message_pin('invalid-token', 1)
+    
+    with pytest.raises(AccessError):
+        assert message.message_unpin('invalid-token', 1)
