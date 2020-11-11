@@ -12,17 +12,19 @@ import channels
 data = {
     'users': [],
     'channels': [],
-    'messages': []
+    'messages': [],
+    'standup': []
 }
 
 
 def clear():
     '''
-    Resets databse
+    Resets database
     '''
     data['users'].clear()
     data['channels'].clear()
     data['messages'].clear()
+    data['standup'].clear()
     return {}
 
 
