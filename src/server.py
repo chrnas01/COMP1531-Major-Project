@@ -120,6 +120,18 @@ def auth_register():
     data = request.get_json()
     return dumps(auth.auth_register(data['email'], data['password'], data['name_first'], data['name_last']))
 
+@APP.route("/auth/passwordreset/request", methods=['POST'])
+def auth_passwordreset_request():
+    data = request.get_json()
+    return dumps(auth.auth_password_request(data['email']))
+
+
+@APP.route("/auth/passwordreset/reset", methods=['POST'])
+def auth_passwordreset_reset():
+    data = request.get_json()
+    return dumps(auth.auth_password_reset(data['reset_code'], data['new_password']))
+
+
 @APP.route("/admin/userpermission/change", methods=['POST'])
 def admin_userpermission_change():
     '''

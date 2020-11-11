@@ -12,7 +12,8 @@ import channels
 data = {
     'users': [],
     'channels': [],
-    'messages': []
+    'messages': [],
+    'reset_codes': []
 }
 
 valid_reacts = [{
@@ -28,6 +29,7 @@ def clear():
     data['users'].clear()
     data['channels'].clear()
     data['messages'].clear()
+    data['reset_codes'].clear()
 
     global valid_reacts
 
@@ -200,6 +202,12 @@ def get_user_permission(u_id):
             perm = user['permission_id']
 
     return perm
+
+def get_first_reset_codes():
+    '''
+    Blackbox testing other functions
+    '''
+    return data['reset_codes'][0]['code']
 
 def update_user_reacts(u_id):
     '''
