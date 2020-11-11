@@ -31,11 +31,8 @@ def clear():
 
     global valid_reacts
 
-    valid_reacts = [{
-        'react_id': 1,
-        'u_ids': [],
-        'is_this_user_reacted': False
-    }]
+    for react in valid_reacts:
+        react['is_this_user_reacted'] = False
 
     return {}
 
