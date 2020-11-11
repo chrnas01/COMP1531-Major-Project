@@ -70,7 +70,7 @@ def test_valid_message(setup):
     assert message.message_send(
             user_1['token'], channel_data['channel_id'], msg) == {'message_id': 1}
     
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
     assert result == {
         'messages': [
             {
@@ -86,9 +86,7 @@ def test_valid_message(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 def test_valid_message_multi(setup):
@@ -106,7 +104,7 @@ def test_valid_message_multi(setup):
     assert message.message_send(
             user_1['token'], channel_data['channel_id'], msg) == {'message_id': 1}
 
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
     assert result == {
         'messages': [
             {
@@ -122,15 +120,13 @@ def test_valid_message_multi(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert message.message_send(
             user_2['token'], channel_data['channel_id'], msg2) == {'message_id': 2}
     
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
     assert result == {
         'messages': [
             {
@@ -159,9 +155,7 @@ def test_valid_message_multi(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 def test_message_remove_nonexistent(setup):
@@ -228,7 +222,7 @@ def test_message_remove_valid(setup):
 
     message.message_remove(user_2['token'], 1)
 
-    result = channel.channel_messages(user_2['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
 
     assert result == {
         'messages': [
@@ -245,9 +239,7 @@ def test_message_remove_valid(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 ########################################################
@@ -303,7 +295,7 @@ def test_message_edit_valid(setup):
 
     message.message_edit(user_2['token'], 1, 'tset')
 
-    result = channel.channel_messages(user_2['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
     assert result == {
         'messages': [
             {
@@ -332,9 +324,7 @@ def test_message_edit_valid(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 def test_message_edit_valid_remove(setup):
@@ -352,7 +342,7 @@ def test_message_edit_valid_remove(setup):
     message.message_send(user_1['token'], channel_data['channel_id'], msg)
     message.message_edit(user_1['token'], 1, '')
 
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
     assert result == {
         'messages': [
             {
@@ -368,9 +358,7 @@ def test_message_edit_valid_remove(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 ########################################################
@@ -387,7 +375,7 @@ def test_send_later_invalid_channel(setup):
 
     with pytest.raises(InputError):
         assert message.message_send_later(user_1['token'], 99, msg,
-                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5))
+                (int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5))
 
 def test_send_later_invalid_message(setup):
     '''
@@ -403,7 +391,7 @@ def test_send_later_invalid_message(setup):
 
     with pytest.raises(InputError):
         assert message.message_send_later(user_1['token'], channel_data['channel_id'], msg,
-                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5))
+                (int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5))
 
 def test_send_later_invalid_time(setup):
     '''
@@ -417,7 +405,7 @@ def test_send_later_invalid_time(setup):
 
     with pytest.raises(InputError):
         assert message.message_send_later(user_1['token'], channel_data['channel_id'], msg,
-                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) - 5))
+                (int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) - 5))
 
 def test_send_later_invalid_access(setup):
     '''
@@ -431,7 +419,7 @@ def test_send_later_invalid_access(setup):
 
     with pytest.raises(AccessError):
         assert message.message_send_later(user_2['token'], channel_data['channel_id'], msg,
-                (int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5))
+                (int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5))
 
 def test_send_later_valid(setup):
     '''
@@ -442,11 +430,11 @@ def test_send_later_valid(setup):
 
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
     msg = 'test'
-    time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+    time = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5
 
     message.message_send_later(user_1['token'], channel_data['channel_id'], msg, time)
 
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
 
     assert result == {
         'messages': [
@@ -463,9 +451,7 @@ def test_send_later_valid(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 ########################################################
@@ -522,7 +508,7 @@ def test_react_valid(setup):
     msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
     message.message_react(user_1['token'], msg['message_id'], 1)
 
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
 
     assert result == {
         'messages': [
@@ -539,9 +525,7 @@ def test_react_valid(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 ########################################################
@@ -598,7 +582,7 @@ def test_unreact_valid(setup):
     message.message_react(user_1['token'], msg['message_id'], 1)
     message.message_unreact(user_1['token'], msg['message_id'], 1)
 
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
 
     assert result == {
         'messages': [
@@ -615,9 +599,7 @@ def test_unreact_valid(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 ########################################################
@@ -688,7 +670,7 @@ def test_pin_valid(setup):
     msg = message.message_send(user_1['token'], channel_data['channel_id'], 'test')
     message.message_pin(user_1['token'], msg['message_id'])
 
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
 
     assert result == {
         'messages': [
@@ -705,9 +687,7 @@ def test_pin_valid(setup):
                 }],
                 'is_pinned': True
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 ########################################################
@@ -780,7 +760,7 @@ def test_unpin_valid(setup):
     message.message_pin(user_1['token'], msg['message_id'])
     message.message_unpin(user_1['token'], msg['message_id'])
 
-    result = channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)
+    result = other.get_messages()
 
     assert result == {
         'messages': [
@@ -797,9 +777,7 @@ def test_unpin_valid(setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
 ########################################################
@@ -826,7 +804,7 @@ def test_invalid_token(setup):
     
     with pytest.raises(AccessError):
         assert message.message_send_later('invalid-token', 1, 'test',
-                int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5)
+                int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5)
     
     with pytest.raises(AccessError):
         assert message.message_react('invalid-token', 1, 1)

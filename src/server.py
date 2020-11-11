@@ -169,6 +169,13 @@ def show_is_empty():
     '''
     return dumps(other.is_empty())
 
+@APP.route('/other/get_messages', methods=['GET'])
+def get_messages():
+    '''
+    gets all messages
+    '''
+    return dumps(other.get_messages())
+
 @APP.route('/search', methods=['GET'])
 def search():
     '''

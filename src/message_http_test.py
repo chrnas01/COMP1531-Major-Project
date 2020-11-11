@@ -121,7 +121,7 @@ def test_message_send_success(url, setup):
         'start': 0
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload).json()
+    resp = requests.get(url + 'other/get_messages', params=payload).json()
 
     expected_result = {
         'messages': [
@@ -138,9 +138,7 @@ def test_message_send_success(url, setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert resp == expected_result
@@ -277,12 +275,10 @@ def test_message_remove_success(url, setup):
     }
 
     expected_result = {
-        'messages': [],
-        'start': 0,
-        'end': -1
+        'messages': []
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload)
+    resp = requests.get(url + 'other/get_messages', params=payload)
     assert resp.json() == expected_result
 
 ########################################################
@@ -396,7 +392,7 @@ def test_message_edit_success(url, setup):
         'start': 0
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload).json()
+    resp = requests.get(url + 'other/get_messages', params=payload).json()
 
     expected_result = {
         'messages': [
@@ -413,9 +409,7 @@ def test_message_edit_success(url, setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert resp == expected_result
@@ -439,7 +433,7 @@ def test_send_later_invalid_channel(url, setup):
         'token': user_1['token'],
         'channel_id': 99,
         'message': 'test',
-        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+        'time_sent': int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5
     }
 
     # InputError
@@ -467,7 +461,7 @@ def test_send_later_invalid_message(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'message': msg,
-        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+        'time_sent': int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5
     }
 
     # InputError
@@ -491,7 +485,7 @@ def test_send_later_invalid_time(url, setup):
         'token': user_1['token'],
         'channel_id': channel_data['channel_id'],
         'message': 'test',
-        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) - 5
+        'time_sent': int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) - 5
     }
 
     # InputError
@@ -515,7 +509,7 @@ def test_send_later_invalid_access(url, setup):
         'token': user_2['token'],
         'channel_id': channel_data['channel_id'],
         'message': 'test',
-        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+        'time_sent': int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5
     }
 
     # AccessError
@@ -535,7 +529,7 @@ def test_send_later_valid(url, setup):
     }
     channel_data = requests.post(url + 'channels/create', json=payload).json()
 
-    time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+    time = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5
 
     payload = {
         'token': user_1['token'],
@@ -551,7 +545,7 @@ def test_send_later_valid(url, setup):
         'start': 0
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload).json()
+    resp = requests.get(url + 'other/get_messages', params=payload).json()
 
     expected_result = {
         'messages': [
@@ -568,9 +562,7 @@ def test_send_later_valid(url, setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert resp == expected_result
@@ -701,7 +693,7 @@ def test_react_valid(url, setup):
         'start': 0
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload).json()
+    resp = requests.get(url + 'other/get_messages', params=payload).json()
 
     expected_result = {
         'messages': [
@@ -718,9 +710,7 @@ def test_react_valid(url, setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert resp == expected_result
@@ -851,7 +841,7 @@ def test_unreact_valid(url, setup):
         'start': 0
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload).json()
+    resp = requests.get(url + 'other/get_messages', params=payload).json()
 
     expected_result = {
         'messages': [
@@ -868,9 +858,7 @@ def test_unreact_valid(url, setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert resp == expected_result
@@ -1034,7 +1022,7 @@ def test_pin_valid(url, setup):
         'start': 0
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload).json()
+    resp = requests.get(url + 'other/get_messages', params=payload).json()
 
     expected_result = {
         'messages': [
@@ -1051,9 +1039,7 @@ def test_pin_valid(url, setup):
                 }],
                 'is_pinned': True
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert resp == expected_result
@@ -1224,7 +1210,7 @@ def test_unpin_valid(url, setup):
         'start': 0
     }
 
-    resp = requests.get(url + 'channel/messages', params=payload).json()
+    resp = requests.get(url + 'other/get_messages', params=payload).json()
 
     expected_result = {
         'messages': [
@@ -1241,9 +1227,7 @@ def test_unpin_valid(url, setup):
                 }],
                 'is_pinned': False
             }
-        ],
-        'start': 0,
-        'end': -1
+        ]
     }
 
     assert resp == expected_result
