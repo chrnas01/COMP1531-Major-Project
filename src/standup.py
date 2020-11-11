@@ -70,27 +70,3 @@ def standup_active(token, channel_id):
         'time_finish': standup_data[index]['time_finish']
     }
 
-def standup_send(token, channel_id, message):
-    '''
-    Sending a message to get buffered in the standup queue, assuming a standup is currently active
-    '''
-
-    # Check if channel is valid
-    if not any(channels['channel_id'] == channel_id for channels in other.data['channels']):
-        raise InputError('Channel ID is not a valid channel')
-
-    # Check if message length is more than 1000 characters
-    if len(message) > 1000:
-        raise InputError('Message is more than 1000 characters')
-
-    # Check if there is an active standup running in this channel
-    if not standup_active(token, channel_id)['is_active']:
-        raise InputError('An active standup is not currently running in this channel')
-
-    # Check if the authorised user is a member of the channel
-    for channel in other.data['channels']:
-        if channel_id == channel['channel_id']:
-            if other.token_to_uid(token) not in channel['all_members']:
-                raise AccessError('The authorised user is not a memeber of the channel that the message is within')
-
-    return {}
