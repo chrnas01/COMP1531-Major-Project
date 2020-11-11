@@ -53,6 +53,8 @@ def message_remove(token, message_id):
 
     msg_exist = False
 
+    msg = {}
+
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
             msg_exist = True
@@ -87,6 +89,8 @@ def message_edit(token, message_id, message):
     #token is invalid
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
+
+    msg = {}
 
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
@@ -136,9 +140,27 @@ def message_send_later(token, channel_id, message, time_sent):
     if other.token_to_uid(token) not in other.data['channels'][channel_id - 1]['all_members']:
         raise AccessError('Authorised user is not a member of channel with channel_id')
 
-    time.sleep(time_sent - curr_time)
+    if not other.data['messages']:
+        message_id = 1
+    else:
+        #new message_id will be the highest id + 1
+        message_id = other.data['messages'][-1]['message_id'] + 1
 
-    return message_send(token, channel_id, message)
+    message_struct = {
+        'message_id': message_id,
+        'channel_id': channel_id,
+        'u_id': other.token_to_uid(token),
+        'message': message,
+        'time_created': time_sent,
+        'reacts': other.valid_reacts,
+        'is_pinned': False
+    }
+
+    other.data['messages'].append(message_struct)
+
+    return {
+        'message_id': message_id,
+    }
 
 def message_react(token, message_id, react_id):
     '''
@@ -148,6 +170,8 @@ def message_react(token, message_id, react_id):
     #token is invalid
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
+
+    msg = {}
 
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
@@ -182,6 +206,8 @@ def message_unreact(token, message_id, react_id):
     #token is invalid
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
+
+    msg = {}
 
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
@@ -218,6 +244,8 @@ def message_pin(token, message_id):
 
     msg_exist = False
 
+    msg = {}
+
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
             msg_exist = True
@@ -252,6 +280,8 @@ def message_unpin(token, message_id):
         raise AccessError('Invalid Token')
 
     msg_exist = False
+
+    msg = {}
 
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
