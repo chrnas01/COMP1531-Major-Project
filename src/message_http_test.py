@@ -421,3 +421,157 @@ def test_message_edit_success(url, setup):
     assert resp == expected_result
 
 ########################################################
+
+def test_send_later_invalid_channel(setup):
+    '''
+    sending a message later to an invalid channel
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': 99,
+        'message': 'test',
+        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/sendlater', json=payload)
+    resp.status_code == 400
+
+def test_send_later_invalid_message(setup):
+    '''
+    sending message later that is too long
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    msg = ''
+    for i in range(1001):
+        msg += str(i)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': msg,
+        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/sendlater', json=payload)
+    resp.status_code == 400
+
+def test_send_later_invalid_time(setup):
+    '''
+    sending message later at time in the past
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test',
+        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) - 5
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/sendlater', json=payload)
+    resp.status_code == 400
+
+def test_send_later_invalid_access(setup):
+    '''
+    sending message later when user has not joined the channel
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test',
+        'time_sent': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+    }
+
+    # AccessError
+    resp = requests.post(url + 'message/sendlater', json=payload)
+    resp.status_code == 400
+
+def test_send_later_valid(setup):
+    '''
+    sending message later
+    '''
+    user_1, user_1, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) + 5
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test',
+        'time_sent': time
+    }
+    requests.post(url + 'message/sendlater', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
+    resp = requests.get(url + 'channel/messages', params=payload).json()
+
+    expected_result = {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': time,
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+    assert resp == expected_result
+
