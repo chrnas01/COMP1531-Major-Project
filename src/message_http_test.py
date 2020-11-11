@@ -876,3 +876,376 @@ def test_unreact_valid(setup):
     assert resp == expected_result
 
 ########################################################
+
+def test_pin_invalid_message(setup):
+    '''
+    pinning a message that does not exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': 99
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/pin', json=payload)
+    resp.status_code == 400
+
+def test_pin_invalid_channel(setup):
+    '''
+    pinning a message that is in a channel the user is not a part of
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_2['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id']
+    }
+
+    # AccessError
+    resp = requests.post(url + 'message/pin', json=payload)
+    resp.status_code == 400
+
+def test_pin_already_pinned(setup):
+    '''
+    pinning a message that is already pinned
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id']
+    }
+    requests.post(url + 'message/pin', json=payload)
+
+    # InputError
+    resp = requests.post(url + 'message/pin', json=payload)
+    resp.status_code == 400
+
+def test_pin_invalid_perms(setup):
+    '''
+    pinning a message when you are not an owner
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/invite', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_2['token'],
+        'message_id': resp['message_id']
+    }
+
+    # AccessError
+    resp = requests.post(url + 'message/pin', json=payload)
+    resp.status_code == 400
+
+def test_pin_valid(setup):
+    '''
+    pinning to a message
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id']
+    }
+
+    requests.post(url + 'message/pin', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
+    resp = requests.get(url + 'channel/messages', params=payload).json()
+
+    expected_result = {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': True
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+    assert resp == expected_result
+
+########################################################
+
+def test_unpin_invalid_message(setup):
+    '''
+    unpinning a message that does not exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': 99
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/unpin', json=payload)
+    resp.status_code == 400
+
+def test_unpin_invalid_channel(setup):
+    '''
+    unpinning a message that is in a channel the user is not a part of
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_2['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_2['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_2['token'],
+        'message_id': resp['message_id']
+    }
+    resp = requests.post(url + 'message/pin', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id']
+    }
+
+    # AccessError
+    resp = requests.post(url + 'message/unpin', json=payload)
+    resp.status_code == 400
+
+def test_unpin_already_unpinned(setup):
+    '''
+    unpinning a message that is already pinned
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    # InputError
+    resp = requests.post(url + 'message/unpin', json=payload)
+    resp.status_code == 400
+
+def test_unpin_invalid_perms(setup):
+    '''
+    pinning a message when you are not an owner
+    '''
+    user_1, user_2, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'u_id': user_2['u_id']
+    }
+    requests.post(url + 'channel/invite', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id']
+    }
+    resp = requests.post(url + 'message/pin', json=payload)
+
+    payload = {
+        'token': user_2['token'],
+        'message_id': resp['message_id']
+    }
+
+    # AccessError
+    resp = requests.post(url + 'message/unpin', json=payload)
+    resp.status_code == 400
+
+def test_unpin_valid(setup):
+    '''
+    pinning to a message
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id']
+    }
+
+    requests.post(url + 'message/pin', json=payload)
+    requests.post(url + 'message/unpin', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
+    resp = requests.get(url + 'channel/messages', params=payload).json()
+
+    expected_result = {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': resp['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+    assert resp == expected_result
+
+########################################################
