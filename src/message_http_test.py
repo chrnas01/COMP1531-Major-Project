@@ -575,3 +575,304 @@ def test_send_later_valid(setup):
 
     assert resp == expected_result
 
+########################################################
+
+def test_react_invalid_message(setup):
+    '''
+    reacting to a message that is in a channel the user is not a part of
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 1
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/react', json=payload)
+    resp.status_code == 400
+
+def test_react_invalid_react(setup):
+    '''
+    reacting to a message with a react that doesn't exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 99
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/react', json=payload)
+    resp.status_code == 400
+
+def test_react_already_reacted(setup):
+    '''
+    reacting to a message that you have already reacted to
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 1
+    }
+    requests.post(url + 'message/react', json=payload)
+
+    # InputError
+    resp = requests.post(url + 'message/react', json=payload)
+    resp.status_code == 400
+
+def test_react_valid(setup):
+    '''
+    reacting to a message
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 1
+    }
+    requests.post(url + 'message/react', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
+    resp = requests.get(url + 'channel/messages', params=payload).json()
+
+    expected_result = {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': resp['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [user_1['u_id']],
+                    'is_this_user_reacted': True
+                }],
+                'is_pinned': False
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+    assert resp == expected_result
+
+########################################################
+
+def test_unreact_invalid_message(setup):
+    '''
+    reacting to a message that is in a channel the user is not a part of
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 1
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/unreact', json=payload)
+    resp.status_code == 400
+
+def test_unreact_invalid_react(setup):
+    '''
+    reacting to a message with a react that doesn't exist
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 99
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/unreact', json=payload)
+    resp.status_code == 400
+
+def test_unreact_already_unreacted(setup):
+    '''
+    reacting to a message that you have already reacted to
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 1
+    }
+
+    # InputError
+    resp = requests.post(url + 'message/unreact', json=payload)
+    resp.status_code == 400
+
+def test_unreact_valid(setup):
+    '''
+    reacting to a message
+    '''
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1['token'],
+        'name': 'test channel',
+        'is_public': False
+    }
+    channel_data = requests.post(url + 'channels/create', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'message': 'test'
+    }
+    resp = requests.post(url + 'message/send', json=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'message_id': resp['message_id'],
+        'react_id': 1
+    }
+    requests.post(url + 'message/react', json=payload)
+    requests.post(url + 'message/unreact', json=payload)
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'start': 0
+    }
+
+    resp = requests.get(url + 'channel/messages', params=payload).json()
+
+    expected_result = {
+        'messages': [
+            {
+                'message_id': 1,
+                'channel_id': channel_data['channel_id'],
+                'u_id': user_1['u_id'],
+                'message': 'test',
+                'time_created': resp['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
+            }
+        ],
+        'start': 0,
+        'end': -1
+    }
+
+    assert resp == expected_result
+
+########################################################
