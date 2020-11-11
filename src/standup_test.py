@@ -16,7 +16,6 @@ def test_standup_start_invalid_channel_id():
     Channel ID is invalid.
     '''
     other.clear()
-    standup.standup_data.clear()
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -29,7 +28,6 @@ def test_standup_start_standup_already_running():
     '''
 
     other.clear()
-    standup.standup_data.clear()
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -47,7 +45,7 @@ def test_standup_start_successful():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -55,7 +53,7 @@ def test_standup_start_successful():
     channel1 = channels.channels_create(user1['token'], 'Channel_1', True)
 
     assert standup.standup_start(user1['token'], channel1['channel_id'], 600) == {
-        'time_finish': standup.standup_data[-1]['time_finish']
+        'time_finish': other.data['standup'][-1]['time_finish']
     }
 
 # Tests for standup_active() function.
@@ -66,7 +64,7 @@ def test_standup_active_invalid_channel_id():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -84,7 +82,7 @@ def test_standup_active_inactive():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -102,7 +100,7 @@ def test_standup_active_successful():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -125,7 +123,7 @@ def test_standup_send_invalid_channel_id():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -144,7 +142,7 @@ def test_standup_send_message_too_long():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -163,7 +161,7 @@ def test_standup_send_no_active_standup():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
 
@@ -183,7 +181,7 @@ def test_standup_send_member_not_user():
     '''
 
     other.clear()
-    standup.standup_data.clear()
+    
 
     user1 = auth.auth_register('chris@gmail.com', 'password', 'Chris', 'Nassif')
     user2 = auth.auth_register('john@gmail.com', 'password', 'John', 'Smith')
@@ -195,3 +193,10 @@ def test_standup_send_member_not_user():
 
     with pytest.raises(AccessError):
         assert standup.standup_send(user2['token'], channel1['channel_id'], 'User not member')
+
+
+
+''' 
+NOTE:
+Write test to include standup twice on same channel
+''' 
