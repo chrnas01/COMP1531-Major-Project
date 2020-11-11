@@ -32,7 +32,7 @@ def message_send(token, channel_id, message):
         'channel_id': channel_id,
         'u_id': other.token_to_uid(token),
         'message': message,
-        'time_created': int(datetime.now().replace(tzinfo=timezone.utc).timestamp()),
+        'time_created': int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()),
         'reacts': other.valid_reacts,
         'is_pinned': False
     }
@@ -132,7 +132,7 @@ def message_send_later(token, channel_id, message, time_sent):
         raise InputError('Message is more than 1000 characters')
 
     # Check that the time sent is not in the past
-    curr_time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+    curr_time = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
     if time_sent < curr_time:
         raise InputError('Time sent is a time in the past')
 

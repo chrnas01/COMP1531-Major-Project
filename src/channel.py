@@ -1,6 +1,7 @@
 '''
 functions to manage users within a channel
 '''
+from datetime import datetime, timezone
 from error import InputError, AccessError
 import other
 
@@ -122,7 +123,9 @@ def channel_messages(token, channel_id, start):
 
     for msg in other.data['messages']:
         if msg['channel_id'] == channel_id:
-            messages.append(msg)
+            curr_time = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+            if msg['time_created'] <= curr_time:
+                messages.append(msg)
 
     if end >= len(messages):
         end_index = len(messages)
@@ -133,7 +136,6 @@ def channel_messages(token, channel_id, start):
         'start': start,
         'end': end
     }
-
 
 
 def channel_leave(token, channel_id):
