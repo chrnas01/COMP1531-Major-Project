@@ -57,6 +57,7 @@ def users_all(token):
             'name_first': u['name_first'],
             'name_last': u['name_last'],
             'handle_str': u['handle_str'],
+            'profile_img_url': u['profile_img_url'],
         }
         new_list.append(new_dict)
 
