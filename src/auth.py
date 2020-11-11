@@ -31,6 +31,8 @@ def auth_login(email, password):
     # calculate token
     token = other.encrypt_token(u_id).decode("utf-8")
 
+    other.update_user_reacts(u_id)
+
     return {
         'u_id': u_id,
         'token': token
@@ -112,6 +114,7 @@ def auth_register(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
+        'profile_img_url': None,
         'permission_id': 1 if u_id == 1 else 2 # flockr owner for first person registered 
     }
 

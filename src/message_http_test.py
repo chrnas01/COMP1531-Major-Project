@@ -130,7 +130,13 @@ def test_message_send_success(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': 'test',
-                'time_created': resp['messages'][0]['time_created']
+                'time_created': resp['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             }
         ],
         'start': 0,
@@ -399,7 +405,13 @@ def test_message_edit_success(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': 'edit',
-                'time_created': resp['messages'][0]['time_created']
+                'time_created': resp['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             }
         ],
         'start': 0,

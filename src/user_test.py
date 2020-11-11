@@ -25,6 +25,7 @@ def test_user_profile_success():
             'name_first': 'Jayden',
             'name_last': 'Leung',
             'handle_str': 'jaydenleung',
+            'profile_img_url': None,
             }
         }
  
@@ -60,6 +61,7 @@ def test_user_profile_setname_success():
             'name_first': 'changed_first',
             'name_last': 'changed_last',
             'handle_str': 'jaydenleung',
+            'profile_img_url': None,
             }
         }
  
@@ -128,6 +130,7 @@ def test_user_profile_setemail_success():
             'name_first': 'Jayden',
             'name_last': 'Leung',
             'handle_str': 'jaydenleung',
+            'profile_img_url': None,
             }
         }
  
@@ -175,6 +178,7 @@ def test_user_profile_sethandle_success():
             'name_first': 'Jayden',
             'name_last': 'Leung',
             'handle_str': 'jaydenleung',
+            'profile_img_url': None,
             }
         }
  
@@ -227,6 +231,7 @@ def test_all_users():
             'name_first': 'Jayden',
             'name_last': 'Leung',
             'handle_str': 'jaydenleung',
+            'profile_img_url': None,
         },
     ]}
 
