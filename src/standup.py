@@ -2,11 +2,9 @@
 This File will hold the standup functions.
 '''
 
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 from error import InputError, AccessError
 import other
-
-standup_data = []
 
 def standup_start(token, channel_id, length):
     '''
@@ -17,6 +15,9 @@ def standup_start(token, channel_id, length):
     channel from the user who started the standup. X is an integer that denotes the number of
     seconds that the standup occurs for
     '''
+    # Token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     # Check if channel is valid
     if not any(channels['channel_id'] == channel_id for channels in other.data['channels']):
@@ -26,15 +27,26 @@ def standup_start(token, channel_id, length):
     if standup_active(token, channel_id)['is_active']:
         raise InputError('An active standup is currently running in this channel')
 
-    standup_data.append({
+    current_time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+
+    other.data['standup'].append({
         'channel_id': channel_id,
-        'time_finish': datetime.now() + timedelta(seconds=length),
+        'time_finish': current_time + length,
         'is_active': True,
-        'msg_queue': []
+        'message': None
     })
 
+    # Removes expired stand up
+    standup = {}
+    for standup in other.data['standup']:
+        if standup['channel_id'] == channel_id:
+            break
+
+    if standup['time_finish'] <= current_time:
+        other.data['standup'].remove(standup)
+
     return {
-        'time_finish': standup_data[-1]['time_finish']   # Access last element of list
+        'time_finish': other.data['standup'][-1]['time_finish']   # Access last element of list
     }
 
 def standup_active(token, channel_id):
@@ -42,38 +54,46 @@ def standup_active(token, channel_id):
     For a given channel, return whether a standup is active in it, and what time
     the standup finishes. If no standup is active, then time_finish returns None.
     '''
+    # Token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     # Check if channel is valid
     if not any(channels['channel_id'] == channel_id for channels in other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
 
     # Find which element the standup of interest is
-    index = -1
-    for j in range(0, len(standup_data)):
-        if standup_data[j]['channel_id'] == channel_id:
-            index = j
+    standup_exists = False
+    standup = {}
+    for standup in other.data['standup']:
+        if standup['channel_id'] == channel_id:
+            standup_exists = True
+            break
 
     # No standup is active return None
-    if index == -1:
+    if not standup_exists:
         return {
             'is_active': False,
             'time_finish': None
         }
 
     # Testing if standup period is still in progress
-    if datetime.now() >= standup_data[index]['time_finish']:
-        standup_data[index]['is_active'] = False
-
+    if int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) >= standup['time_finish']:
+        standup['is_active'] = False
 
     return {
-        'is_active': standup_data[index]['is_active'],
-        'time_finish': standup_data[index]['time_finish']
+        'is_active': standup['is_active'],
+        'time_finish': standup['time_finish']
     }
 
 def standup_send(token, channel_id, message):
     '''
     Sending a message to get buffered in the standup queue, assuming a standup is currently active
     '''
+
+    # Token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
 
     # Check if channel is valid
     if not any(channels['channel_id'] == channel_id for channels in other.data['channels']):
@@ -91,13 +111,27 @@ def standup_send(token, channel_id, message):
     for channel in other.data['channels']:
         if channel_id == channel['channel_id']:
             if other.token_to_uid(token) not in channel['all_members']:
-                raise AccessError('The authorised user is not a memeber of the channel that the message is within')
+                raise AccessError('''The authorised user is not a memeber of the channel
+                        that the message is within''')
+    
+    # Iterates to user handle string
+    for user in other.data['users']:
+        if user['token'] == token:
+            break
+    
+    standup_msg = user['handle_str'] + ': ' + message + '\n' 
+
+    standup = {}
+    for standup in other.data['standup']:
+        if standup['channel_id'] == channel_id:
+            break
+    
+    standup['message'].append(standup_msg)
 
     return {}
 
 
-
 '''
 NOTE:
-- Need to figure out a way to clear a standup once it is over 
-'''
+Sort out last line of the message after standup is done
+''' 
