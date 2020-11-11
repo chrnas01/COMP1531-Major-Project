@@ -15,6 +15,11 @@ data = {
     'messages': []
 }
 
+valid_reacts = [{
+    'react_id': 1,
+    'u_ids': [],
+    'is_this_user_reacted': False
+}]
 
 def clear():
     '''
@@ -23,6 +28,15 @@ def clear():
     data['users'].clear()
     data['channels'].clear()
     data['messages'].clear()
+
+    global valid_reacts
+
+    valid_reacts = [{
+        'react_id': 1,
+        'u_ids': [],
+        'is_this_user_reacted': False
+    }]
+
     return {}
 
 
@@ -185,3 +199,14 @@ def get_user_permission(u_id):
             perm = user['permission_id']
 
     return perm
+
+def update_user_reacts(u_id):
+    '''
+    Helper function to update user reacts
+    '''
+    for message in data['messages']:
+        for react in message['reacts']:
+            if u_id in react['u_ids']:
+                react['is_this_user_reacted'] = True
+            else:
+                react['is_this_user_reacted'] = False
