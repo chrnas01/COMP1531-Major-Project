@@ -3,6 +3,7 @@ functions to manage users within a channel
 '''
 from datetime import datetime, timezone
 from error import InputError, AccessError
+from operator import itemgetter
 import other
 
 def channel_invite(token, channel_id, u_id):
@@ -126,6 +127,8 @@ def channel_messages(token, channel_id, start):
             curr_time = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
             if msg['time_created'] <= curr_time:
                 messages.append(msg)
+
+    messages = sorted(messages, key=itemgetter('time_created')) 
 
     if end >= len(messages):
         end_index = len(messages)
