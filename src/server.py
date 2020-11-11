@@ -241,6 +241,31 @@ def http_message_edit():
     data = request.get_json()
     return dumps(message.message_edit(data['token'], int(data['message_id']), data['message']))
 
+@APP.route('/message/sendlater', methods=['POST'])
+def http_message_send_later():
+    data = request.get_json()
+    return dumps(message.message_send_later(data['token'], int(data['channel_id']), data['message'], data['time_sent']))
+
+@APP.route('/message/react', methods=['POST'])
+def http_message_react():
+    data = request.get_json()
+    return dumps(message.message_react(data['token'], data['message_id'], data['react_id']))
+
+@APP.route('/message/unreact', methods=['POST'])
+def http_message_unreact():
+    data = request.get_json()
+    return dumps(message.message_unreact(data['token'], data['message_id'], data['react_id']))
+
+@APP.route('/message/pin', methods=['POST'])
+def http_message_pin():
+    data = request.get_json()
+    return dumps(message.message_pin(data['token'], data['message_id']))
+
+@APP.route('/message/unpin', methods=['POST'])
+def http_message_unpin():
+    data = request.get_json()
+    return dumps(message.message_unpin(data['token'], data['message_id']))
+
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port

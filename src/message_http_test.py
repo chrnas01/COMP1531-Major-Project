@@ -422,7 +422,7 @@ def test_message_edit_success(url, setup):
 
 ########################################################
 
-def test_send_later_invalid_channel(setup):
+def test_send_later_invalid_channel(url, setup):
     '''
     sending a message later to an invalid channel
     '''
@@ -446,7 +446,7 @@ def test_send_later_invalid_channel(setup):
     resp = requests.post(url + 'message/sendlater', json=payload)
     resp.status_code == 400
 
-def test_send_later_invalid_message(setup):
+def test_send_later_invalid_message(url, setup):
     '''
     sending message later that is too long
     '''
@@ -474,7 +474,7 @@ def test_send_later_invalid_message(setup):
     resp = requests.post(url + 'message/sendlater', json=payload)
     resp.status_code == 400
 
-def test_send_later_invalid_time(setup):
+def test_send_later_invalid_time(url, setup):
     '''
     sending message later at time in the past
     '''
@@ -498,7 +498,7 @@ def test_send_later_invalid_time(setup):
     resp = requests.post(url + 'message/sendlater', json=payload)
     resp.status_code == 400
 
-def test_send_later_invalid_access(setup):
+def test_send_later_invalid_access(url, setup):
     '''
     sending message later when user has not joined the channel
     '''
@@ -522,7 +522,7 @@ def test_send_later_invalid_access(setup):
     resp = requests.post(url + 'message/sendlater', json=payload)
     resp.status_code == 400
 
-def test_send_later_valid(setup):
+def test_send_later_valid(url, setup):
     '''
     sending message later
     '''
@@ -577,7 +577,7 @@ def test_send_later_valid(setup):
 
 ########################################################
 
-def test_react_invalid_message(setup):
+def test_react_invalid_message(url, setup):
     '''
     reacting to a message that is in a channel the user is not a part of
     '''
@@ -607,7 +607,7 @@ def test_react_invalid_message(setup):
     resp = requests.post(url + 'message/react', json=payload)
     resp.status_code == 400
 
-def test_react_invalid_react(setup):
+def test_react_invalid_react(url, setup):
     '''
     reacting to a message with a react that doesn't exist
     '''
@@ -637,7 +637,7 @@ def test_react_invalid_react(setup):
     resp = requests.post(url + 'message/react', json=payload)
     resp.status_code == 400
 
-def test_react_already_reacted(setup):
+def test_react_already_reacted(url, setup):
     '''
     reacting to a message that you have already reacted to
     '''
@@ -668,7 +668,7 @@ def test_react_already_reacted(setup):
     resp = requests.post(url + 'message/react', json=payload)
     resp.status_code == 400
 
-def test_react_valid(setup):
+def test_react_valid(url, setup):
     '''
     reacting to a message
     '''
@@ -727,7 +727,7 @@ def test_react_valid(setup):
 
 ########################################################
 
-def test_unreact_invalid_message(setup):
+def test_unreact_invalid_message(url, setup):
     '''
     reacting to a message that is in a channel the user is not a part of
     '''
@@ -757,7 +757,7 @@ def test_unreact_invalid_message(setup):
     resp = requests.post(url + 'message/unreact', json=payload)
     resp.status_code == 400
 
-def test_unreact_invalid_react(setup):
+def test_unreact_invalid_react(url, setup):
     '''
     reacting to a message with a react that doesn't exist
     '''
@@ -787,7 +787,7 @@ def test_unreact_invalid_react(setup):
     resp = requests.post(url + 'message/unreact', json=payload)
     resp.status_code == 400
 
-def test_unreact_already_unreacted(setup):
+def test_unreact_already_unreacted(url, setup):
     '''
     reacting to a message that you have already reacted to
     '''
@@ -817,7 +817,7 @@ def test_unreact_already_unreacted(setup):
     resp = requests.post(url + 'message/unreact', json=payload)
     resp.status_code == 400
 
-def test_unreact_valid(setup):
+def test_unreact_valid(url, setup):
     '''
     reacting to a message
     '''
@@ -877,7 +877,7 @@ def test_unreact_valid(setup):
 
 ########################################################
 
-def test_pin_invalid_message(setup):
+def test_pin_invalid_message(url, setup):
     '''
     pinning a message that does not exist
     '''
@@ -906,7 +906,7 @@ def test_pin_invalid_message(setup):
     resp = requests.post(url + 'message/pin', json=payload)
     resp.status_code == 400
 
-def test_pin_invalid_channel(setup):
+def test_pin_invalid_channel(url, setup):
     '''
     pinning a message that is in a channel the user is not a part of
     '''
@@ -935,7 +935,7 @@ def test_pin_invalid_channel(setup):
     resp = requests.post(url + 'message/pin', json=payload)
     resp.status_code == 400
 
-def test_pin_already_pinned(setup):
+def test_pin_already_pinned(url, setup):
     '''
     pinning a message that is already pinned
     '''
@@ -965,7 +965,7 @@ def test_pin_already_pinned(setup):
     resp = requests.post(url + 'message/pin', json=payload)
     resp.status_code == 400
 
-def test_pin_invalid_perms(setup):
+def test_pin_invalid_perms(url, setup):
     '''
     pinning a message when you are not an owner
     '''
@@ -1001,7 +1001,7 @@ def test_pin_invalid_perms(setup):
     resp = requests.post(url + 'message/pin', json=payload)
     resp.status_code == 400
 
-def test_pin_valid(setup):
+def test_pin_valid(url, setup):
     '''
     pinning to a message
     '''
@@ -1043,7 +1043,7 @@ def test_pin_valid(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1['u_id'],
                 'message': 'test',
-                'time_created': result['messages'][0]['time_created'],
+                'time_created': resp['messages'][0]['time_created'],
                 'reacts': [{
                     'react_id': 1,
                     'u_ids': [],
@@ -1060,7 +1060,7 @@ def test_pin_valid(setup):
 
 ########################################################
 
-def test_unpin_invalid_message(setup):
+def test_unpin_invalid_message(url, setup):
     '''
     unpinning a message that does not exist
     '''
@@ -1089,7 +1089,7 @@ def test_unpin_invalid_message(setup):
     resp = requests.post(url + 'message/unpin', json=payload)
     resp.status_code == 400
 
-def test_unpin_invalid_channel(setup):
+def test_unpin_invalid_channel(url, setup):
     '''
     unpinning a message that is in a channel the user is not a part of
     '''
@@ -1113,7 +1113,7 @@ def test_unpin_invalid_channel(setup):
         'token': user_2['token'],
         'message_id': resp['message_id']
     }
-    resp = requests.post(url + 'message/pin', json=payload)
+    requests.post(url + 'message/pin', json=payload)
 
     payload = {
         'token': user_1['token'],
@@ -1124,7 +1124,7 @@ def test_unpin_invalid_channel(setup):
     resp = requests.post(url + 'message/unpin', json=payload)
     resp.status_code == 400
 
-def test_unpin_already_unpinned(setup):
+def test_unpin_already_unpinned(url, setup):
     '''
     unpinning a message that is already pinned
     '''
@@ -1142,13 +1142,13 @@ def test_unpin_already_unpinned(setup):
         'channel_id': channel_data['channel_id'],
         'message': 'test'
     }
-    resp = requests.post(url + 'message/send', json=payload).json()
+    requests.post(url + 'message/send', json=payload)
 
     # InputError
     resp = requests.post(url + 'message/unpin', json=payload)
     resp.status_code == 400
 
-def test_unpin_invalid_perms(setup):
+def test_unpin_invalid_perms(url, setup):
     '''
     pinning a message when you are not an owner
     '''
@@ -1179,7 +1179,7 @@ def test_unpin_invalid_perms(setup):
         'token': user_1['token'],
         'message_id': resp['message_id']
     }
-    resp = requests.post(url + 'message/pin', json=payload)
+    requests.post(url + 'message/pin', json=payload)
 
     payload = {
         'token': user_2['token'],
@@ -1190,7 +1190,7 @@ def test_unpin_invalid_perms(setup):
     resp = requests.post(url + 'message/unpin', json=payload)
     resp.status_code == 400
 
-def test_unpin_valid(setup):
+def test_unpin_valid(url, setup):
     '''
     pinning to a message
     '''
