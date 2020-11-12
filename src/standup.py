@@ -36,7 +36,7 @@ def standup_start(token, channel_id, length):
         'message': None
     })
 
-    # Removes expired stand up
+    # Removes Completed Standup
     standup = {}
     for standup in other.data['standup']:
         if standup['channel_id'] == channel_id:
@@ -113,25 +113,20 @@ def standup_send(token, channel_id, message):
             if other.token_to_uid(token) not in channel['all_members']:
                 raise AccessError('''The authorised user is not a memeber of the channel
                         that the message is within''')
-    
+
     # Iterates to user handle string
+    user = {}
     for user in other.data['users']:
         if user['token'] == token:
             break
-    
-    standup_msg = user['handle_str'] + ': ' + message + '\n' 
+
+    standup_msg = user['handle_str'] + ': ' + message + '\n'
 
     standup = {}
     for standup in other.data['standup']:
         if standup['channel_id'] == channel_id:
             break
-    
+
     standup['message'].append(standup_msg)
 
     return {}
-
-
-'''
-NOTE:
-Sort out last line of the message after standup is done
-''' 
