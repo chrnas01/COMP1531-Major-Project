@@ -101,9 +101,10 @@ def test_standup_start_already_active1(url):
         'channel_id': channel1['channel_id'],
         'length': 60
     }
-    standup1 = requests.post(url + 'standup/start', json=standup_payload).json()
+    # Standup 1 
+    requests.post(url + 'standup/start', json=standup_payload).json()
 
-    resp = request.post(url + 'standup/start', json=standup_payload).json()
+    resp = requests.post(url + 'standup/start', json=standup_payload).json()
     assert 'code' in resp
     assert resp['code'] == 400
 
@@ -147,7 +148,8 @@ def test_standup_start_already_acive2(url):
         'channel_id': channel1['channel_id'],
         'length': 60
     }
-    standup1 = requests.post(url + 'standup/start', json=standup1_payload).json()
+    # Standup 1 
+    requests.post(url + 'standup/start', json=standup1_payload).json()
 
     standup2_payload = {
         'token': user2['token'],
@@ -155,7 +157,7 @@ def test_standup_start_already_acive2(url):
         'length': 60
     }
 
-    resp = request.post(url + 'standup/start', json=standup2_payload).json()
+    resp = requests.post(url + 'standup/start', json=standup2_payload).json()
     assert 'code' in resp
     assert resp['code'] == 400
 
@@ -176,21 +178,27 @@ def test_standup_start_successful(url):
     }
     user1 = requests.post(url + 'auth/register', json=user1_payload).json()
 
-    # Creating Private Channel
+    # Creating Public Channel
     channel_payload = {
         'token': user1['token'],
         'name': 'Channel1',
-        'is_public': False
+        'is_public': True
     }
     channel1 = requests.post(url + 'channels/create', json=channel_payload).json()
 
     standup1_payload = {
         'token': user1['token'],
         'channel_id': channel1['channel_id'],
-        'length': 60
+        'length': 600
     }
     resp = requests.post(url + 'standup/start', json=standup1_payload).json()
-    assert json.loads(resp.txt) == {'time_finish': other.data['standup'][-1]['time_finish']}
+    
+    standup = {}
+    for standup in other.data['standup']:
+        if standup['channel_id'] == channel1['channel_id']:
+            break
 
-# Tests for standup_active() function.
+    assert resp == {'time_finish': standup['time_finish']}
+
+# Tests for htto_standup_active() function.
 ###################################################################################
