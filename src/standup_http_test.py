@@ -202,3 +202,157 @@ def test_standup_start_successful(url):
 
 # Tests for htto_standup_active() function.
 ###################################################################################
+def test_standup_active_invalid_token(url):
+    '''
+    Token is invalid
+    '''
+   
+    # Clearing Database
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    # Creating Private Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': False
+    }
+    channel1 = requests.post(url + 'channels/create', json=channel_payload).json()
+
+    standup_payload = {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'length': 60
+    }
+    requests.post(url + 'standup/start', json=standup_payload).json()
+
+    active_payload = {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id']
+    }
+
+    resp = requests.get(url + 'standup/active', params=active_payload).json()
+    assert 'code' in resp
+    assert resp['code'] == 400
+
+def test_standup_active_invalid_channel_id(url):
+    '''
+    Channel ID is invalid.
+    '''
+
+    # Clearing Database
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    # Creating Private Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': False
+    }
+    channel1 = requests.post(url + 'channels/create', json=channel_payload).json()
+
+    standup_payload = {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'length': 60
+    }
+    requests.post(url + 'standup/start', json=standup_payload).json()
+
+    active_payload = {
+        'token': user1['token'],
+        'channel_id': 321
+    }
+
+    resp = requests.get(url + 'standup/active', params=active_payload).json()
+    assert 'code' in resp
+    assert resp['code'] == 400
+
+def test_standup_active_inactive():
+    '''
+    Calling standup_active function when there is no standup occuring
+    '''
+
+    # Clearing Database
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    # Creating Private Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': False
+    }
+    channel1 = requests.post(url + 'channels/create', json=channel_payload).json()
+
+    active_payload = {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id']
+    }
+    resp = requests.get(url + 'standup/active', params=active_payload).json()
+    assert resp == {'is_active': False, 'time_finish': None}
+
+
+def test_standup_active_successful():
+    '''
+    Standup successfully detected and correct finishing time returned
+    '''
+
+    # Clearing Database
+    requests.delete(url + 'clear')
+
+    # Registering user
+    user_payload = {
+        'email': 'chrisnassif@gmail.com',
+        'password': 'password',
+        'name_first': 'Chris',
+        'name_last': 'Nassif'
+    }
+    user1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    # Creating Private Channel
+    channel_payload = {
+        'token': user1['token'],
+        'name': 'Channel1',
+        'is_public': False
+    }
+    channel1 = requests.post(url + 'channels/create', json=channel_payload).json()
+
+    # Starting Standup
+    standup_payload = {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id'],
+        'length': 60
+    }
+    standup1 = requests.post(url + 'standup/start', json=standup_payload).json()
+    
+    active_payload = {
+        'token': user1['token'],
+        'channel_id': channel1['channel_id']
+    }
+    resp = requests.get(url + 'standup/active', params=active_payload).json()
+    assert resp == {'is_active': True, 'time_finish': standup1['time_finish']}
