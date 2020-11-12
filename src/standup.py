@@ -33,7 +33,7 @@ def standup_start(token, channel_id, length):
         'channel_id': channel_id,
         'time_finish': current_time + length,
         'is_active': True,
-        'message': None
+        'message': []
     })
 
     # Removes Completed Standup
