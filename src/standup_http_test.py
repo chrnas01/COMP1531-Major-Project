@@ -4,7 +4,6 @@ tests for http_standup.py
 
 import json
 import requests
-import other
 from echo_http_test import url
 
 # Tests for http_standup_start() function.
@@ -101,7 +100,7 @@ def test_standup_start_already_active1(url):
         'channel_id': channel1['channel_id'],
         'length': 60
     }
-    # Standup 1 
+    # Standup 1
     requests.post(url + 'standup/start', json=standup_payload).json()
 
     resp = requests.post(url + 'standup/start', json=standup_payload).json()
@@ -148,7 +147,7 @@ def test_standup_start_already_acive2(url):
         'channel_id': channel1['channel_id'],
         'length': 60
     }
-    # Standup 1 
+    # Standup 1
     requests.post(url + 'standup/start', json=standup1_payload).json()
 
     standup2_payload = {
@@ -192,7 +191,7 @@ def test_standup_start_successful(url):
         'length': 600
     }
     resp = requests.post(url + 'standup/start', json=standup1_payload).json()
-    
+
     assert resp == {'time_finish': resp['time_finish']}
 
 # Tests for htto_standup_active() function.
@@ -201,7 +200,7 @@ def test_standup_active_invalid_token(url):
     '''
     Token is invalid
     '''
-   
+
     # Clearing Database
     requests.delete(url + 'clear')
 
@@ -344,7 +343,7 @@ def test_standup_active_successful(url):
         'length': 60
     }
     standup1 = requests.post(url + 'standup/start', json=standup_payload).json()
-    
+
     active_payload = {
         'token': user1['token'],
         'channel_id': channel1['channel_id']
@@ -358,7 +357,7 @@ def test_standup_send_invalid_token(url):
     '''
     Token is invalid
     '''
-   
+
     # Clearing Database
     requests.delete(url + 'clear')
 
@@ -602,7 +601,7 @@ def test_standup_send_member_not_user(url):
         'message': 'User 2 is not a memeber of this channel'
     }
     resp = requests.post(url + 'standup/send', json=send_payload).json()
-    
+
     assert 'code' in resp
     assert resp['code'] == 400
 
@@ -661,7 +660,7 @@ def test_standup_send_multiple_users(url):
     }
     requests.post(url + 'channel/join', json=join_payload2).json()
 
-    # Creating Standup 
+    # Creating Standup
     standup_payload = {
         'token': user1['token'],
         'channel_id': channel1['channel_id'],
