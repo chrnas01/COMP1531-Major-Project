@@ -250,7 +250,7 @@ def http_standup_start():
 @APP.route('/standup/active', methods=['GET'])
 def http_standup_active():
     token = request.args.get('token')
-    channel_id = request.args.get('channel_id')
+    channel_id = int(request.args.get('channel_id'))
     return dumps(standup.standup_active(token, channel_id))
 
 @APP.route('/standup/send', methods=['POST'])
