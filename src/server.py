@@ -4,12 +4,13 @@ from flask import Flask, request
 from flask_cors import CORS
 import channel
 from error import InputError, AccessError
-import channels
 import auth 
+import channels
 import re
 import other
 import user
 import message
+import standup
 
 def defaultHandler(err):
     response = err.get_response()
@@ -241,6 +242,21 @@ def http_message_edit():
     data = request.get_json()
     return dumps(message.message_edit(data['token'], int(data['message_id']), data['message']))
 
+@APP.route('/standup/start', methods=['POST'])
+def http_standup_start():
+    data = request.get_json()
+    return dumps(standup.standup_start(data['token'], data['channel_id'], data['length']))
+
+@APP.route('/standup/active', methods=['GET'])
+def http_standup_active():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    return dumps(standup.standup_active(token, channel_id))
+
+@APP.route('/standup/send', methods=['POST'])
+def http_standup_send():
+    data = request.get_json()
+    return dumps(standup.standup_send(data['token'], data['channel_id'], data['message']))
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
