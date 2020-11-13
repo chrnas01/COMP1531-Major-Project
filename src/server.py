@@ -280,7 +280,7 @@ def http_standup_active():
 def http_standup_send():
     data = request.get_json()
     return dumps(standup.standup_send(data['token'], data['channel_id'], data['message']))
-=======
+
 @APP.route('/message/sendlater', methods=['POST'])
 def http_message_send_later():
     data = request.get_json()
