@@ -4,7 +4,9 @@ functions for authentication of user
 import re
 from error import InputError, AccessError
 import other
-
+import string
+import random
+import smtplib
 
 def auth_login(email, password):
     '''
@@ -112,6 +114,7 @@ def auth_register(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle_str,
+        'profile_img_url': None,
         'permission_id': 1 if u_id == 1 else 2 # flockr owner for first person registered 
     }
 
@@ -138,4 +141,60 @@ def is_password_correct(u_id, password):
     # index 0 holds u_id 1
     if other.data['users'][u_id - 1]['password'] == password:
         return True
+    return False
+
+def auth_password_request(email):
+    '''
+    Request a change in password
+    '''
+    # What if email is not registered
+    code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=30))
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.ehlo()
+    s.starttls() 
+    s.login("comp1531dummyemailingbot@gmail.com", "COMP1531Rules") 
+    s.sendmail("comp1531dummyemailingbot@gmail.com", email, code) 
+    s.quit()
+
+    # New reset_code:
+    new_reset_details = {
+        'email': email,
+        'code': code
+    }
+
+    other.data['reset_codes'].append(new_reset_details)
+    return {}
+
+def auth_password_reset(reset_code, new_password):
+    '''
+    Reset password
+    '''
+    if not is_reset_code_valid(reset_code):
+        raise InputError('reset_code is invalid')
+    
+    # password valid length
+    if len(new_password) < 6:
+        raise InputError('length of password is invalid - Cannot register')
+
+    user_email = is_reset_code_valid(reset_code)
+
+    user_to_delete = {
+        'code': reset_code,
+        'email': user_email
+    }
+    other.data['reset_codes'].remove(user_to_delete)
+
+    for user in other.data['users']:
+        if user['email'] == user_email:
+            user['password'] = other.password_encrypt(new_password)
+
+    return {}
+
+def is_reset_code_valid(given_code):
+    '''
+    Check that is_reset code is valid
+    '''
+    for reset_user in other.data['reset_codes']:
+        if reset_user['code'] == given_code:
+            return reset_user['email']
     return False

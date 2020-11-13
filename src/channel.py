@@ -66,7 +66,8 @@ def channel_details(token, channel_id):
                 temp_dict = {
                     'u_id': user['u_id'],
                     'name_first': user['name_first'],
-                    'name_last': user['name_last']
+                    'name_last': user['name_last'],
+                    'profile_img_url': user['profile_img_url'],
                 }
                 list_owner_members.append(temp_dict)
                 break
@@ -79,7 +80,8 @@ def channel_details(token, channel_id):
                 temp_dict = {
                     'u_id': user['u_id'],
                     'name_first': user['name_first'],
-                    'name_last': user['name_last']
+                    'name_last': user['name_last'],
+                    'profile_img_url': user['profile_img_url'],
                 }
                 list_all_members.append(temp_dict)
                 break

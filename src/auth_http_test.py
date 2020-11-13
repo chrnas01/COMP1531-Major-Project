@@ -357,3 +357,29 @@ def test_http_handle_str20char(url):
 
     resp = requests.get(url + 'other/show/handle_str')
     assert json.loads(resp.text) == ['twentycharactersisth', 'twentycharactersist2']
+
+################################################################################
+# Test password reset
+def test_http_auth_password_request(url):
+    '''
+    Check if password request works
+    '''
+    requests.delete(url + 'clear')
+    payload = {
+        'email': 'email@gmail.com'
+    }
+    resp = requests.post(url + 'auth/passwordreset/request', json=payload)
+    assert json.loads(resp.text) == {}
+
+
+def test_http_auth_password_reset_code_invalid(url):
+    '''
+    Check if InputError is raised if reset_code is invalid
+    '''
+    requests.delete(url + 'clear')
+    payload = {
+        'reset_code': '',
+        'new_password': 'PASSWORD'
+    }
+    resp = requests.post(url + 'auth/passwordreset/reset', json=payload)
+    assert resp.status_code == 400
