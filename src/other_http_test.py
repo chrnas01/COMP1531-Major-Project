@@ -188,14 +188,26 @@ def test_search(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1.json()['u_id'],
                 'message': 'test',
-                'time_created': resp['messages'][0]['time_created']
+                'time_created': resp['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             },
             {
                 'message_id': 4,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_2.json()['u_id'],
                 'message': 'test2',
-                'time_created': resp['messages'][1]['time_created']
+                'time_created': resp['messages'][1]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             }
         ]
     }
@@ -271,14 +283,26 @@ def test_search_other_channel(url, setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1.json()['u_id'],
                 'message': 'test',
-                'time_created': resp['messages'][0]['time_created']
+                'time_created': resp['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             },
             {
                 'message_id': 3,
                 'channel_id': channel_data['channel_id'],
                 'u_id': user_1.json()['u_id'],
                 'message': 'Hello',
-                'time_created': resp['messages'][1]['time_created']
+                'time_created': resp['messages'][1]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             }
         ]
     }

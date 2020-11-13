@@ -217,3 +217,66 @@ def test_handle_str20char():
     auth.auth_register('EMAIL@gmail.com', 'WORDSS', 'twentycharacters', 'isthisname')
     auth.auth_register('EMAIL2@gmail.com', 'WORDSS', 'twentycharacters', 'isthisname')
     assert other.get_user_handle_strs() == ['twentycharactersisth', 'twentycharactersist2']
+
+################################################################################
+# Test password reset
+def test_auth_password_request():
+    '''
+    Check if password request works
+    '''
+    other.clear()
+    assert auth.auth_password_request('email@gmail.com') == {}
+
+
+def test_auth_password_reset_code_invalid():
+    '''
+    Check if InputError is raised if reset_code is invalid
+    '''
+    other.clear()
+    with pytest.raises(InputError):
+        assert auth.auth_password_reset('', 'PASSWORD')
+
+def test_auth_password_reset_password_invalid():
+    '''
+    Check if InputError is raised if reset_code is invalid
+    '''
+    other.clear()
+    auth.auth_password_request('email@gmail.com')
+    with pytest.raises(InputError):
+        # Password of length 5 is invalid
+        assert auth.auth_password_reset(other.get_first_reset_codes(), 'WORDS')
+
+def test_auth_password_reset_valid():
+    '''
+    Check if InputError is raised if reset_code is invalid
+    '''
+    other.clear()
+    auth.auth_password_request('email@gmail.com')
+    assert auth.auth_password_reset(other.get_first_reset_codes(), 'PASSWORD') == {}
+
+def test_get_first_reset_codes():
+    '''
+    Check that reset_codes is empty
+    '''
+    other.clear()
+    with pytest.raises(IndexError):
+        assert other.get_first_reset_codes()
+
+def test_is_reset_code_false():
+    '''
+    Test is reset_code identifies false code
+    '''
+    other.clear()
+    assert not auth.is_reset_code_valid('This_code_is_imaginary')
+
+def test_is_reset_code_valid():
+    '''
+    Test is reset_code identifies correct code
+    '''
+    other.clear()
+    valid_user = {
+        'code': 'ABCDEFG',
+        'email': 'email@gmail.com'
+    }
+    other.data['reset_codes'].append(valid_user)
+    assert auth.is_reset_code_valid('ABCDEFG')

@@ -14,8 +14,14 @@ data = {
     'channels': [],
     'messages': [],
     'standup': []
+    'reset_codes': []
 }
 
+valid_reacts = [{
+    'react_id': 1,
+    'u_ids': [],
+    'is_this_user_reacted': False
+}]
 
 def clear():
     '''
@@ -25,6 +31,14 @@ def clear():
     data['channels'].clear()
     data['messages'].clear()
     data['standup'].clear()
+    data['reset_codes'].clear()
+
+    global valid_reacts
+
+    for react in valid_reacts:
+        react['u_ids'] = []
+        react['is_this_user_reacted'] = False
+
     return {}
 
 
@@ -45,6 +59,7 @@ def users_all(token):
             'name_first': u['name_first'],
             'name_last': u['name_last'],
             'handle_str': u['handle_str'],
+            'profile_img_url': u['profile_img_url'],
         }
         new_list.append(new_dict)
 
@@ -187,3 +202,33 @@ def get_user_permission(u_id):
             perm = user['permission_id']
 
     return perm
+
+def get_first_reset_codes():
+    '''
+    Blackbox testing other functions
+    '''
+    return data['reset_codes'][0]['code']
+
+def update_user_reacts(u_id):
+    '''
+    Helper function to update user reacts
+    '''
+    for message in data['messages']:
+        for react in message['reacts']:
+            if u_id in react['u_ids']:
+                react['is_this_user_reacted'] = True
+            else:
+                react['is_this_user_reacted'] = False
+
+def get_messages():
+    '''
+    Helper function to get all messages
+    '''
+    messages = []
+
+    for msg in data['messages']:
+        messages.append(msg)
+
+    return {
+        'messages': messages
+    }

@@ -96,14 +96,26 @@ def test_search(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             },
             {
                 'message_id': 4,
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_2['token']),
                 'message': 'test2',
-                'time_created': result['messages'][1]['time_created']
+                'time_created': result['messages'][1]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             }
         ]
     }
@@ -129,14 +141,26 @@ def test_search_other_channel(setup):
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
-                'time_created': result['messages'][0]['time_created']
+                'time_created': result['messages'][0]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             },
             {
                 'message_id': 3,
                 'channel_id': channel_data['channel_id'],
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'Hello',
-                'time_created': result['messages'][1]['time_created']
+                'time_created': result['messages'][1]['time_created'],
+                'reacts': [{
+                    'react_id': 1,
+                    'u_ids': [],
+                    'is_this_user_reacted': False
+                }],
+                'is_pinned': False
             }
         ]
     }
