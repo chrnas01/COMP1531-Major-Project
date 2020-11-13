@@ -33,11 +33,9 @@ def clear():
 
     global valid_reacts
 
-    valid_reacts = [{
-        'react_id': 1,
-        'u_ids': [],
-        'is_this_user_reacted': False
-    }]
+    for react in valid_reacts:
+        react['u_ids'] = []
+        react['is_this_user_reacted'] = False
 
     return {}
 
@@ -219,3 +217,16 @@ def update_user_reacts(u_id):
                 react['is_this_user_reacted'] = True
             else:
                 react['is_this_user_reacted'] = False
+
+def get_messages():
+    '''
+    Helper function to get all messages
+    '''
+    messages = []
+
+    for msg in data['messages']:
+        messages.append(msg)
+
+    return {
+        'messages': messages
+    }
