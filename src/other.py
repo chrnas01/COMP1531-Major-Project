@@ -13,7 +13,7 @@ data = {
     'users': [],
     'channels': [],
     'messages': [],
-    'standup': []
+    'standup': [],
     'reset_codes': []
 }
 
