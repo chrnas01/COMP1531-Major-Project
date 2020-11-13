@@ -13,6 +13,7 @@ data = {
     'users': [],
     'channels': [],
     'messages': [],
+    'standup': [],
     'reset_codes': []
 }
 
@@ -24,11 +25,12 @@ valid_reacts = [{
 
 def clear():
     '''
-    Resets databse
+    Resets database
     '''
     data['users'].clear()
     data['channels'].clear()
     data['messages'].clear()
+    data['standup'].clear()
     data['reset_codes'].clear()
 
     global valid_reacts

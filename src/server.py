@@ -4,12 +4,13 @@ from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 import channel
 from error import InputError, AccessError
-import channels
 import auth 
+import channels
 import re
 import other
 import user
 import message
+import standup
 import urllib.request
 import os
 import random
@@ -125,12 +126,10 @@ def auth_passwordreset_request():
     data = request.get_json()
     return dumps(auth.auth_password_request(data['email']))
 
-
 @APP.route("/auth/passwordreset/reset", methods=['POST'])
 def auth_passwordreset_reset():
     data = request.get_json()
     return dumps(auth.auth_password_reset(data['reset_code'], data['new_password']))
-
 
 @APP.route("/admin/userpermission/change", methods=['POST'])
 def admin_userpermission_change():
@@ -265,6 +264,22 @@ def http_message_remove():
 def http_message_edit():
     data = request.get_json()
     return dumps(message.message_edit(data['token'], int(data['message_id']), data['message']))
+
+@APP.route('/standup/start', methods=['POST'])
+def http_standup_start():
+    data = request.get_json()
+    return dumps(standup.standup_start(data['token'], data['channel_id'], data['length']))
+
+@APP.route('/standup/active', methods=['GET'])
+def http_standup_active():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    return dumps(standup.standup_active(token, channel_id))
+
+@APP.route('/standup/send', methods=['POST'])
+def http_standup_send():
+    data = request.get_json()
+    return dumps(standup.standup_send(data['token'], data['channel_id'], data['message']))
 
 @APP.route('/message/sendlater', methods=['POST'])
 def http_message_send_later():
