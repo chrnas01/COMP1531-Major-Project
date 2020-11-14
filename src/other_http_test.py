@@ -8,6 +8,7 @@ import other
 import pytest
 from echo_http_test import url
 
+
 @pytest.fixture
 def setup(url):
     '''
@@ -23,7 +24,7 @@ def setup(url):
         'name_first': 'Jayden',
         'name_last': 'Leung'
     }
-    user_1 = requests.post(url + 'auth/register', json=payload) # Owner
+    user_1 = requests.post(url + 'auth/register', json=payload)  # Owner
 
     payload = {
         'email': 'Steven@gmail.com',
@@ -126,6 +127,7 @@ def test_admin_userpermission_change_success(url, setup):
 
 ################################################################################
 
+
 def test_search(url, setup):
     '''
     searching in a channel
@@ -199,7 +201,7 @@ def test_search(url, setup):
                         'react_id': 2,
                         'u_ids': [],
                         'is_this_user_reacted': False
-                        },
+                    },
                     {
                         'react_id': 3,
                         'u_ids': [],
@@ -223,7 +225,7 @@ def test_search(url, setup):
                         'react_id': 2,
                         'u_ids': [],
                         'is_this_user_reacted': False
-                        },
+                    },
                     {
                         'react_id': 3,
                         'u_ids': [],
@@ -235,6 +237,7 @@ def test_search(url, setup):
     }
 
     assert resp == expected_result
+
 
 def test_search_other_channel(url, setup):
     '''
@@ -316,7 +319,7 @@ def test_search_other_channel(url, setup):
                         'react_id': 2,
                         'u_ids': [],
                         'is_this_user_reacted': False
-                        },
+                    },
                     {
                         'react_id': 3,
                         'u_ids': [],
@@ -340,7 +343,7 @@ def test_search_other_channel(url, setup):
                         'react_id': 2,
                         'u_ids': [],
                         'is_this_user_reacted': False
-                        },
+                    },
                     {
                         'react_id': 3,
                         'u_ids': [],
@@ -352,4 +355,36 @@ def test_search_other_channel(url, setup):
     }
 
     assert resp == expected_result
-    
+
+
+def test_http_extra_email_send_invalid_email(url, setup):
+    '''
+    Extra feature of sending email through text
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1.json()['token'],
+        'email': 'notanemail',
+        'message': "Did it work?"
+    }
+    resp = requests.post(url + 'email/send', json=payload)
+    assert "code" in resp.json()
+    assert resp.json()['code'] == 400
+
+
+def test_http_extra_email_send_valid_email(url, setup):
+    '''
+    Extra feature of sending email through text
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    payload = {
+        'token': user_1.json()['token'],
+        'email': 'comp1531dummyemailingbot@gmail.com',
+        'message': "Did it work?"
+    }
+    resp = requests.post(url + 'email/send', json=payload).json()
+    assert resp == {}
