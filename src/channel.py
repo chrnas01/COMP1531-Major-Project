@@ -127,10 +127,12 @@ def channel_messages(token, channel_id, start):
     messages = []
 
     #sends the standup message
-    for standup in other.data['standup']:
-        if standup['channel_id'] == channel_id:
-            if not standup.standup_active(token, channel_id):
-                message.message_send_later(standup['token'], channel_id, standup['message'], standup['time_finish'])
+    for standup_item in other.data['standup']:
+        if standup_item['channel_id'] == channel_id:
+            if not standup.standup_active(token, channel_id)['is_active']:
+                if not standup_item['sent']:
+                    message.message_send(standup_item['token'], channel_id, standup_item['message'])
+                    standup_item['sent'] = True
 
     for msg in other.data['messages']:
         if msg['channel_id'] == channel_id:
@@ -138,6 +140,7 @@ def channel_messages(token, channel_id, start):
             if msg['time_created'] <= curr_time:
                 messages.append(msg)
 
+    other.update_user_reacts(other.token_to_uid(token))
     messages = sorted(messages, key=itemgetter('time_created')) 
 
     if end >= len(messages):

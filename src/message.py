@@ -26,6 +26,8 @@ def message_send(token, channel_id, message):
     else:
         #new message_id will be the highest id + 1
         message_id = other.data['messages'][-1]['message_id'] + 1
+    
+    reacts = other.valid_reacts.copy()
 
     message_struct = {
         'message_id': message_id,
@@ -33,7 +35,7 @@ def message_send(token, channel_id, message):
         'u_id': other.token_to_uid(token),
         'message': message,
         'time_created': int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()),
-        'reacts': other.valid_reacts,
+        'reacts': reacts,
         'is_pinned': False
     }
 
@@ -145,6 +147,8 @@ def message_send_later(token, channel_id, message, time_sent):
     else:
         #new message_id will be the highest id + 1
         message_id = other.data['messages'][-1]['message_id'] + 1
+    
+    reacts = other.valid_reacts.copy()
 
     message_struct = {
         'message_id': message_id,
@@ -152,7 +156,7 @@ def message_send_later(token, channel_id, message, time_sent):
         'u_id': other.token_to_uid(token),
         'message': message,
         'time_created': time_sent,
-        'reacts': other.valid_reacts,
+        'reacts': reacts,
         'is_pinned': False
     }
 
@@ -171,12 +175,10 @@ def message_react(token, message_id, react_id):
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    msg = {}
-
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
             break
-    
+
     # Check that the user is a member of the channel in which the message was sent
     if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['all_members']:
         raise InputError('message_id is not a valid message within a channel that the authorised user has joined')
@@ -184,17 +186,17 @@ def message_react(token, message_id, react_id):
     # Check that the react is valid
     if all(react_id != react['react_id'] for react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
-    
-    if msg['reacts'][0]['is_this_user_reacted']:
-        print('test')
-        raise InputError('''Message with ID message_id already contains an active 
-                React with ID react_id from the authorised user''')
 
     for react in msg['reacts']:
         if react['react_id'] == react_id:
-            react['u_ids'].append(other.token_to_uid(token))
-            react['is_this_user_reacted'] = True
             break
+
+    if react['is_this_user_reacted']:
+        raise InputError('''Message with ID message_id already contains an active 
+                React with ID react_id from the authorised user''')
+
+    react['u_ids'].append(other.token_to_uid(token))
+    react['is_this_user_reacted'] = True
 
     return {}
 
@@ -207,8 +209,6 @@ def message_unreact(token, message_id, react_id):
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    msg = {}
-
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
             break
@@ -221,15 +221,16 @@ def message_unreact(token, message_id, react_id):
     if all(react_id != react['react_id'] for react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
 
-    if not msg['reacts'][0]['is_this_user_reacted']:
+    for react in msg['reacts']:
+        if react['react_id'] == react_id:
+            break
+
+    if not react['is_this_user_reacted']:
         raise InputError('''Message with ID message_id does not 
                 contain an active React with ID react_id''')
 
-    for react in msg['reacts']:
-        if react['react_id'] == react_id:
-            react['u_ids'].remove(other.token_to_uid(token))
-            react['is_this_user_reacted'] = False
-            break
+    react['u_ids'].remove(other.token_to_uid(token))
+    react['is_this_user_reacted'] = False
 
     return {}
 
@@ -243,8 +244,6 @@ def message_pin(token, message_id):
         raise AccessError('Invalid Token')
 
     msg_exist = False
-
-    msg = {}
 
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
@@ -280,8 +279,6 @@ def message_unpin(token, message_id):
         raise AccessError('Invalid Token')
 
     msg_exist = False
-
-    msg = {}
 
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
