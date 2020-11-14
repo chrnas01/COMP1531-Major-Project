@@ -121,12 +121,14 @@ def test_standup_start_multiple_standups():
             user1_handle_str = user['handle_str']
 
     assert target == {
+        'token': user1['token'],
         'channel_id': channel1['channel_id'],
         'time_finish': standup2['time_finish'],
         'is_active': False,
         'message': [user1_handle_str + ': ' + 'This is' + '\n',
                     user1_handle_str + ': ' + 'standup number 2' + '\n'
-                   ]
+                   ],
+        'sent': False
     }
 
 def test_standup_start_successful():

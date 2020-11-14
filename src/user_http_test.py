@@ -456,3 +456,89 @@ def test_all_users(url):
         'handle_str': 'jaydenleung',
         'profile_img_url': ''}]       
     }
+
+def test_user_delete_invalid_user(url):
+    '''
+    Deleting a user that doesn't exist
+    '''
+    requests.delete(url + 'clear')
+
+    # Setup users
+    user_payload = {
+        'email': 'jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung'
+    }
+    user_1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    resp = requests.delete(url + 'admin/user/remove', json={'token': user_1['token'], 'u_id': 99}).json()
+
+    assert 'code' in resp
+    assert resp['code'] == 400
+
+def test_user_delete_invalid_perms(url):
+    '''
+    Deleting a user when you are not the flockr owner
+    '''
+    requests.delete(url + 'clear')
+
+    # Setup users
+    user_payload = {
+        'email': 'jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung'
+    }
+    user_1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    user_payload = {
+        'email': 'Steven@gmail.com',
+        'password': 'password',
+        'name_first': 'Steven',
+        'name_last': 'Luong'
+    }
+    user_2 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    resp = requests.delete(url + 'admin/user/remove', json={'token': user_2['token'], 'u_id': user_1['u_id']}).json()
+
+    assert 'code' in resp
+    assert resp['code'] == 400
+
+def test_user_delete_success(url):
+    '''
+    Deleting a user
+    '''
+    requests.delete(url + 'clear')
+
+    # Setup users
+    user_payload = {
+        'email': 'jayden@gmail.com',
+        'password': 'password',
+        'name_first': 'Jayden',
+        'name_last': 'Leung'
+    }
+    user_1 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    user_payload = {
+        'email': 'Steven@gmail.com',
+        'password': 'password',
+        'name_first': 'Steven',
+        'name_last': 'Luong'
+    }
+    user_2 = requests.post(url + 'auth/register', json=user_payload).json()
+
+    requests.delete(url + 'admin/user/remove', json={'token': user_1['token'], 'u_id': user_2['u_id']})
+
+    resp = requests.get(url + 'users/all', params={'token': user_1['token']}).json()
+
+    assert resp == {'users': [
+        {
+            'u_id': 1,
+            'email': 'jayden@gmail.com',
+            'name_first': 'Jayden',
+            'name_last': 'Leung',
+            'handle_str': 'jaydenleung',
+            'profile_img_url': '',
+        },
+    ]}

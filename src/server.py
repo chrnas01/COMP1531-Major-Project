@@ -249,6 +249,14 @@ def users_all():
     token = request.args.get('token')
     return dumps(other.users_all(token))
 
+@APP.route('/admin/user/remove', methods=['DELETE'])
+def user_delete():
+    '''
+    Given a User by their user ID, remove the user from the slackr.
+    '''
+    data = request.get_json()
+    return dumps(user.user_delete(data['token'], data['u_id']))
+
 @APP.route('/message/send', methods=['POST'])
 def http_message_send():
     data = request.get_json()

@@ -122,3 +122,25 @@ def user_profile_sethandle(token, handle_str):
 
     return {
     }
+
+def user_delete(token, u_id):
+    '''
+    Given a User by their user ID, remove the user from the slackr.
+    '''
+    #token is invalid
+    if other.token_to_uid(token) == -1:
+        raise AccessError('Invalid Token')
+    
+    #user does not exist
+    if all(u_id != user['u_id'] for user in other.data['users']):
+        raise InputError('u_id does not refer to a valid user')
+
+    if not other.check_if_flockr_owner(other.token_to_uid(token)):
+        raise AccessError('The authorised user is not an owner of the slackr')
+
+    for user in other.data['users']:
+        if user['u_id'] == u_id:
+            other.data['users'].remove(user)
+            break
+
+    return {}

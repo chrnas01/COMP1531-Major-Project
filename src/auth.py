@@ -86,7 +86,11 @@ def auth_register(email, password, name_first, name_last):
     password = other.password_encrypt(password)
     
     # register
-    u_id = len(other.data['users']) + 1 # first person u_id 1, second 2,...
+    if not other.data['users']:
+        u_id = 1
+    else:
+        u_id = other.data['users'][-1]['u_id'] + 1 # first person u_id 1, second 2,...
+
     token = other.encrypt_token(u_id).decode("utf-8")
 
     # concatenate
