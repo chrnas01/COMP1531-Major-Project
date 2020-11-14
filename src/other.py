@@ -18,11 +18,23 @@ data = {
 }
 
 # Only copy do not directly modify
-valid_reacts = [{
+valid_reacts = [
+    {
     'react_id': 1,
     'u_ids': [],
     'is_this_user_reacted': False
-}]
+    },
+    {
+    'react_id': 2,
+    'u_ids': [],
+    'is_this_user_reacted': False
+    },
+    {
+    'react_id': 3,
+    'u_ids': [],
+    'is_this_user_reacted': False
+    }
+]
 
 def clear():
     '''

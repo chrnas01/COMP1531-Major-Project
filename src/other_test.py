@@ -97,11 +97,22 @@ def test_search(setup):
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             },
             {
@@ -110,11 +121,22 @@ def test_search(setup):
                 'u_id': other.token_to_uid(user_2['token']),
                 'message': 'test2',
                 'time_created': result['messages'][1]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
@@ -142,11 +164,22 @@ def test_search_other_channel(setup):
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             },
             {
@@ -155,11 +188,22 @@ def test_search_other_channel(setup):
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'Hello',
                 'time_created': result['messages'][1]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
