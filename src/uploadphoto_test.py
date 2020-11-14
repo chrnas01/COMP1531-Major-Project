@@ -37,7 +37,7 @@ def test_user_profile_uploadphoto_bad_url(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_invalid_x_start_small(url):
@@ -72,7 +72,7 @@ def test_user_profile_uploadphoto_invalid_x_start_small(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_invalid_x_start_big(url):
@@ -106,7 +106,7 @@ def test_user_profile_uploadphoto_invalid_x_start_big(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_invalid_y_start_small(url):
@@ -140,7 +140,7 @@ def test_user_profile_uploadphoto_invalid_y_start_small(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_invalid_y_start_big(url):
@@ -174,7 +174,7 @@ def test_user_profile_uploadphoto_invalid_y_start_big(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_invalid_x_end_small(url):
@@ -208,7 +208,7 @@ def test_user_profile_uploadphoto_invalid_x_end_small(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_invalid_x_end_big(url):
@@ -242,7 +242,7 @@ def test_user_profile_uploadphoto_invalid_x_end_big(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_invalid_y_end_small(url):
@@ -276,7 +276,7 @@ def test_user_profile_uploadphoto_invalid_y_end_small(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_not_JPG(url):
@@ -310,7 +310,7 @@ def test_user_profile_uploadphoto_not_JPG(url):
         'u_id': user_1['u_id'],
     }
     resp = requests.get(url + 'user/profile', params=payload).json()
-    assert resp['user']['profile_img_url'] == None
+    assert resp['user']['profile_img_url'] == ''
 
 
 def test_user_profile_uploadphoto_success(url):
