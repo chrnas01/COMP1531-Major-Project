@@ -237,6 +237,50 @@ def test_all_users():
 
 ########################################################
 
+def test_user_delete_invalid_user():
+    '''
+    Deleting a user that doesn't exist
+    '''
+    other.clear()
+    user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung')
+
+    with pytest.raises(InputError):
+        user.user_delete(user_1['token'], 99)
+
+def test_user_delete_invalid_perms():
+    '''
+    Deleting a user when you are not the flockr owner
+    '''
+    other.clear()
+    user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung')
+    user_2 = auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong')
+
+    with pytest.raises(AccessError):
+        user.user_delete(user_2['token'], user_1['u_id'])
+
+def test_user_delete_success():
+    '''
+    Deleting a user
+    '''
+    other.clear()
+    user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung')
+    user_2 = auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong')
+
+    user.user_delete(user_1['token'], user_2['u_id'])
+
+    assert other.users_all(user_1['token']) == {'users': [
+        {
+            'u_id': 1,
+            'email': 'jayden@gmail.com',
+            'name_first': 'Jayden',
+            'name_last': 'Leung',
+            'handle_str': 'jaydenleung',
+            'profile_img_url': '',
+        },
+    ]}
+
+########################################################
+
 def test_invalid_token():
     '''
     Checking that the invalid token checks are working
