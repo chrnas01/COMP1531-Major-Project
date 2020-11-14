@@ -30,6 +30,7 @@ def standup_start(token, channel_id, length):
     current_time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
 
     other.data['standup'].append({
+        'token': token,
         'channel_id': channel_id,
         'time_finish': current_time + length,
         'is_active': True,
