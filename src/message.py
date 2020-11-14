@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import time
 from error import InputError, AccessError
 import other
+import copy
 import channels
 import auth
 
@@ -26,8 +27,8 @@ def message_send(token, channel_id, message):
     else:
         #new message_id will be the highest id + 1
         message_id = other.data['messages'][-1]['message_id'] + 1
-    
-    reacts = other.valid_reacts.copy()
+
+    reacts = copy.deepcopy(other.valid_reacts)
 
     message_struct = {
         'message_id': message_id,
@@ -148,7 +149,7 @@ def message_send_later(token, channel_id, message, time_sent):
         #new message_id will be the highest id + 1
         message_id = other.data['messages'][-1]['message_id'] + 1
     
-    reacts = other.valid_reacts.copy()
+    reacts = copy.deepcopy(other.valid_reacts)
 
     message_struct = {
         'message_id': message_id,
@@ -184,7 +185,7 @@ def message_react(token, message_id, react_id):
         raise InputError('message_id is not a valid message within a channel that the authorised user has joined')
 
     # Check that the react is valid
-    if all(react_id != react['react_id'] for react in other.valid_reacts):
+    if all(react_id != temp_react['react_id'] for temp_react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
 
     for react in msg['reacts']:
@@ -218,7 +219,7 @@ def message_unreact(token, message_id, react_id):
         raise InputError('message_id is not a valid message within a channel that the authorised user has joined')
 
     # Check that the react is valid
-    if all(react_id != react['react_id'] for react in other.valid_reacts):
+    if all(react_id != temp_react['react_id'] for temp_react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
 
     for react in msg['reacts']:
