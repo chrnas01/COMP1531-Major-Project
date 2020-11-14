@@ -9,8 +9,8 @@ import channels
 import channel
 from datetime import datetime, timezone
 from error import InputError, AccessError
- 
- 
+
+
 @pytest.fixture
 def setup():
     '''
@@ -18,72 +18,79 @@ def setup():
     '''
     # Clear database
     other.clear()
- 
+
     # Setup users
-    user_1 = auth.auth_register('jayden@gmail.com', 'password', 'Jayden', 'Leung')  # Flockr Owner
-    user_2 = auth.auth_register('Steven@gmail.com', 'password', 'Steven', 'Luong')
+    user_1 = auth.auth_register(
+        'jayden@gmail.com', 'password', 'Jayden', 'Leung')  # Flockr Owner
+    user_2 = auth.auth_register(
+        'Steven@gmail.com', 'password', 'Steven', 'Luong')
     user_3 = auth.auth_register('sam@gmail.com', 'password', 'Sam', 'He')
- 
+
     return (user_1, user_2, user_3)
- 
+
 ################################################################################
- 
- 
+
+
 def test_admin_userpermission_change_invalid_uid(setup):
     '''
     Changing user permission of u_id that does not exist
     '''
     # Setup pytest
     user_1, _, _ = setup
- 
+
     with pytest.raises(InputError):
         assert other.admin_userpermission_change(user_1['token'], 99, 1)
- 
- 
+
+
 def test_admin_userpermission_change_invalid_permission_id(setup):
     '''
     Changing user permission with wrong permission_id
     '''
     # Setup pytest
     user_1, user_2, _ = setup
- 
+
     with pytest.raises(InputError):
-        assert other.admin_userpermission_change(user_1['token'], user_2['u_id'], 0)
- 
- 
+        assert other.admin_userpermission_change(
+            user_1['token'], user_2['u_id'], 0)
+
+
 def test_admin_userpermission_change_unauthorised_user(setup):
     '''
     Changing user permission with wrong unauthorised user
     '''
     # Setup pytest
     _, user_2, user_3 = setup
- 
+
     with pytest.raises(AccessError):
-        assert other.admin_userpermission_change(user_2['token'], user_3['u_id'], 1)
- 
- 
+        assert other.admin_userpermission_change(
+            user_2['token'], user_3['u_id'], 1)
+
+
 def test_admin_userpermission_change_success(setup):
     '''
     Successful admin user permission change
     '''
     # Setup pytest
     user_1, user_2, _ = setup
- 
+
     other.admin_userpermission_change(user_1['token'], user_2['u_id'], 1)
- 
+
     assert other.get_user_permission(user_2['u_id']) == 1
- 
+
 ################################################################################
- 
+
+
 def test_search(setup):
     '''
     searching in a channel
     '''
     user_1, user_2, _ = setup
- 
-    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
-    channel.channel_invite(user_1['token'], channel_data['channel_id'], user_2['u_id'])
- 
+
+    channel_data = channels.channels_create(
+        user_1['token'], 'test channel', False)
+    channel.channel_invite(
+        user_1['token'], channel_data['channel_id'], user_2['u_id'])
+
     message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
     message.message_send(user_1['token'], channel_data['channel_id'], 'test')
     message.message_send(user_1['token'], channel_data['channel_id'], 'Hello')
@@ -97,11 +104,22 @@ def test_search(setup):
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             },
             {
@@ -110,25 +128,39 @@ def test_search(setup):
                 'u_id': other.token_to_uid(user_2['token']),
                 'message': 'test2',
                 'time_created': result['messages'][1]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
     }
- 
+
+
 def test_search_other_channel(setup):
     '''
     searching in a separate channel
     '''
     user_1, user_2, _ = setup
- 
-    channel_data = channels.channels_create(user_1['token'], 'test channel', False)
-    channel_data2 = channels.channels_create(user_2['token'], 'test channel2', False)
- 
+
+    channel_data = channels.channels_create(
+        user_1['token'], 'test channel', False)
+    channel_data2 = channels.channels_create(
+        user_2['token'], 'test channel2', False)
+
     message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
     message.message_send(user_1['token'], channel_data['channel_id'], 'test')
     message.message_send(user_1['token'], channel_data['channel_id'], 'Hello')
@@ -142,11 +174,22 @@ def test_search_other_channel(setup):
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'test',
                 'time_created': result['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             },
             {
@@ -155,17 +198,29 @@ def test_search_other_channel(setup):
                 'u_id': other.token_to_uid(user_1['token']),
                 'message': 'Hello',
                 'time_created': result['messages'][1]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
     }
 
 ################################################################################
+
 
 def test_invalid_token(setup):
     '''
@@ -175,14 +230,39 @@ def test_invalid_token(setup):
     # Setup pytest
     user_1, user_2, _ = setup
 
-    channel_data = channels.channels_create(user_1['token'], 'test channel', True)
+    channel_data = channels.channels_create(
+        user_1['token'], 'test channel', True)
     message.message_send(user_1['token'], channel_data['channel_id'], 'msg')
 
     with pytest.raises(AccessError):
         assert other.users_all('invalid-token')
-    
+
     with pytest.raises(AccessError):
-        assert other.admin_userpermission_change('invalid-token', user_2['u_id'], 1)
-    
+        assert other.admin_userpermission_change(
+            'invalid-token', user_2['u_id'], 1)
+
     with pytest.raises(AccessError):
         assert other.search('invalid-token', 'a')
+
+
+def test_extra_email_send_invalid_email(setup):
+    '''
+    Extra feature of sending email through text
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    with pytest.raises(InputError):
+        other.email_send(
+            user_1['token'], 'notanemail', "Did it work?")
+
+
+def test_extra_email_send_valid_email(setup):
+    '''
+    Extra feature of sending email through text
+    '''
+    # Setup pytest
+    user_1, _, _ = setup
+
+    assert other.email_send(
+        user_1['token'], 'comp1531dummyemailingbot@gmail.com', "Did it work?") == {}

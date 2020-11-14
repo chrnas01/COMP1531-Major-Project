@@ -131,11 +131,22 @@ def test_message_send_success(url, setup):
                 'u_id': user_1['u_id'],
                 'message': 'test',
                 'time_created': resp['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
@@ -402,11 +413,22 @@ def test_message_edit_success(url, setup):
                 'u_id': user_1['u_id'],
                 'message': 'edit',
                 'time_created': resp['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
@@ -555,11 +577,22 @@ def test_send_later_valid(url, setup):
                 'u_id': user_1['u_id'],
                 'message': 'test',
                 'time_created': time,
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
@@ -703,11 +736,22 @@ def test_react_valid(url, setup):
                 'u_id': user_1['u_id'],
                 'message': 'test',
                 'time_created': resp['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [user_1['u_id']],
-                    'is_this_user_reacted': True
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [1],
+                        'is_this_user_reacted': True
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
@@ -851,11 +895,22 @@ def test_unreact_valid(url, setup):
                 'u_id': user_1['u_id'],
                 'message': 'test',
                 'time_created': resp['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
@@ -1032,11 +1087,22 @@ def test_pin_valid(url, setup):
                 'u_id': user_1['u_id'],
                 'message': 'test',
                 'time_created': resp['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': True
             }
         ]
@@ -1220,11 +1286,22 @@ def test_unpin_valid(url, setup):
                 'u_id': user_1['u_id'],
                 'message': 'test',
                 'time_created': resp['messages'][0]['time_created'],
-                'reacts': [{
-                    'react_id': 1,
-                    'u_ids': [],
-                    'is_this_user_reacted': False
-                }],
+                'reacts': [
+                    {
+                        'react_id': 1,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    },
+                    {
+                        'react_id': 2,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                        },
+                    {
+                        'react_id': 3,
+                        'u_ids': [],
+                        'is_this_user_reacted': False
+                    }],
                 'is_pinned': False
             }
         ]
