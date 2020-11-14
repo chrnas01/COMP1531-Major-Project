@@ -27,13 +27,15 @@ def standup_start(token, channel_id, length):
     if standup_active(token, channel_id)['is_active']:
         raise InputError('An active standup is currently running in this channel')
 
-    current_time = int(datetime.now().replace(tzinfo=timezone.utc).timestamp())
+    current_time = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
 
     other.data['standup'].append({
+        'token': token,
         'channel_id': channel_id,
         'time_finish': current_time + length,
         'is_active': True,
-        'message': []
+        'message': [],
+        'sent': False
     })
 
     # Removes Completed Standup
@@ -78,7 +80,7 @@ def standup_active(token, channel_id):
         }
 
     # Testing if standup period is still in progress
-    if int(datetime.now().replace(tzinfo=timezone.utc).timestamp()) >= standup['time_finish']:
+    if int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) >= standup['time_finish']:
         standup['is_active'] = False
 
     return {

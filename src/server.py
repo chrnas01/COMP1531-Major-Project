@@ -11,7 +11,6 @@ import other
 import user
 import message
 import standup
-import urllib.request
 import os
 import random
 import requests
@@ -337,7 +336,9 @@ def uploadphoto():
     full_file_location = os.path.join(os.path.dirname(__file__) + '/imgurl/', file_name + file_extension)
 
     try:
-        urllib.request.urlretrieve(url, full_file_location)
+        r = requests.get(url)
+        with open(full_file_location, 'wb') as f:
+            f.write(r.content)
     except:
         raise InputError('img_url returns an HTTP status other than 200')
                 

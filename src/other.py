@@ -17,6 +17,7 @@ data = {
     'reset_codes': []
 }
 
+# Only copy do not directly modify
 valid_reacts = [{
     'react_id': 1,
     'u_ids': [],
