@@ -2,8 +2,8 @@
 tests for standup.py
 '''
 
-import pytest
 import time
+import pytest
 import auth
 import channel
 import channels
@@ -76,7 +76,7 @@ def test_standup_start_already_acive2():
 
 def test_standup_start_multiple_standups():
     '''
-    Running two subseqent standups 
+    Running two subseqent standups
     '''
     other.clear()
 
@@ -87,8 +87,8 @@ def test_standup_start_multiple_standups():
 
     # Creating standup
     standup.standup_start(user1['token'], channel1['channel_id'], 1)
-    
-    # Interacting in inital standup 
+
+    # Interacting in inital standup
     standup.standup_send(user1['token'], channel1['channel_id'], 'Talking')
     standup.standup_send(user1['token'], channel1['channel_id'], 'in')
     standup.standup_send(user1['token'], channel1['channel_id'], 'First')
@@ -100,32 +100,34 @@ def test_standup_start_multiple_standups():
     # Starting second standup
     standup2 = standup.standup_start(user1['token'], channel1['channel_id'], 1)
 
-    # Interacting with second standup 
+    # Interacting with second standup
     standup.standup_send(user1['token'], channel1['channel_id'], 'This is')
     standup.standup_send(user1['token'], channel1['channel_id'], 'standup number 2')
 
     # Allowing Standup 2 to finish
     time.sleep(1)
-    
-    # Updating standup status 
+
+    # Updating standup status
     standup.standup_active(user1['token'], channel1['channel_id'])
-    
+
     target = {}
     for target in other.data['standup']:
         if  channel1['channel_id'] == target['channel_id']:
             break
-    
+
     user = {}
     for user in other.data['users']:
         if user['token'] == user1['token']:
             user1_handle_str = user['handle_str']
-    
+
     assert target == {
-                     'channel_id': channel1['channel_id'],
-                     'time_finish': standup2['time_finish'],
-                     'is_active': False,
-                     'message': [user1_handle_str + ': ' + 'This is' + '\n', user1_handle_str + ': ' + 'standup number 2' + '\n']
-                     }
+        'channel_id': channel1['channel_id'],
+        'time_finish': standup2['time_finish'],
+        'is_active': False,
+        'message': [user1_handle_str + ': ' + 'This is' + '\n',
+                    user1_handle_str + ': ' + 'standup number 2' + '\n'
+                   ]
+    }
 
 def test_standup_start_successful():
     '''
