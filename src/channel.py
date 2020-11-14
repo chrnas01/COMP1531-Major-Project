@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from error import InputError, AccessError
 from operator import itemgetter
 import message
+import standup
 import other
 
 def channel_invite(token, channel_id, u_id):
@@ -128,7 +129,8 @@ def channel_messages(token, channel_id, start):
     #sends the standup message
     for standup in other.data['standup']:
         if standup['channel_id'] == channel_id:
-            message.message_send_later(standup['token'], channel_id, standup['message'], standup['time_finish'])
+            if not standup.standup_active(token, channel_id):
+                message.message_send_later(standup['token'], channel_id, standup['message'], standup['time_finish'])
 
     for msg in other.data['messages']:
         if msg['channel_id'] == channel_id:
