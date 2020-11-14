@@ -435,10 +435,10 @@ def send_img(filename):
 @APP.route('/email/send', methods=['POST'])
 def http_email_send():
     data = request.get_json()
-    return dumps(other.email_send(data['token'], data['email'], data['message']))
+    return dumps(other.email_send(data['token'], data['email'], data['msg']))
 
 
 if __name__ == "__main__":
 
-    APP.run(port=0)  # Do not edit this port
-    # APP.run(port=5100, debug=True)
+    # APP.run(port=0)  # Do not edit this port
+    APP.run(port=5100, debug=True)

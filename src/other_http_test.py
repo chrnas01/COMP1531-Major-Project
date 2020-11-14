@@ -367,7 +367,7 @@ def test_http_extra_email_send_invalid_email(url, setup):
     payload = {
         'token': user_1.json()['token'],
         'email': 'notanemail',
-        'message': "Did it work?"
+        'msg': "Did it work?"
     }
     resp = requests.post(url + 'email/send', json=payload)
     assert "code" in resp.json()
@@ -384,7 +384,7 @@ def test_http_extra_email_send_valid_email(url, setup):
     payload = {
         'token': user_1.json()['token'],
         'email': 'comp1531dummyemailingbot@gmail.com',
-        'message': "Did it work?"
+        'msg': "Did it work?"
     }
     resp = requests.post(url + 'email/send', json=payload).json()
     assert resp == {}
