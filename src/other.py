@@ -1,12 +1,17 @@
 '''
 Contains miscellaneous functions
 '''
+from flask_mail import Mail, Message
+import re
 import auth
 import channels
 import jwt
 import hashlib
 from error import InputError, AccessError
 import channels
+import smtplib
+import os
+from server import APP
 
 
 data = {
@@ -20,21 +25,22 @@ data = {
 # Only copy do not directly modify
 valid_reacts = [
     {
-    'react_id': 1,
-    'u_ids': [],
-    'is_this_user_reacted': False
+        'react_id': 1,
+        'u_ids': [],
+        'is_this_user_reacted': False
     },
     {
-    'react_id': 2,
-    'u_ids': [],
-    'is_this_user_reacted': False
+        'react_id': 2,
+        'u_ids': [],
+        'is_this_user_reacted': False
     },
     {
-    'react_id': 3,
-    'u_ids': [],
-    'is_this_user_reacted': False
+        'react_id': 3,
+        'u_ids': [],
+        'is_this_user_reacted': False
     }
 ]
+
 
 def clear():
     '''
@@ -205,6 +211,7 @@ def is_successful_in_change_permissions(user_1, user_2):
                 successful = True
     return {'successful': successful}
 
+
 def get_user_permission(u_id):
     '''
     Helper function to get user permission
@@ -216,11 +223,13 @@ def get_user_permission(u_id):
 
     return perm
 
+
 def get_first_reset_codes():
     '''
     Blackbox testing other functions
     '''
     return data['reset_codes'][0]['code']
+
 
 def update_user_reacts(u_id):
     '''
@@ -232,6 +241,7 @@ def update_user_reacts(u_id):
                 react['is_this_user_reacted'] = True
             else:
                 react['is_this_user_reacted'] = False
+
 
 def get_messages():
     '''
@@ -245,3 +255,38 @@ def get_messages():
     return {
         'messages': messages
     }
+
+
+def email_send(token, email, message):
+    '''
+    Send email extra feature
+    '''
+    regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
+    if not re.search(regex, email):
+        raise InputError('Invalid email!')
+
+    mail_settings = {
+        "MAIL_SERVER": 'smtp.gmail.com',
+        "MAIL_PORT": 465,
+        "MAIL_USE_TLS": False,
+        "MAIL_USE_SSL": True,
+        "MAIL_USERNAME": "comp1531dummyemailingbot@gmail.com",
+        "MAIL_PASSWORD": "COMP1531Rules"
+    }
+
+    APP.config.update(mail_settings)
+    mail = Mail(APP)
+    for user in data['users']:
+        if token_to_uid(token) == user['u_id']:
+            name = f"{user['name_first']} {user['name_last']}"
+            break
+
+    with APP.app_context():
+        msg = Message(
+            subject=f"Flockr Message from {name}",
+            sender=APP.config.get("MAIL_USERNAME"),
+            recipients=[email],
+            body=f"On Flockr, {name} sent:\n {message} \n\n Regards, Flockr team \n\n Do not reply to this email."
+        )
+        mail.send(msg)
+    return {}
