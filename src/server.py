@@ -294,7 +294,7 @@ def user_delete():
     Given a User by their user ID, remove the user from the slackr.
     '''
     data = request.get_json()
-    return dumps(user.user_delete(data['token'], data['u_id']))
+    return dumps(user.user_delete(data['token'], int(data['u_id'])))
 
 
 @APP.route('/message/send', methods=['POST'])
@@ -318,7 +318,7 @@ def http_message_edit():
 @APP.route('/standup/start', methods=['POST'])
 def http_standup_start():
     data = request.get_json()
-    return dumps(standup.standup_start(data['token'], data['channel_id'], data['length']))
+    return dumps(standup.standup_start(data['token'], int(data['channel_id']), int(data['length'])))
 
 
 @APP.route('/standup/active', methods=['GET'])
@@ -331,37 +331,37 @@ def http_standup_active():
 @APP.route('/standup/send', methods=['POST'])
 def http_standup_send():
     data = request.get_json()
-    return dumps(standup.standup_send(data['token'], data['channel_id'], data['message']))
+    return dumps(standup.standup_send(data['token'], int(data['channel_id']), data['message']))
 
 
 @APP.route('/message/sendlater', methods=['POST'])
 def http_message_send_later():
     data = request.get_json()
-    return dumps(message.message_send_later(data['token'], int(data['channel_id']), data['message'], data['time_sent']))
+    return dumps(message.message_send_later(data['token'], int(data['channel_id']), data['message'], int(data['time_sent'])))
 
 
 @APP.route('/message/react', methods=['POST'])
 def http_message_react():
     data = request.get_json()
-    return dumps(message.message_react(data['token'], data['message_id'], data['react_id']))
+    return dumps(message.message_react(data['token'], int(data['message_id']), int(data['react_id'])))
 
 
 @APP.route('/message/unreact', methods=['POST'])
 def http_message_unreact():
     data = request.get_json()
-    return dumps(message.message_unreact(data['token'], data['message_id'], data['react_id']))
+    return dumps(message.message_unreact(data['token'], int(data['message_id']), int(data['react_id'])))
 
 
 @APP.route('/message/pin', methods=['POST'])
 def http_message_pin():
     data = request.get_json()
-    return dumps(message.message_pin(data['token'], data['message_id']))
+    return dumps(message.message_pin(data['token'], int(data['message_id'])))
 
 
 @APP.route('/message/unpin', methods=['POST'])
 def http_message_unpin():
     data = request.get_json()
-    return dumps(message.message_unpin(data['token'], data['message_id']))
+    return dumps(message.message_unpin(data['token'], int(data['message_id'])))
 
 
 @APP.route('/user/profile/uploadphoto', methods=['POST'])
