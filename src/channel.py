@@ -110,7 +110,7 @@ def channel_messages(token, channel_id, start):
         raise AccessError('Invalid Token')
 
     # Check for channel_id exists
-    if channel_id > len(other.data['channels']):
+    if all(channel_id != channel_temp['channel_id'] for channel_temp in other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
 
     #Check that the start is within the number of messages
@@ -163,7 +163,7 @@ def channel_leave(token, channel_id):
         raise AccessError('Invalid Token')
 
     # Check for channel_id exists
-    if channel_id > len(other.data['channels']):
+    if all(channel_id != channel_temp['channel_id'] for channel_temp in other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
 
     # Check that the user is a member of the channel
@@ -187,7 +187,7 @@ def channel_join(token, channel_id):
         raise AccessError('Invalid Token')
 
     # Check for channel_id exists
-    if channel_id > len(other.data['channels']):
+    if all(channel_id != channel_temp['channel_id'] for channel_temp in other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
 
     # for not global owner(flockr owner)
@@ -214,7 +214,7 @@ def channel_addowner(token, channel_id, u_id):
         raise AccessError('Invalid Token')
 
     # Check for channel_id exists
-    if channel_id > len(other.data['channels']):
+    if all(channel_id != channel_temp['channel_id'] for channel_temp in other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
 
     # Check if user exists
@@ -250,7 +250,7 @@ def channel_removeowner(token, channel_id, u_id):
         raise AccessError('Invalid Token')
 
     # Check for channel_id exists
-    if channel_id > len(other.data['channels']):
+    if all(channel_id != channel_temp['channel_id'] for channel_temp in other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
 
     # Check if user exists

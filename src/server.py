@@ -16,6 +16,9 @@ import random
 import requests
 import string
 from PIL import Image
+import smtplib
+import os
+from flask_mail import Mail, Message
 
 
 def defaultHandler(err):
@@ -435,10 +438,41 @@ def send_img(filename):
 @APP.route('/email/send', methods=['POST'])
 def http_email_send():
     data = request.get_json()
-    return dumps(other.email_send(data['token'], data['email'], data['msg']))
+    return dumps(email_send(data['token'], data['email'], data['msg']))
 
+def email_send(token, email, message):
+    '''
+    Send email extra feature
+    '''
+    regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
+    if not re.search(regex, email):
+        raise InputError('Invalid email!')
+
+    mail_settings = {
+        "MAIL_SERVER": 'smtp.gmail.com',
+        "MAIL_PORT": 465,
+        "MAIL_USE_TLS": False,
+        "MAIL_USE_SSL": True,
+        "MAIL_USERNAME": "comp1531dummyemailingbot@gmail.com",
+        "MAIL_PASSWORD": "COMP1531Rules"
+    }
+
+    APP.config.update(mail_settings)
+    mail = Mail(APP)
+    for user in other.data['users']:
+        if other.token_to_uid(token) == user['u_id']:
+            name = f"{user['name_first']} {user['name_last']}"
+            break
+
+    with APP.app_context():
+        msg = Message(
+            subject=f"Flockr Message from {name}",
+            sender=APP.config.get("MAIL_USERNAME"),
+            recipients=[email],
+            body=f"On Flockr, {name} sent:\n {message} \n\n Regards, Flockr team \n\n Do not reply to this email."
+        )
+        mail.send(msg)
+    return {}
 
 if __name__ == "__main__":
-
-    #APP.run(port=0)  # Do not edit this port
-    APP.run(port=5100)
+    APP.run(port=5000)

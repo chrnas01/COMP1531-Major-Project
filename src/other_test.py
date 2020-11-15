@@ -7,6 +7,7 @@ import auth
 import message
 import channels
 import channel
+import server
 from datetime import datetime, timezone
 from error import InputError, AccessError
 
@@ -253,7 +254,7 @@ def test_extra_email_send_invalid_email(setup):
     user_1, _, _ = setup
 
     with pytest.raises(InputError):
-        other.email_send(
+        server.email_send(
             user_1['token'], 'notanemail', "Did it work?")
 
 
@@ -264,5 +265,5 @@ def test_extra_email_send_valid_email(setup):
     # Setup pytest
     user_1, _, _ = setup
 
-    assert other.email_send(
+    assert server.email_send(
         user_1['token'], 'comp1531dummyemailingbot@gmail.com', "Did it work?") == {}

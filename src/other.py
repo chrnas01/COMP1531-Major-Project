@@ -1,7 +1,6 @@
 '''
 Contains miscellaneous functions
 '''
-from flask_mail import Mail, Message
 import re
 import auth
 import channels
@@ -9,9 +8,6 @@ import jwt
 import hashlib
 from error import InputError, AccessError
 import channels
-import smtplib
-import os
-from server import APP
 
 
 data = {
@@ -255,38 +251,3 @@ def get_messages():
     return {
         'messages': messages
     }
-
-
-def email_send(token, email, message):
-    '''
-    Send email extra feature
-    '''
-    regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
-    if not re.search(regex, email):
-        raise InputError('Invalid email!')
-
-    mail_settings = {
-        "MAIL_SERVER": 'smtp.gmail.com',
-        "MAIL_PORT": 465,
-        "MAIL_USE_TLS": False,
-        "MAIL_USE_SSL": True,
-        "MAIL_USERNAME": "comp1531dummyemailingbot@gmail.com",
-        "MAIL_PASSWORD": "COMP1531Rules"
-    }
-
-    APP.config.update(mail_settings)
-    mail = Mail(APP)
-    for user in data['users']:
-        if token_to_uid(token) == user['u_id']:
-            name = f"{user['name_first']} {user['name_last']}"
-            break
-
-    with APP.app_context():
-        msg = Message(
-            subject=f"Flockr Message from {name}",
-            sender=APP.config.get("MAIL_USERNAME"),
-            recipients=[email],
-            body=f"On Flockr, {name} sent:\n {message} \n\n Regards, Flockr team \n\n Do not reply to this email."
-        )
-        mail.send(msg)
-    return {}

@@ -127,8 +127,8 @@ def message_send_later(token, channel_id, message, time_sent):
         raise AccessError('Invalid Token')
 
     # Check for channel_id exists
-    if channel_id > len(other.data['channels']):
-        raise InputError('channel_id does not refer to a valid channel')
+    if all(channel_id != channel_temp['channel_id'] for channel_temp in other.data['channels']):
+        raise InputError('Channel ID is not a valid channel')
 
     # Check that the message is within the character limit
     if len(message) > 1000:
