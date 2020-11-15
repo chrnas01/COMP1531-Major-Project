@@ -200,18 +200,6 @@ def get_user_handle_strs():
     return ret
 
 
-def is_successful_in_change_permissions(user_1, user_2):
-    '''
-    Helper function to check that permissions were changed
-    '''
-    successful = False
-    for user in data['users']:
-        if user['u_id'] == user_2['u_id']:
-            if user['permission_id'] == 1:
-                successful = True
-    return {'successful': successful}
-
-
 def get_user_permission(u_id):
     '''
     Helper function to get user permission

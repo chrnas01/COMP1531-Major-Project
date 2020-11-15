@@ -100,31 +100,6 @@ def test_admin_userpermission_change_unauthorised_user(url, setup):
     assert "code" in resp.json()
     assert resp.json()['code'] == 400
 
-
-def test_admin_userpermission_change_success(url, setup):
-    '''
-    Successful admin user permission change
-    '''
-    # Setup pytest
-    user_1, user_2, _ = setup
-
-    # Test that {} was returned (Not an error)
-    payload = {
-        'token': user_1.json()['token'],
-        'u_id': user_2.json()['u_id'],
-        'permission_id': 1
-    }
-    resp = requests.post(url + 'admin/userpermission/change', json=payload)
-    assert json.loads(resp.text) == {}
-
-    # Test that user permission was changed
-    payload = {
-        'user_1': user_1.json(),
-        'user_2': user_2.json()
-    }
-    resp = requests.post(url + 'other/successful/permissions', json=payload)
-    assert json.loads(resp.text) == {'successful': True}
-
 ################################################################################
 
 

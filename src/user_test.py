@@ -237,6 +237,15 @@ def test_all_users():
 
 ########################################################
 
+def test_user_delete_invalid_token():
+    '''
+    Deleting a user that doesn't exist
+    '''
+    other.clear()
+
+    with pytest.raises(AccessError):
+        user.user_delete('not a token', 1)
+
 def test_user_delete_invalid_user():
     '''
     Deleting a user that doesn't exist

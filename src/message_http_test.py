@@ -120,8 +120,14 @@ def test_message_send_success(url, setup):
         'channel_id': channel_data['channel_id'],
         'start': 0
     }
-
     resp = requests.get(url + 'other/get_messages', params=payload).json()
+
+    payload = {
+        'token': user_1['token'],
+        'channel_id': channel_data['channel_id'],
+        'length': 60
+    }
+    requests.post(url + 'standup/start', json=payload).json()
 
     expected_result = {
         'messages': [

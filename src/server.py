@@ -159,15 +159,6 @@ def admin_userpermission_change():
     return other.admin_userpermission_change(data['token'], int(data['u_id']), int(data['permission_id']))
 
 
-@APP.route("/other/successful/permissions", methods=['POST'])
-def other_if_successful_permission():
-    '''
-    Check if permission change was successful
-    '''
-    data = request.get_json()
-    return dumps(other.is_successful_in_change_permissions(data['user_1'], data['user_2']))
-
-
 @APP.route("/clear", methods=['DELETE'])
 def other_clear():
     '''
