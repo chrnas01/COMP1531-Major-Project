@@ -42,11 +42,9 @@ def standup_start(token, channel_id, length):
     standup = {}
     for standup in other.data['standup']:
         if standup['channel_id'] == channel_id:
-            break
-
-    if standup['time_finish'] <= current_time:
-        other.data['standup'].remove(standup)
-
+            if standup['time_finish'] <= current_time:
+                other.data['standup'].remove(standup)
+    
     return {
         'time_finish': other.data['standup'][-1]['time_finish']   # Access last element of list
     }
@@ -124,11 +122,8 @@ def standup_send(token, channel_id, message):
 
     standup_msg = user['handle_str'] + ': ' + message + '\n'
 
-    standup = {}
     for standup in other.data['standup']:
         if standup['channel_id'] == channel_id:
-            break
-
-    standup['message'].append(standup_msg)
+            standup['message'].append(standup_msg)
 
     return {}

@@ -72,7 +72,7 @@ def channel_details(token, channel_id):
                     'profile_img_url': user['profile_img_url'],
                 }
                 list_owner_members.append(temp_dict)
-                break
+                
 
     list_all_members = []
     for u_id in all_members:
@@ -86,7 +86,7 @@ def channel_details(token, channel_id):
                     'profile_img_url': user['profile_img_url'],
                 }
                 list_all_members.append(temp_dict)
-                break
+                
 
 
     return {
@@ -113,7 +113,7 @@ def channel_messages(token, channel_id, start):
     if channel_id > len(other.data['channels']):
         raise InputError('Channel ID is not a valid channel')
 
-    #Check that the start is within the number of messages
+    # Check that the start is within the number of messages
     if start > len(other.data['messages']):
         raise InputError('Start is greater than the total number of messages in the channel')
 
@@ -126,7 +126,7 @@ def channel_messages(token, channel_id, start):
 
     messages = []
 
-    #sends the standup message
+    # Sends the standup message
     for standup_item in other.data['standup']:
         if standup_item['channel_id'] == channel_id:
             if not standup.standup_active(token, channel_id)['is_active']:

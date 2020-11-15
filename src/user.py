@@ -54,8 +54,6 @@ def user_profile_setname(token, name_first, name_last):
         if user['u_id'] == current_user:
             user['name_first'] = name_first
             user['name_last'] = name_last
-            break
-
 
     return {
     }
@@ -117,8 +115,6 @@ def user_profile_sethandle(token, handle_str):
     for user in other.data['users']:
         if user['u_id'] == current_user:
             user['handle_str'] = handle_str
-            break
-
 
     return {
     }
@@ -141,6 +137,5 @@ def user_delete(token, u_id):
     for user in other.data['users']:
         if user['u_id'] == u_id:
             other.data['users'].remove(user)
-            break
 
     return {}

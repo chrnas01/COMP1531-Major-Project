@@ -57,7 +57,6 @@ def message_remove(token, message_id):
     msg_exist = False
 
     msg = {}
-
     for msg in other.data['messages']:
         if msg['message_id'] == message_id:
             msg_exist = True
@@ -94,10 +93,9 @@ def message_edit(token, message_id, message):
         raise AccessError('Invalid Token')
 
     msg = {}
-
-    for msg in other.data['messages']:
-        if msg['message_id'] == message_id:
-            break
+    for msg2 in other.data['messages']:
+        if msg2['message_id'] == message_id:
+            msg = msg2
 
     #check they are deleting their own message
     if msg['u_id'] != other.token_to_uid(token):
@@ -176,9 +174,10 @@ def message_react(token, message_id, react_id):
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    for msg in other.data['messages']:
-        if msg['message_id'] == message_id:
-            break
+    msg = {}
+    for msg2 in other.data['messages']:
+        if msg2['message_id'] == message_id:
+            msg = msg2
 
     # Check that the user is a member of the channel in which the message was sent
     if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['all_members']:
@@ -188,9 +187,10 @@ def message_react(token, message_id, react_id):
     if all(react_id != temp_react['react_id'] for temp_react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
 
-    for react in msg['reacts']:
-        if react['react_id'] == react_id:
-            break
+    react = {}
+    for react2 in msg['reacts']:
+        if react2['react_id'] == react_id:
+            react = react2
 
     if react['is_this_user_reacted']:
         raise InputError('''Message with ID message_id already contains an active 
@@ -210,9 +210,10 @@ def message_unreact(token, message_id, react_id):
     if other.token_to_uid(token) == -1:
         raise AccessError('Invalid Token')
 
-    for msg in other.data['messages']:
-        if msg['message_id'] == message_id:
-            break
+    msg = {}
+    for msg2 in other.data['messages']:
+        if msg2['message_id'] == message_id:
+            msg = msg2
 
     # Check that the user is a member of the channel in which the message was sent
     if other.token_to_uid(token) not in other.data['channels'][msg['channel_id'] - 1]['all_members']:
@@ -222,9 +223,10 @@ def message_unreact(token, message_id, react_id):
     if all(react_id != temp_react['react_id'] for temp_react in other.valid_reacts):
         raise InputError('react_id is not a valid React ID')
 
-    for react in msg['reacts']:
-        if react['react_id'] == react_id:
-            break
+    react = {}
+    for react2 in msg['reacts']:
+        if react2['react_id'] == react_id:
+            react = react2
 
     if not react['is_this_user_reacted']:
         raise InputError('''Message with ID message_id does not 

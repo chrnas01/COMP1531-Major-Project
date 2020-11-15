@@ -1,13 +1,14 @@
 '''
 tests for channel.py
 '''
+import time
 import pytest
 import auth
 import channel
 import channels
 from error import InputError, AccessError
 import other
-
+import standup
 ########################################################
 
 @pytest.fixture
@@ -249,6 +250,27 @@ def test_channel_messages_success(setup):
 
     # Create a private channel
     channel_data = channels.channels_create(user_3['token'], 'test channel', True)
+
+    standup.standup_start(user_3['token'], channel_data['channel_id'], 60)
+
+    assert channel.channel_messages(user_3['token'], channel_data['channel_id'], 0) == {
+        'messages': [], 'start': 0, 'end': -1}
+
+def test_channel_messages_success2(setup):
+    '''
+    successful call
+    '''
+    # Setup pytest
+    _, _, user_3 = setup
+
+    # Create a private channel
+    channel_data = channels.channels_create(user_3['token'], 'test channel', True)
+
+    standup.standup_start(user_3['token'], channel_data['channel_id'], 1)
+
+    time.sleep(1)
+
+    standup.standup_start(user_3['token'], channel_data['channel_id'], 1)
 
     assert channel.channel_messages(user_3['token'], channel_data['channel_id'], 0) == {
         'messages': [], 'start': 0, 'end': -1}

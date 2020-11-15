@@ -266,3 +266,7 @@ def test_extra_email_send_valid_email(setup):
 
     assert other.email_send(
         user_1['token'], 'comp1531dummyemailingbot@gmail.com', "Did it work?") == {}
+
+
+def test_is_empty(setup):
+    assert other.is_empty() == True

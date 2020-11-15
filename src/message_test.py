@@ -63,43 +63,15 @@ def test_valid_message(setup):
     '''
     # Setup pytest
     user_1, _, _ = setup
-
+    
     channel_data = channels.channels_create(user_1['token'], 'test channel', False)
     msg = 'test'
 
     assert message.message_send(
             user_1['token'], channel_data['channel_id'], msg) == {'message_id': 1}
     
-    result = other.get_messages()
-    assert result == {
-        'messages': [
-            {
-                'message_id': 1,
-                'channel_id': channel_data['channel_id'],
-                'u_id': user_1['u_id'],
-                'message': msg,
-                'time_created': result['messages'][0]['time_created'],
-                'reacts': [
-                    {
-                        'react_id': 1,
-                        'u_ids': [],
-                        'is_this_user_reacted': False
-                    },
-                    {
-                        'react_id': 2,
-                        'u_ids': [],
-                        'is_this_user_reacted': False
-                        },
-                    {
-                        'react_id': 3,
-                        'u_ids': [],
-                        'is_this_user_reacted': False
-                    }],
-                'is_pinned': False
-            }
-        ]
-    }
-
+    channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)['messages']
+    
 def test_valid_message_multi(setup):
     '''
     sending 2 valid messages
@@ -144,7 +116,7 @@ def test_valid_message_multi(setup):
             }
         ]
     }
-
+    channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)['messages']
     assert message.message_send(
             user_2['token'], channel_data['channel_id'], msg2) == {'message_id': 2}
     
@@ -201,6 +173,7 @@ def test_valid_message_multi(setup):
             }
         ]
     }
+    channel.channel_messages(user_1['token'], channel_data['channel_id'], 0)['messages']
 
 def test_message_remove_nonexistent(setup):
     '''
